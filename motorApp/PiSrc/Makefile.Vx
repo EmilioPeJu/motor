@@ -1,0 +1,22 @@
+# Makefile.Vx
+TOP = ../../..
+include $(TOP)/config/CONFIG_APP
+#----------------------------------------
+#  ADD MACRO DEFINITIONS AFTER THIS LINE
+
+# The following are used for debugging messages.
+#USR_CFLAGS += -DDEBUG
+#USR_CXXFLAGS += -DDEBUG
+
+# Physik Instrumente (PI) GmbH & Co. KG driver support.
+SRCS.c += ../devPIC844.c ../drvPIC844.c
+
+LIBOBJS = $(SRCS.c:../%.c=%.o)
+LIBNAME = PILib
+
+#Note that the command line that builds the
+#library $(LIBNAME) may be HUGE (>3kB)
+#
+include $(TOP)/config/RULES.Vx
+#----------------------------------------
+#  ADD RULES AFTER THIS LINE

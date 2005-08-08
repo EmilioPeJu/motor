@@ -1,0 +1,14 @@
+# Makefile.Host
+TOP = ../../..
+include $(TOP)/config/CONFIG_APP
+#----------------------------------------
+#  ADD MACRO DEFINITIONS AFTER THIS LINE
+
+USR_DBDFLAGS += -I $(TEMPLATE_TOP)/exampleApp/src
+
+DBDEXPAND = NoMPFInclude.dbd
+DBDNAME = NoMPFApp.dbd
+
+include $(TOP)/config/RULES.Host
+#----------------------------------------
+#  ADD RULES AFTER THIS LINE
