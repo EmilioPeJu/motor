@@ -4,9 +4,9 @@ FILENAME..	devSoft.h
 USAGE... 	This file contains information that is common to
 		all Soft channel device support modules.
 
-Version:	1.6
+Version:	1.10
 Modified By:	sluiter
-Last Modified:	2002/07/05 19:40:57
+Last Modified:	2004/09/23 16:18:12
 */
 
 /*
@@ -27,32 +27,33 @@ Last Modified:	2002/07/05 19:40:57
  *
  * Modification Log:
  * -----------------
+ * .01 06-16-03 rls Converted to R3.14.x.
+ * .02 09-23-04 rls Increase the maximum number of Soft Channel motor records
+ *                  from 20 to 50.
  */
 
 #ifndef	INCdevSofth
 #define	INCdevSofth 1
 
+#include <callback.h>
+
 typedef enum DONE_STATES {SOFTMOVE = 0, HARDMOVE = 1, DONE = 2} DONE_STATES;
 
-#define MAXMSGS 20
+#define MAXMSGS 50
 
 struct soft_private
 {
     CALLBACK callback;
-    long callback_flag;
-#ifdef DMR_SOFTMOTOR_MODS
-    BOOLEAN load_position;
-    long new_position;
-#endif
+    CALLBACK_VALUE callback_flag;
     DONE_STATES dinp_value;		/* Value from DINP link. */
-    BOOLEAN default_done_behavior;	/* If the DINP is not programmed, exhibit
+    bool default_done_behavior;		/* If the DINP is not programmed, exhibit
 					 * "immediate done" default behavior. */
-    BOOLEAN initialized;		/* 1st RDBL call after interruptAccept is TRUE
+    bool initialized;			/* 1st RDBL call after interruptAccept is TRUE
 					 * sets this ON. */
 };
 
-extern long soft_init(int);
-extern long soft_init_record(struct motorRecord *);
+extern long soft_init(void *);
+extern long soft_init_record(void *);
 extern void soft_dinp_func(struct motorRecord *, short);
 extern void soft_rdbl_func(struct motorRecord *, double);
 extern void soft_rinp_func(struct motorRecord *, long);

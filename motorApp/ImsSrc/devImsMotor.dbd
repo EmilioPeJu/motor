@@ -5,5 +5,7 @@ device(motor,VME_IO,devMDrive, "MDrive")
 driver(drvIM483SM)
 driver(drvIM483PL)
 driver(drvMDrive)
-
-
+registrar(IMSmotorRegister)
+variable(drvIM483SMdebug)
+variable(drvIM483PLdebug)
+variable(drvMDrivedebug)

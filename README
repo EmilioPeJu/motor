@@ -1,8 +1,7 @@
-Motor Record R4-9-4 Release Notice
+Motor Record R5-6 Release Notice
 ===============================================================================
 
-The motor record software in this release is compatible with EPICS base
-R3.13.5 thru R3.13.10.
+The motor record software in this release is compatible with EPICS base R3-14-7.
 
 
 Contents
@@ -14,33 +13,33 @@ This <supporttop> contains the following motor record related items:
 	- device/driver libraries for various controllers.
 	- motor record/device/driver level documentation.
 	- motor record release documentation.
-	- two example applications; one without MPF (i.e. motorExApp/NoMPF) and
-		one with MPF (i.e., motorExApp/WithMPF).
+	- two example applications; one without ASYN (i.e. motorExApp/NoMPF) and
+		one with ASYN (i.e., motorExApp/WithMPF). See the README files
+		under <motor>/iocBoot/* for configuration instructions.
 
 As distributed, this support directory only builds the following:
-	- motorLib; Record support and common code for all device/drivers.
+	- motor; Record support and common code for all device/drivers.
 
 Optionally, any of the following device/driver libraries can be built by
 uncommenting the appropriate line in ./motorApp/Makefile.
-	ImsLib - Intelligent Motion Systems (IMS) controllers; ImsSrc
-		 directory.
-	newportLib - Newport controllers; NewportSrc directory.
-	omsLib - Oregon Micro System (OMS) controllers; OmsSrc directory.
-	AcsLib - Advanced Control Systems controllers; AcsSrc directory.
-	MclennanLib - Mclennan controllers; MclennanSrc directory.
-	softMotorLib - Soft Channel device support; SoftMotorSrc directory.
-	motorCOM_mpf - Communication interface between motor device/drivers and
-		MPF; CommSrc directory.
-	PILib - Physik Instrumente (PI) GmbH & Co. controllers; PiSrc
+	Acs - Advanced Control Systems controllers; AcsSrc directory.
+	DeltaTau - Delta Tau controllers; DeltaTauSrc directory.
+	Ims - Intelligent Motion Systems (IMS) controllers; ImsSrc directory.
+	Mclennan - Mclennan controllers; MclennanSrc directory.
+	Micos - Micos controller; MicosSrc directory.
+	MicroMo - MicroMo controllers; MicroMoSrc directory.
+	Newport - Newport controllers; NewportSrc directory.
+	oms - Oregon Micro System (OMS) controllers; OmsSrc directory.
+	PI - Physik Instrumente (PI) GmbH & Co. controllers; PiSrc
 		directory.
-	MicroMoLib - MicroMo controllers; MicroMoSrc directory.
-	MicosLib - Micos controller; MicosSrc directory.
+	softMotor - Soft Channel device support; SoftMotorSrc directory.
+
 
 Configuration
 =============
 The following files can be edited to tailor this distribution to site specific
 needs.  See individual files for instructions.
-	- ./config/RELEASE: Define location of external products.
+	- <motor>/configure/RELEASE: Define location of external products.
 	
 		If only VMEbus based motor controllers (e.g., OMS, Highland
 		V544) and/or Soft Channel device support is used, then only
@@ -48,19 +47,19 @@ needs.  See individual files for instructions.
 
 		For serial and/or GPIB motor controller communication, ALL of
 		the following support modules are required;
-			- EPICS_BASE R3.13.2 or above.
-			- MPF V1.5 or above.
-			- MPF_SERIAL V1.1 or above
-			- either MPF_GPIB V1.3 or GPIB V0.1 or above.
+			- EPICS base R3-14-7
+			- ASYN R4-2
 		
 		If any example applications (motorExApp) are to be built, then
 			TEMPLATE_TOP and MSITOP must be defined.
 
-	- ./motorApp/Makefile: Define which device/driver modules to build.
+	- <motor>/motorApp/Makefile: Define which device/driver modules to build.
+	- ./Makefile: uncomment the following to build example applications.
+		#DIRS := $(DIRS) $(filter-out $(DIRS), motorExApp)
+		#DIRS := $(DIRS) $(filter-out $(DIRS), iocBoot)
 	- ./motorExApp/Makefile: Define which, if any, example applications are
 		to be built.
 		
-Newport - Newport device drivers require both MPF_SERIAL and MPF_GPIB support.
 
 
 Known Problems
@@ -69,150 +68,203 @@ Known Problems
 1) The PAUSE function of the SPMG field only works if the RTRY field is
 	nonzero.  This bug existed as far back as V3.3 of the motor record.
 
-2) Backlash correction does not work with jogging for the Newport ESP300.  This
-	is due to postProcess() in motorRecord.c concatenating two moves into
-	one command line.
+2) MM4005 only.  On the first attempt to move off an activated limit switch,
+	the motor moves to where it was commanded.  However, the motor record's
+	positions (both target and readback) do not reflect the move.  This
+	is because of the following sequence of events:
+
+	- a limit (i.e., laser light beam) violation occurs.  The Newport
+	controller turns motor power off.
+	- the axis stops at position X.
+	- a move command is issued in the opposite direction.
+	- after a delay of between 16.67 ms and 33.33 ms, a motor status
+	(i.e., MS) query is issued to the MM4005.
+	- the motor status response indicates the axis is NOT in motion
+	and motor power is OFF (the motor record interprets this as "Done
+	Moving" true).
+	- a "read actual positions" command is issued.
+	- the actual position response indicates the axis is still at
+	position X.
+	- the controller turns motor power on and the axis moves to the
+	requested position.
 
 3) The OMS VME58 servo motor controller board (i.e., model -8S) is unable to
 	move off an activated limit switch.  Users are advised to avoid this
-	situation.
+	situation.  This problem is fixed with the MAXv model.
 
 
-Modification Log from R4-9-3 to R4-9-4
-======================================
-
-1) Activate the Status Update field (STUP) whenever the record is processed
-	and there is nothing else to do.  This change allows a user to
-	configure a motor record for periodic status updates through the SCAN
-	field.
-
-	File modified: - do_work() in motorRecord.c
-
-2) Added a retry on initial communication with the Physik Instrumente (PI)
-	C-844 motor controller.  It was intermittently not responding after an
-	IOC power-cycle.
-	
-	File modified: - motor_init() in drvPIC844.c
-
-Modification Log from R4-9-2 to R4-9-3
-======================================
-
-1) drvBitBus.o was removed from EPICS base R3-13-10.  Since drvGpib.o in
-	R3-13-10 still has an unresolved external reference to "drvBitBus",
-	the BITBUS module was added to the config/RELEASE file and
-	motorExApp/WithMPF/Makefile.Vx was modified so that the user can select
-	whether to get drvBitBus.o from EPICS base or from the BITBUS support
-	module.
-
-	Files modified: - config/RELEASE
-			- motorExApp/WithMPF/Makefile.Vx
-
-2) The Newport MM3000 enable/disable torque control field (CNEN) was not
-	working; the axis specifier was missing from the commands.
-
-	File modified: - devMM3000.c
-
-3) Modified the <motor>/motorApp/op/adl/motorx_all.adl file by changing the
-	"STATUS" header in the lower right corner to a status update button.
-	
-	File modified: - <motor>/motorApp/op/adl/motorx_all.adl
-
-4) Kevin Peterson modified MicroMo MVP 2001 B02 device support as follows:
-	- lowered minimum current limit to 50mA.
-	- added an extra call to recv_mess during the controller-detection part
-	of motor_init to clear "MVP2001 Ready" messages that some MVP2001s
-	append to the first response after power-up.
-	- added a task delay to send_message because MVME2700 processors send
-	commands to the MVP2001 faster than it can process them.
- 
-	Files modified: - devMVP2001.c and drvMVP2001.c
-	
-5) An error was introduced into the Newport MM3000 device driver with R4-8,
-	item #4 below.  The driver was confusing a valid response with the
-	"system error" response from the controller.
-
-	File modified: - drvMM3000.cc
-
-
-Modification Log from R4-9-1 to R4-9-2
-======================================
-
-1) A delay was added to the driver support with R3-5 to prevent motor
-	controller status updates from reading "stale data".  This problem
-	arose under the following scenario;
-	- Start a motor move which is in the opposite direction from the
-	previous move.
-	- Immediately (e.g., < 1ms) ask the controller for status information
-	that includes the motor's direction.
-	- For OMS controllers the update rate is 1ms.  Intermittently, the
-	status information returned from the OMS controller would indicate that
-	the direction had not changed; hence the term "stale data".
-	
-	This problem was fixed by inserting a delay between the start of motor
-	motion and the first status update.  Unfortunately, the delay was
-	implemented in such a way as to have an undesirable side effect for VME
-	based controllers (i.e., OMS) that interrupt on motion complete.
-	Namely, if the motor move time was less than approximately two VxWorks
-	system clock ticks (33.33 ms for a 60HZ system clock), than the
-	response time to the controller signally motion complete was based on
-	the polling rate, rather than the done interrupt latency.
-
-	This problem has been fixed by having query_axis() in motordrvCom.c
-	return the remaining delay time to motor_task(), so that motor_task()
-	can delay for the remainder of the delay rather than the larger polling
-	rate.
-
-	File modified: - motor_task() and query_axis() in motordrvCom.c.
-
-2) The IMS MDrive driver support had the input terminator incorrectly defined.
-
-	File modified: - drvMDrive.c
-
-
-Modification Log from R4-9 to R4-9-1
-====================================
-
-1) Eliminated the erroneous "Motor motion timeout ERROR" that would occur if
-	the user repeats 10 consecutive commands that include a controller
-	update command (i.e., INFO) without any intervening motor moves.
-	Modified all drivers to suspend incrementing the "no_motion_count" when
-	the motor is not moving.
-
-	Files modified: - set_status() in all drivers.
-
-2) PID parameters (i.e., PCOF, ICOF and DCOF fields) were not initialized at
-	boot-up.  With this release, if the GAIN_SUPPORT bit in the MSTA is
-	true, each nonzero, PID parameter will be initialized.  For backwards
-	compatibility, zero valued PID parameters will not be initialized.
-
-	File modified:    motor_init_record_com() in motordevCom.c
-
-3) A bug was introduced when item #2, under R4.6 was fixed. This error
-	occurred when the SET/USE field was in the SET mode and the FOFF field
-	was in the FROZEN mode.  Under these conditions, if the user entered
-	a new RVAL, the record ignored every other new RVAL; with every other
-	new DVAL that the user entered, RVAL was not updated.  VAL always
-	worked.
-
-	File modified:	- load_pos() in motorRecord.c modified so that LVAL
-				is updated when FOFF is in the FROZEN mode.
-
-4) Previous releases of the IMS MDrive device driver did not work.  Thanks to
-	Kevin M. Peterson (UNI-CAT) for identifying and fixing the errors in
-	previous releases.  A README file has been added to the ImsSrc
-	directory that documents how the MDrive must be initialized before
-	using it with this device driver.
-
-	Files modified: - Added README file.
-			- drvMDrive.c; incorporated Kevin's modifications.
-			- devMDrive.c; Added encoder support.
-
-
-Modification Log from R4-8 to R4-9
+Modification Log from R5-5 to R5-6
 ==================================
 
-1) The STUP field (Status Update) has been modified due to bug fixes.  The STUP
-	field functions as follows;
+1) IMS MDrive modifications;
+	1) Support flexible configuration of limit switches (see
+		<motor>/motorApp/ImsSrc/README file).
+	2) User must configure MDrives' Echo Mode Flag to two (EM=2).
+
+	Files modified: drvIM483.h and drvMDrive.cc
+
+2) Removed code from record level code that rounded-up absolute and relative
+	positions before passing them on the device level code.  Any rounding
+	required for controllers that communicate in integer values (motor
+	steps) must be done at the device level.
+	
+	File modified: do_work() in motorRecord.cc
+
+3) Modifications made to OMS device drivers that allow omsLib to be built, but
+	not ran, for solaris and linux targets.
+
+	Files modified: in motorApp/OmsSrc; Makefile, devOmsCom.cc, drvMAXv.cc,
+			drvOms.cc and drvOms58.cc
+
+4) Override invalid acceleration rates and output an error message for OMS
+	devices only.
+
+	File modified: devOmsCom.cc
+
+5) Replaced hardcoded task/thread stack size and priority values with generic
+	OSI values in all epicsThreadCreate() calls.
+
+	Files modified: All drivers.
+
+6) Removed the MPF based directory <motor>/motorExApp/ipServerApp from the
+	distribution.
+
+	Files modified: Removed ipServerApp from <motor>/motorExApp/Makefile
+
+
+Modification Log from R5-4 to R5-5
+==================================
+
+
+1) Removed the <motor>/motorExApp/Db directory.  R3.13.x  versions of the motor
+	distribution needed some way to convert *.substitutions files into *.db
+	files, because it could not rely on the synApps version of
+	dbLoadTemplates().  This is not required with R3.14.x since "motor" is
+	able to use the EPICS base version of dbLoadTemplates().  This, in
+	turn, means that all the *.substitutions have been moved to their
+	respective iocBoot directories and loaded directly by
+	dbLoadTemplates().
+
+2) The motor record would get into an invalid state when it attempted to
+	perform a backlash correction move in the direction of an activated
+	limit switch.
+
+	File modified: - update CDIR in postProcess() in motorRecord.cc
+
+3) Ported all affected device drivers to R4-1 of asyn.
+
+	Files modified - all serial and/or GPIB based drivers.
+
+4) Slew acceleration calculations were incorrect.  Instead of the correct
+	calculation; A = (Vf - Vo) / t, the record was using A = Vf / t,
+	which is correct only if Vo (VBAS) is zero.  Thanks to Harvey Rarback
+	for pointing out this long standing error.
+
+	File modified - motorRecord.cc
+
+5) Modifications for EPICS R3.14.7 compatibility.
+
+	Files modified - devSoftAux.cc; changes to epicsThread.h required
+			 adding an explicit "#include <stdlib.h>".
+
+6) Modifications for MicroSoft Visual C compiler compatibility.  Changed all
+	occurrences of epicsExportAddress(); to extern "C"
+	{epicsExportAddress();}.
+
+	Files modified - most all.
+
+7) Eliminated calls to devConnectInterrupt() due to C++ problems with devLib.h;
+	i.e. "sorry, not implemented: `tree_list' not supported..." compiler
+	error message.
+
+	Files modified - drvOms.cc, drvOms58.cc and drvMAXv.cc
+
+8) Omitted iocshRegister() call to resister PIC844Config().
+
+	Files modified - PiRegister.cc
+
+9) Added MM4006 to the list of controllers supported by the Newport MM4000
+	device driver.
+
+	Files modified - drvMM4000.cc
+
+
+Modification Log from R5-3 to R5-4
+==================================
+
+1) Mark Rivers and I converted the motor record device drivers from MPF to
+	ASYN.
+
+	Files modified: too numerous to list.
+
+2) OMS MAXv device support was added.
+
+	Files added: to the motorApp/OmsSrc directory; drvMAXv.h, devMAXv.cc
+                     and drvMAXv.cc.
+
+3) In order to support the maximum number of motors per board for the Delta Tau
+	PMAC motor controller (32), several changes have been made to all
+	driver level code.
+
+	- The "maximum number of axis per board" definition in motor.h
+	(MAX_AXIS) was increased from 10 to 32.
+
+	- The "driver_table" structure in motordrvCom.h was modified by
+	changing the "axis_names" member from a "char *" to a "char **".  The
+	third argument of the sendmsg() declaration was changed from a "char"
+	to a "char *".
+
+	- The "axis name" argument of sendmsg() was changed from a "char" to a
+	"char *" in all drivers.  Those drivers that used the axis name
+	argument of send_mess() were modified accordingly.
+
+	- Those device drivers that defined an array of axis names in the
+	driver (e.g., MAXv, PIC844) where redefined from an array of char's to
+	an array of strings.
+	
+	Files modified: too numerous to list.
+
+4) If the motor record is processed and there are no functions to perform
+	(i.e., no current or outstanding move request) then the motor record
+	will perform a status update using the STUP field.
+
+	File modified: do_work() in motorRecord.cc determines that the record
+			is not being processed as a result of a call back and
+			that there is nothing to do.
+
+5) Delta Tau PMAC device support was added.
+
+	Files added: added the motorApp/DeltaTauSrc directory.
+	
+
+Modification Log from R5-2 to R5-3
+==================================
+
+1) The update (polling) rate for the "OMS VME8/44" device driver was incorrect.
+
+	File modified: - omsSetup() in drvOms.cc.
+
+2) When TWV is set to less than MRES, the following scenario would result.
+	First, tweak forward (TWF).  Since DIFF < MRES, the motor is not moved.
+	Next, tweak reverse (TWR).  Next TWF again.  The motor record does not
+	respond; i.e., DVAL and RVAL are not updated; VAL is not posted.
+	A single tweak, back and forth, confirms that the motor record is not
+	responding.
+	The problem was that do_work() in motorRecord.c was performing the "no
+	move" test before testing for new positions and posting new positions.
+
+	File modified: - do_work() in motorRecord.cc
+
+3) The motor record would lock-up when a user tried to move off an activated
+	limit switch with the OMS VME58 servo motor controller board (i.e.,
+	model -8S).  See above "Known Problems" item #3.
+
+	File modified: - set_status() in drvOms58.cc; had to force CDIR to
+			match the limit switch polarity for record level code
+			to see the limit switch error condition.
+			
+4) Added the STUP field (Status Update) to the motor record that allows
+	continuous status updates.  The STUP field functions as follows;
 
 	- the valid values for STUP are OFF(0), ON(1) and BUSY(2).
 
@@ -228,51 +280,90 @@ Modification Log from R4-8 to R4-9
 	thus the incurred overhead) at which the CA client writes ON(1) to
 	STUP.
 
-	With the STUP field it is possible to have another EPICS record
-	periodically write ON(1) to the motor record's STUP field.  This would
-	result in continuous, periodic status updates.  Under certain
-	circumstances, item #2 under "Known Problems" will occur with the use
-	of STUP.  This will be fixed in a later release.
+	With the STUP field it is possible to have another EPICS record whose
+	SCAN field (e.g.,  Calcout record) is set to periodically scan.  This
+	record could periodically write ON(1) to the motor record's STUP
+	field.  This would result in continuous, periodic status updates.
+	Under certain circumstances, item #2 under "Known Problems" will occur
+	with the use of STUP.  This will be fixed in a later release.
 
 	Files modified: - MotorSrc/motorRecord.dbd
-			- MotorSrc/motorRecord.c
+			- MotorSrc/motorRecord.cc
 
-2) Added support for the Physik Instrumente (PI) GmbH & Co. C-844 motor
-	controller.
-	
-	Files added: 	- PiSrc directory.
-			- devPIC844.c, devPIMotor.dbd, drvPI.h, drvPIC844.c
+5) Eliminated the erroneous "Motor motion timeout ERROR" that would occur if
+	the user repeats 10 consecutive commands that include a controller
+	update command (i.e., INFO) without any intervening motor moves.
+	Modified all drivers to suspend incrementing the "no_motion_count" when
+	the motor is not moving.
 
-3) Kevin Peterson added support for the MicroMo MVP 2001 B02 controller.
-	
-	Files added: 	- MicroMoSrc directory.
-			- devMVP2001.c, devMicroMo.dbd, drvMVP2001.h,
-			  drvMVP2001.c
+	Files modified: - set_status() in all drivers.
 
-4) Kurt Goetze added support for the Micos MoCo dc controller.
-	
-	Files added: 	- MicosSrc directory.
-			- devMicos.c, devMicos.dbd, drvMicos.h, drvMicos.c
+6) PID parameters (i.e., PCOF, ICOF and DCOF fields) were not initialized at
+	boot-up.  With this release, if the GAIN_SUPPORT bit in the MSTA is
+	true, each nonzero, PID parameter will be initialized.  For backwards
+	compatibility, zero valued PID parameters will not be initialized.
+
+	File modified:    motor_init_record_com() in motordevCom.cc
+
+7) A bug was introduced when item #2, under R5.1 was fixed. This error
+	occurred when the SET/USE field was in the SET mode and the FOFF field
+	was in the FROZEN mode.  Under these conditions, if the user entered
+	a new RVAL, the record ignored every other new RVAL; with every other
+	new DVAL that the user entered, RVAL was not updated.  VAL always
+	worked.
+
+	File modified:	- load_pos() in motorRecord.c modified so that LVAL
+				is updated when FOFF is in the FROZEN mode.
+
+8) Item#5 under R5-2 was not fixed.  There was still a problem in the logic
+	that enforced a time delay between UNDEFINED or IMMEDIATE type commands.
+	On OMS VME58 controllers an INFO update after a LOAD_POS command would,
+	intermittently, yield the previous position.
+
+	File modified: process_messages() in motordrvCom.cc modified so that a
+			valid "delay" in process_messages() is limited to,
+			0 <= delay <= (quantum * 2).
+
+9) Previous releases of the motor record forced the sign of ERES to match the
+	sign of MRES.  With this release, ERES and MRES may have different
+	signs.  This allows the user to change the sign of ERES rather than
+	reverse encoder wires when the motor and encoder direction are
+	reversed.  Warning! This does not work with controllers that are doing
+	closed-loop control; e.g., DC motors.  Reference (D/A) and feedback
+	(encoder) signals must have the same polarity for DC motors or the
+	motor will literally run away.
+
+	File modified: do_work() in motorRecord.cc
+
+10) Previous releases of the IMS MDrive device driver did not work.  Thanks to
+	Kevin M. Peterson (UNI-CAT) for identifying and fixing the errors in
+	previous releases.  A README file has been added to the ImsSrc
+	directory that documents how the MDrive must be initialized before
+	using it with this device driver.
+
+	Files modified: - Added README file.
+			- drvMDrive.cc; incorporated Kevin's modifications.
+			- devMDrive.cc; Added encoder support.
+
+11) The following three device drivers have been ported from the R3.13.x
+	compatible version of the motor record:
+        - the Physik Instrumente (PI) GmbH & Co. C-844 motor controller.
+	- Kevin Peterson's support for the MicroMo MVP 2001 B02 controller.
+	- Kurt Goetze's support for the Micos MoCo dc controller.
 
 
-Modification Log from R4-7 to R4-8
+Modification Log from R5-1 to R5-2
 ==================================
 
-1) With release R4-5, DBE_LOG was omitted from the event select mask of all
-	db_post_events() calls.  This prevented archival clients from being
-	notified of process variable changes.  With this release, DBE_LOG is
-	on for all calls to db_post_events()
-	
-	Files modified: - motorRecord.c, motordevCom.c and devSoft.c
+1) Communication with the Newport MM3000 motor controller was getting out of
+	synchronization whenever the MM3000 responded with an error message.
+	This problem was resolved by having recv_mess() in drvMM3000.c detect
+	an error message response, print the error message and then,
+	recursively, call itself.  This restored communication transmit/receive
+	synchronization.
+	File modified: - recv_mess() in drvMM3000.cc
 
-2) Mark Rivers added support for the Mclennan PM600 controller and fixed limit
-	switch error detection in the PM304.
-
-	Files modified: - MclennanSrc/devPM304.c
-			- MclennanSrc/drvPM304.c
-			- MclennanSrc/drvPM304.h
-
-3) Spurious interrupts were occurring with OMS VX2-006 ver 1.04 controller
+2) Spurious interrupts were occurring with OMS VX2-006 ver 1.04 controller
 	boards.  For the sake of throughput, the OMS VME8/44 device driver
 	enables the done (DON_E) and input buffer full (IBF_E) interrupts, but
 	disables the transmit buffer empty (TBE_E).
@@ -293,47 +384,35 @@ Modification Log from R4-7 to R4-8
 	This problem has been fixed by using all of the OMS board interrupts
 	(i.e., enable transmit buffer empty).  The OMS VME8/44/VX2/VS4 design
 	is limited with regard to interrupts by an all or none choice.
+
+	In addition, the following modifications were made to the OMS8/44
+	device driver;
+	- Moved the OMS specific data structure "irqdatastr" from motordrvCom.h
+	to drvOms.h.
+	- Changed recv_rng and send_rng in irqdatastr from C to C++ interface.
+	- Added epicsThreadSleep() calls to omsGet() and omsPut() in drvOms.cc
+	during delays.
 	
 	Files modified: - OmsSrc/drvOms.h; enable TBE_E interrupt.
-			- OmsSrc/drvOms.c; support TBE_E interrupt in.
+			- OmsSrc/drvOms.cc; support TBE_E interrupt.
+			- MotorSrc/motordrvCom.h
 
-4) Communication with the Newport MM3000 and PM500 motor controllers were
-	getting out of synchronization whenever the controller responded with
-	an error message.  This problem was resolved by having recv_mess()
-	detect an error message response, print the error message and then,
-	recursively, call itself.  This restored communication transmit/receive
-	synchronization.  Added "defensive" code to devMM3000.c
-
-	File modified:	- recv_mess() in drvMM3000.c and drvPM500.c
-			- devMM3000.c
-
-5) With release R4-7, there was a slight (undocumented) modification made to
+3) With release R4-7, there was a slight (undocumented) modification made to
 	the way that backlash correction functioned. If a move is in the
 	preferred direction and the backlash speed and acceleration are the
 	same as the slew speed and acceleration, then the backlash move is
 	skipped and the motor moves directly to the target position.
 	
-	Unfortunately, there was a bug in the logic that appeared only when
-	MRES < 0.  When MRES < 0, and the backlash speed and acceleration were
-	the same as the slew speed and acceleration, the motor record did the
+	Unfortunately, there was a bug in the logic that appeared only when MRES
+	< 0.  When MRES < 0, and the backlash speed and acceleration were the
+	same as the slew speed and acceleration, the motor record did the
 	opposite of the requirements; i.e., it did backlash correction when the
 	move was in the preferred direction and did not do backlash correction
 	when the move was not in the preferred direction.
 
-	File modified: - do_work() in motorRecord.c
+	File modified: - do_work() in motorRecord.cc
 
-6) Limit switch error detection bug fix for Advanced Control Systems, Corp. 
-	model MCB-4B by Mark Rivers.
-
-	File modified: - set_status() in drvMCB4B.c
-
-7) Mark Rivers added the serialIOSendRecv() for atomic send/receive to CommSrc
-	facility.
-
-	Files modified	- CommSrc/serialIO.h
-			- CommSrc/serialIOMPF.cc
-
-8) The Newport ESP300 would randomly crash at boot-up because an internal
+4) The Newport ESP300 would randomly crash at boot-up because an internal
 	parameter ("drive_resolution") was not always, under all
 	configurations, initialized.  With this release, the "drive_resolution"
 	is set based on the response to the ESP300 "SU?" command.  In addition,
@@ -345,14 +424,29 @@ Modification Log from R4-7 to R4-8
 	File added:     - NewportSrc/README (notes on serial communication and
 				ESP300 configuration).
 
-9) Mark Rivers added a work around for a Newport MM4000/5 firmware bug
-	(versions 2.40 and 2.44) in which the controller reports the motor as
-	done moving on the first poll after a move is begun subsequent to motor
-	power off.  This fix only works if drvMM4000ReadbackDelay is used.
-	
-	File modified: - set_status() in drvMM4000.c
+5) There were two timing related bugs with the previous release (R5.1).  First,
+	the update rate was not working properly.  The end result was that the
+	motor task was polling controllers as fast as possible.  Second, there
+	was an error in the motor_task function process_messages() that
+	enforces a time delay between UNDEFINED or IMMEDIATE type commands
+	(e.g., LOAD_POS, SET_ENC_RATIO, etc.) and an INFO type command.  One
+	result of this error was that on OMS VME58 controllers an INFO update
+	after a LOAD_POS command would, intermittently, yield the previous
+	position.
 
-10) Although there is no explicit statement in the motor record documentation,
+	File modified: motor_task() and process_messages() in motordrvCom.cc
+
+6) Backlash correction after jogging was not working for controllers that do
+	not support multiple position commands on the same command line (e.g.,
+	Newport ESP300).  This has been corrected with this release with one
+	caveat; in contrast to the feature described in item#3 above, backlash
+	correction is always done after jogging, regardless of the jog
+	acceleration and speed parameters.
+
+	File modified: Added extra jog backlash states to postProcess() in
+			motorRecord.cc
+
+7) Although there is no explicit statement in the motor record documentation,
 	most user's would expect the "Readback settle time" field (DLY) to
 	update the readback after the delay timeout.  It did not do this.
 	With this release, the readback is updated one time after the timeout.
@@ -364,109 +458,8 @@ Modification Log from R4-7 to R4-8
 	
 	File modified: - callbackFunc() and process() in motorRecord.cc
 
-11) When TWV is set to less than MRES, the following scenario would result.
-	First, tweak forward (TWF).  Since DIFF < MRES, the motor is not moved.
-	Next, tweak reverse (TWR).  Next TWF again.  The motor record does not
-	respond; i.e., DVAL and RVAL are not updated; VAL is not posted.
-	A single tweak, back and forth, confirms that the motor record is not
-	responding.
-	The problem was that do_work() in motorRecord.c was performing the "no
-	move" test before testing for new positions and posting new positions.
 
-	File modified: - do_work() in motorRecord.c
-
-12) The motor record would lock-up when a user tried to move off an activated
-	limit switch with the OMS VME58 servo motor controller board (i.e.,
-	model -8S).  See above "Known Problems" item #4.
-
-	Files modified: - set_status() in drvOms58.c; had to force CDIR to
-			match the limit switch polarity for record level code
-			to see the limit switch error condition.
-			- do_work() in motorRecord.c; Set CDIR before sending
-			motor commands so set_status() in drvOms58.c always
-			sees the updated CDIR.
-
-13) Added the STUP field (Status Update) to the motor record that allows
-	continuous status updates.  The STUP field functions as follows;
-
-	- the valid values for STUP are YES(1) and NO(0).
-
-	- a Channel Access (CA) client writes YES(1) to the STUP field which
-	causes the motor record to set STUP back to NO(0) and do a single
-	controller status update.
-
-	- there are no restrictions on when a CA client could can write YES(1)
-	to STUP (motor moving or motor stopped).
-
-	- it is the responsibility of the user to restrict the frequency (and
-	thus the incurred overhead) at which the CA client writes YES(1) to
-	STUP.
-
-	With the STUP field it is possible to have another EPICS record whose
-	SCAN field (e.g.,  Calcout record) is set to periodically scan.  This
-	record could periodically write YES(1) to the motor record's STUP
-	field.  This would result in continuous, periodic status updates.
-	Under certain circumstances, item #2 under "Known Problems" will occur
-	with the use of STUP.  This will be fixed in a later release.
-
-	Files modified: - MotorSrc/motorRecord.dbd
-			- MotorSrc/motorRecord.c
-
-
-Modification Log from R4-6 to R4-7
-==================================
-
-1) An uninitialized pointer error check was omitted from a Newport ESP300
-	device function.  This resulted in a bus error at boot-up if the IOC
-	failed to connect to the ESP300 controller.
-	
-	File modified: ESP300_init_record() in the devESP300.c
-
-2) "device directive" support has been extended to the PREM and POST fields for
-	OMS devices only.  The new device directive supports changing the value
-	of a database variable.  The syntax is as follows:
-
-	PREM - @PUT(<pvname>, <pv-value>, <delay in seconds>)@
-	POST - @PUT(<pvname>, <pv-value>)@
-
-	Note that the PREM supports a delay argument, but that POST does not.
-	The "Readback settle time" field (DLY) should be used to create a time
-	delay after the PV specified in the POST field is written.  See the
-	"Miscellaneous fields" in motorRecord.html for further information on
-	the INIT, PREM and POST fields.
-
-	Files modified: devOmsCom.c, drvOms58.c and drvOms.c
-
-3) Device driver support added for the Intelligent Motion Systems (IMS)
-	MDrive17 model motor controller.
-	
-	Files modified: - [dev/drv]MDrive.c added to ImsSrc/Makefile.Vx
-			- "MDrive" device and driver added to devImsMotor.dbd
-	Files added:	- [dev/drv]MDrive.c added to ImsSrc directory.
-
-4) Eliminated redundant DMOV monitor posting's.  For example, with previous
-	releases the motor record would post DMOV=0 twice if backlash
-	correction was enabled and the user jogged the motor.
-	
-	Files modified: modified postProcess(), process() and load_pos()
-			in motorRecord.c
-
-5) A Home Velocity field (HVEL) was added.
-	Files modified: - HVEL added to motorRecord.dbd
-			- motorRecord.c
-			- op/adl/motorx_setup.adl
-
-6) There is a problem with OMS VME58 ver 2.35-8 firmware when used with
-	MVME2700 CPU boards.  The problem is that the controller board
-	intermittently, reports that there is no limit switch error when there
-	is an error.  This error can occur if the user repeatedly, tries to
-	move in the direction of the limit switch when the limit error
-	condition exits.  A delay has been added to work around the problem.
-
-	File modified: - drvOms58.c; conditional delay added to query_done().
-
-
-Modification Log from R4-5 to R4-6
+Modification Log from R4-5 to R5-1
 ==================================
 
 1) The following scenario would put the motor record into an invalid state.
@@ -481,7 +474,7 @@ Modification Log from R4-5 to R4-6
 	direction in which the motor moves during the backlash-takeout part of
 	a motor move).
 
-	File modified: do_work() in motorRecord.c.  Update last target
+	File modified: do_work() in motorRecord.cc.  Update last target
 			positions and set DMOV TRUE, only if the motion in
 			progress indicator (MIP) is DONE.
 
@@ -491,7 +484,7 @@ Modification Log from R4-5 to R4-6
 	position at the backlash velocity rather than the slew velocity.
 	This bug was discovered by Kevin M. Peterson.
 	
-	File modified: process() in motorRecord.c.  Before calling
+	File modified: process() in motorRecord.cc.  Before calling
 			postProcess() check if the target position has changed.
 
 3) A conflict between the requirements specified in item #2 below and the goal
@@ -533,7 +526,7 @@ Modification Log from R4-5 to R4-6
 	of NTM.
 
 	Files modified: - NTM field added to motorRecord.dbd
-			- process() in motorRecord.c checks NTM field before
+			- process() in motorRecord.cc checks NTM field before
 				sending stop motor command.
 
 4) A Soft Channel device support design limitation was discovered by Tim
@@ -551,12 +544,77 @@ Modification Log from R4-5 to R4-6
 	synchronization due to the readback changing.
 	
 	Files modified: - LOCK field added to motorRecord.dbd
-			- soft_dinp_func() in devSoft.c checks LOCK field
+			- soft_dinp_func() in devSoft.cc checks LOCK field
 				before putting dinp_value into HARDMOVE state.
 
+
 5) Device driver support added for the Newport ESP300 motor controller.
-	Files added: - NewportSrc/devESP300.c
-		     - NewportSrc/drvESP300.c
+	Files added: - NewportSrc/devESP300.cc
+		     - NewportSrc/drvESP300.cc
+
+6) An uninitialized pointer error check was omitted from a Newport ESP300
+	device function.  This resulted in a bus error at boot-up if the IOC
+	failed to connect to the ESP300 controller.
+	
+	File modified: ESP300_init_record() in the devESP300.cc
+
+7) "device directive" support has been extended to the PREM and POST fields for
+	OMS devices only.  The new device directive supports changing the value
+	of a database variable.  The syntax is as follows:
+
+	PREM - @PUT(<pvname>, <pv-value>, <delay in seconds>)@
+	POST - @PUT(<pvname>, <pv-value>)@
+
+	Note that the PREM supports a delay argument, but that POST does not.
+	The "Readback settle time" field (DLY) should be used to create a time
+	delay after the PV specified in the POST field is written.  See the
+	"Miscellaneous fields" in motorRecord.html for further information on
+	the INIT, PREM and POST fields.
+
+	Files modified: devOmsCom.cc, drvOms58.cc and drvOms.cc
+
+8) Device driver support added for the Intelligent Motion Systems (IMS)
+	MDrive17 model motor controller.
+	
+	Files modified: - [dev/drv]MDrive.cd added to ImsSrc/Makefile.Vx
+			- "MDrive" device and driver added to devImsMotor.dbd
+	Files added:	- [dev/drv]MDrive.cd added to ImsSrc directory.
+
+9) Eliminated redundant DMOV monitor posting's.  For example, with previous
+	releases the motor record would post DMOV=0 twice if backlash
+	correction was enabled and the user jogged the motor.
+	
+	Files modified: modified postProcess(), process() and load_pos()
+			in motorRecord.cc.
+
+10) A Home Velocity field (HVEL) was added.
+	Files modified: - HVEL added to motorRecord.dbd
+			- motorRecord.cc
+			- op/adl/motorx_setup.adl
+
+11) There is a problem with OMS VME58 ver 2.35-8 firmware when used with
+	MVME2700 CPU boards.  The problem is that the controller board
+	intermittently, reports that there is no limit switch error when there
+	is an error.  This error can occur if the user repeatedly, tries to
+	move in the direction of the limit switch when the limit error
+	condition exits.  A delay has been added to work around the problem.
+
+	File modified: - drvOms58.c; conditional delay added to query_done().
+
+12) With release R4-5, DBE_LOG was omitted from the event select mask of all
+	db_post_events() calls.  This prevented archival clients from being
+	notified of process variable changes.  With this release, DBE_LOG is
+	on for all calls to db_post_events()
+	
+	Files modified: - motorRecord.cc, motordevCom.cc and devSoft.cc
+
+13) Mark Rivers added support for the Mclennan PM600 controller.
+
+	Files modified: - MclennanSrc/devPM304.cc
+			- MclennanSrc/drvPM304.cc
+			- MclennanSrc/drvPM304.h
+
+14) MX device driver support added.  MXmotorSrc directory added.
 
 
 Modification Log from R4-4 to R4-5

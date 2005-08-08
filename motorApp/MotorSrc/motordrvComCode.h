@@ -4,9 +4,9 @@ USAGE... This file contains local variables that are allocated
 	in each motor record driver.  The variables are allocated
 	in each driver by including this file.
 
-Version:	1.1.10.1
+Version:	1.3
 Modified By:	sluiter
-Last Modified:	2003/12/11 19:32:10
+Last Modified:	2002/10/31 20:46:17
 */
 
 /*
@@ -32,16 +32,18 @@ Last Modified:	2003/12/11 19:32:10
 #ifndef	INCmotordrvComCode
 #define	INCmotordrvComCode 1
 
+#include <epicsTypes.h>
+#include <epicsEvent.h>
+
 /* --- Local data common to each driver. --- */
-static volatile int motor_scan_rate = SCAN_RATE;
 static struct controller **motor_state;
 static int total_cards;
 static int any_motor_in_motion;
 static struct circ_queue mess_queue;	/* in message queue head */
-static FAST_LOCK queue_lock;
+static epicsEvent queue_lock(epicsEventFull);
 static struct circ_queue free_list;
-static FAST_LOCK freelist_lock;
-static SEM_ID motor_sem;
-static BOOLEAN initialized = OFF;	/* Driver initialized indicator. */
+static epicsEvent freelist_lock(epicsEventFull);
+static epicsEvent motor_sem(epicsEventEmpty);
+static bool initialized = false;	/* Driver initialized indicator. */
 
 #endif	/* INCmotordrvComCode */

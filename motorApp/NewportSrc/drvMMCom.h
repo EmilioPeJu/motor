@@ -3,9 +3,9 @@ FILENAME...	drvMMCom.h
 USAGE... This file contains Newport Motion Master (MM) driver "include"
 	    information that is specific to Motion Master models 3000/4000.
 
-Version:	1.5
-Modified By:	sluiter
-Last Modified:	2001/12/14 20:50:34
+Version:	1.10
+Modified By:	rivers
+Last Modified:	2004/08/17 21:28:22
 */
 
 /*
@@ -36,13 +36,17 @@ Last Modified:	2001/12/14 20:50:34
  *
  * Modification Log:
  * -----------------
- * .01  01-18-93	mlr     initialized from drvOms58
+ * .01  01-18-93 mlr initialized from drvOms58
+ * .02  06-16-03 rls Converted to R3.14.x.
  */
 
 #ifndef	INCdrvMMComh
 #define	INCdrvMMComh 1
 
+#include "motor.h"
 #include "motordrvCom.h"
+#include "asynDriver.h"
+#include "asynOctetSyncIO.h"
 
 enum MM_model
 {
@@ -65,13 +69,9 @@ typedef enum MM_motor_type MM_motor_type;
 /* Motion Master specific data is stored in this structure. */
 struct MMcontroller
 {
-    PortType port_type;		/* GPIB_PORT or RS232_PORT */
-    struct serialInfo *serialInfo;  /* For RS-232 */
-    int gpib_link;
-    int gpib_address;
-    struct gpibInfo *gpibInfo;  /* For GPIB */
-    int serial_card;            /* Card on which Hideos is running */
-    char serial_task[20];       /* Hideos task name for serial port */
+    asynUser *pasynUser;  	/* For RS-232 */
+    int asyn_address;		/* Use for GPIB or other address with asyn */
+    char asyn_port[80];     	/* asyn port name */
     char status_string[80];     /* String containing status of motors */
     char position_string[80];   /* String containing position of motors */
     MM_model model;		/* Motion Master Model. */
@@ -85,20 +85,32 @@ struct MMcontroller
     CommStatus status;		/* Controller communication status. */
 };
 
+
 /* Motor status response for MM[3000/4000/4005]. */
 typedef union
 {
     epicsUInt8 All;
     struct
     {
-	BOOLEAN bit7		:1;	/* Bit #7 N/A. */
-	BOOLEAN bit6		:1;	/* Bit #6 N/A. */
-	BOOLEAN homels		:1;	/* Home LS. */
-	BOOLEAN minusTL		:1;	/* Minus Travel Limit. */
-	BOOLEAN plustTL		:1;	/* Plus Travel Limit. */
-	BOOLEAN direction	:1;	/* Motor direction: 0 - minus; 1 - plus. */
-	BOOLEAN NOT_power	:1;	/* Motor power 0 - ON; 1 - OFF. */
-	BOOLEAN inmotion	:1;	/* In-motion indicator. */
+#ifdef MSB_First
+	bool bit7	:1;	/* Bit #7 N/A. */
+	bool bit6	:1;	/* Bit #6 N/A. */
+	bool homels	:1;	/* Home LS. */
+	bool minusTL	:1;	/* Minus Travel Limit. */
+	bool plustTL	:1;	/* Plus Travel Limit. */
+	bool direction	:1;	/* Motor direction: 0 - minus; 1 - plus. */
+	bool NOT_power	:1;	/* Motor power 0 - ON; 1 - OFF. */
+	bool inmotion	:1;	/* In-motion indicator. */
+#else
+	bool inmotion	:1;	/* In-motion indicator. */
+	bool NOT_power	:1;	/* Motor power 0 - ON; 1 - OFF. */
+	bool direction	:1;	/* Motor direction: 0 - minus; 1 - plus. */
+	bool plustTL	:1;	/* Plus Travel Limit. */
+	bool minusTL	:1;	/* Minus Travel Limit. */
+	bool homels	:1;	/* Home LS. */
+	bool bit6	:1;	/* Bit #6 N/A. */
+	bool bit7	:1;	/* Bit #7 N/A. */
+#endif
     } Bits;
 } MOTOR_STATUS;
 

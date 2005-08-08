@@ -16,6 +16,7 @@
 #define	INCdrvMCB4Bh 1
 
 #include "motordrvCom.h"
+#include "asynDriver.h"
 
 /* MCB4B default profile. */
 
@@ -23,13 +24,11 @@
 #define MCB4B_NUM_CHANNELS        4
 
 #define OUTPUT_TERMINATOR "\r"
-#define INPUT_TERMINATOR  '\r'
 
 struct MCB4Bcontroller
 {
-    void *serialInfo;       /* For RS-232 */
-    int serial_card;        /* Card on which Hideos/MPF is running */
-    char serial_task[20];   /* Hideos/MPF task/server name for serial port */
+    asynUser *pasynUser;   /* asynUser structure */
+    char port[80];   /* asyn port name */
 };
 
 #endif	/* INCdrvMCB4Bh */

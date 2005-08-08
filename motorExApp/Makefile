@@ -1,9 +1,9 @@
 TOP = ..
-include $(TOP)/config/CONFIG_APP
+include $(TOP)/configure/CONFIG
 
-#DIRS += Db
-#DIRS += NoMPF
-#DIRS += WithMPF
-#DIRS += ipServerApp
+DIRS += NoMPF
+ifdef ASYN
+DIRS += WithMPF
+endif
 
-include $(TOP)/config/RULES_DIRS
+include $(TOP)/configure/RULES_DIRS

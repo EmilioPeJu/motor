@@ -3,9 +3,9 @@ FILENAME...	motor.h
 USAGE...	Definitions and structures common to all levels of motorRecord
 		support (i.e., record, device and driver).
 
-Version:	1.5.4.1
+Version:	1.14
 Modified By:	sluiter
-Last Modified:	2003/06/03 19:02:56
+Last Modified:	2005/03/30 19:19:58
 */
 
 /*
@@ -35,6 +35,14 @@ Last Modified:	2003/06/03 19:02:56
  *
  * Modification Log:
  * -----------------
+ *
+ * .01 10-21-02 rls - Convert to R3.14.x and C++.
+ * .02 12-12-03 rls - Added MAX_SCAN_RATE.
+ *		    - Converted MSTA #define's to bit field.
+ * .03 08-30-04 rls - Added osiUnistd.h for RTEMS.
+ * .04 09-20-04 rls - Increase max. axis / board to 32 for Delta Tau PMAC.
+ * .05 12-21-04 rls - Changed pre-compiler instructions for LSB/MSB_First
+ *		      to support MS Visual C.
  */
 
 #ifndef	INCmotorh
@@ -43,12 +51,23 @@ Last Modified:	2003/06/03 19:02:56
 #include <stdio.h>
 #include <dbScan.h>
 #include <devSup.h>
+#include <osiUnistd.h> 
 
 /* Maximum message size of all supported devices; see drv[device].h for maximum
 message size for each device. */
 #define MAX_MSG_SIZE	300
 
-typedef enum BOOLEAN_VALUES {OFF = 0, ON = 1} BOOLEAN;
+#if defined(OK)
+#undef OK
+#endif
+
+#if defined(ERROR)
+#undef ERROR
+#endif
+
+typedef enum RTN_VALUES {OK = 0, ERROR = 1} RTN_STATUS;
+
+typedef enum CALLBACK_VALUES {NOTHING_DONE = 0, CALLBACK_DATA = 1} CALLBACK_VALUE;
 
 #define NINT(f)	(long)((f)>0 ? (f)+0.5 : (f)-0.5)	/* Nearest integer. */
 
@@ -63,7 +82,7 @@ enum motor_cmnd {
 	MOVE_REL,	/* Relative Move. */
 	HOME_FOR,	/* Home Forward. */
 	HOME_REV,	/* Home Reverse. */
-	LOAD_POS,	/* Load Zero Position. */
+	LOAD_POS,	/* Load Position. */
 	SET_VEL_BASE,	/* Set Minimum Velocity. */
 	SET_VELOCITY,	/* Set Jog and Trajectory Velocity. */
 	SET_ACCEL,	/* Set Acceleration. */
@@ -83,40 +102,73 @@ enum motor_cmnd {
 	JOG_VELOCITY	/* Change Jog velocity. */
 };
 
-#ifndef __cplusplus
-typedef enum motor_cmnd motor_cmnd;
-#endif
 
 /* -------------------------------------------------- */
 
 /* driver and device support parameters */
-#define SCAN_RATE	6	/* 60=once a second */
-#define MAX_COUNT	50000 /*19000*/	/* timeout value */
-#define MAX_AXIS	10	/* max number of axis per board */
-
-#define NOTHING_DONE	0
-#define CALLBACK_DATA 	1
+#define MAX_SCAN_RATE	60	/* Maximum polling rate in HZ. */
+#define SCAN_RATE	6	/* Default polling rate in HZ. */
+#define MAX_COUNT	50000	/*19000*/	/* timeout value */
+#define MAX_AXIS	32	/* max number of axis per board */
 
 #define NO		0
 #define YES		1
 
+// Define, from top to bottom, how bit fields are packed.
+// This works for VxWorks, SunPro, Linux g++, MS Visual C.
+#ifdef _WIN32
+#define LSB_First (TRUE)  // LSB is packed first.
+#else
+#if #cpu(i386) && !#cpu(sparc)
+#define LSB_First (TRUE)  // LSB is packed first.
+#else
+#define MSB_First (TRUE)  // MSB is packed first.
+#endif
+#endif
+
 /* -------------------------------------------------- */
 /* axis and encoder status for return to requester */
-#define RA_DIRECTION		0x01	/* (last) 0=Negative, 1=Positive */
-#define RA_DONE			0x02	/* a motion is complete */
-#define RA_PLUS_LS		0x04	/* plus limit switch has been hit */
-#define RA_HOME			0x08	/* The home signal is on */
-#define EA_SLIP			0x10	/* encoder slip enabled */
-#define EA_POSITION		0x20	/* position maintenence enabled */
-#define EA_SLIP_STALL		0x40	/* slip/stall detected */
-#define EA_HOME			0x80	/* encoder home signal on */
-#define EA_PRESENT		0x100	/* encoder is present */
-#define RA_PROBLEM		0x200	/* driver stopped polling */
-#define RA_MOVING		0x400	/* non-zero velocity present */
-#define GAIN_SUPPORT		0x800	/* Motor supports closed-loop position
-					    control. */
-#define CNTRL_COMM_ERR		0x1000	/* Controller communication error. */
-#define RA_MINUS_LS		0x2000	/* minus limit switch has been hit */
+
+typedef union
+{
+    unsigned long All;
+    struct
+    {
+#ifdef MSB_First
+	unsigned int na		    :18;/* N/A bits  */
+	unsigned int RA_MINUS_LS    :1;	/* minus limit switch has been hit */
+	unsigned int CNTRL_COMM_ERR :1;	/* Controller communication error. */
+	unsigned int GAIN_SUPPORT   :1;	/* Motor supports closed-loop position control. */
+	unsigned int RA_MOVING      :1;	/* non-zero velocity present */
+	unsigned int RA_PROBLEM     :1; /* driver stopped polling */
+	unsigned int EA_PRESENT     :1; /* encoder is present */
+	unsigned int EA_HOME        :1; /* encoder home signal on */
+	unsigned int EA_SLIP_STALL  :1; /* slip/stall detected */
+	unsigned int EA_POSITION    :1; /* position maintenence enabled */
+	unsigned int EA_SLIP        :1; /* encoder slip enabled */
+	unsigned int RA_HOME        :1; /* The home signal is on */
+	unsigned int RA_PLUS_LS     :1; /* plus limit switch has been hit */
+	unsigned int RA_DONE        :1;	/* a motion is complete */
+	unsigned int RA_DIRECTION   :1;	/* (last) 0=Negative, 1=Positive */
+#else
+	unsigned int RA_DIRECTION   :1;	/* (last) 0=Negative, 1=Positive */
+	unsigned int RA_DONE        :1;	/* a motion is complete */
+	unsigned int RA_PLUS_LS     :1; /* plus limit switch has been hit */
+	unsigned int RA_HOME        :1; /* The home signal is on */
+	unsigned int EA_SLIP        :1; /* encoder slip enabled */
+	unsigned int EA_POSITION    :1; /* position maintenence enabled */
+	unsigned int EA_SLIP_STALL  :1; /* slip/stall detected */
+	unsigned int EA_HOME        :1; /* encoder home signal on */
+	unsigned int EA_PRESENT     :1; /* encoder is present */
+	unsigned int RA_PROBLEM     :1; /* driver stopped polling */
+	unsigned int RA_MOVING      :1;	/* non-zero velocity present */
+	unsigned int GAIN_SUPPORT   :1;	/* Motor supports closed-loop position control. */
+	unsigned int CNTRL_COMM_ERR :1;	/* Controller communication error. */
+	unsigned int RA_MINUS_LS    :1;	/* minus limit switch has been hit */
+	unsigned int na		    :18;/* N/A bits  */
+#endif
+    } Bits;                                
+} msta_field;
 
 /*
    The RA_PROBLEM status bit indicates that the driver has stopped the polling
@@ -126,35 +178,17 @@ typedef enum motor_cmnd motor_cmnd;
    RA_DONE.
 */
 
-#ifdef __cplusplus
-struct local_dset
-{
-    long number;			/*number of support routines*/
-    long (*report) (FILE, int);		/*print report*/
-    long (*init) (int);			/*init support*/
-    long (*init_record) (void *);	/*init support for particular record*/
-    long (*get_ioint_info)
-	(int, struct dbCommon *, IOSCANPVT *); /* get io interrupt information*/
-};
-#endif
 
 /* device support entry table */
 struct motor_dset
 {
-#ifdef __cplusplus
-    struct local_dset base;
-    long (*update_values) (struct motorRecord *);
-    long (*start_trans) (struct motorRecord *);
-    long (*build_trans) (motor_cmnd, double *, struct motorRecord *);
-    long (*end_trans) (struct motorRecord *);
-#else
     struct dset base;
-    DEVSUPFUN update_values;
-    DEVSUPFUN start_trans;
-    DEVSUPFUN build_trans;
-    DEVSUPFUN end_trans;
-#endif
+    CALLBACK_VALUE (*update_values) (struct motorRecord *);
+    long (*start_trans) (struct motorRecord *);
+    RTN_STATUS (*build_trans) (motor_cmnd, double *, struct motorRecord *);
+    RTN_STATUS (*end_trans) (struct motorRecord *);
 };
+
 
 /* All db_post_events() calls set both VALUE and LOG bits. */
 #define DBE_VAL_LOG (unsigned int) (DBE_VALUE | DBE_LOG)

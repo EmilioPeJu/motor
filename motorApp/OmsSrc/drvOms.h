@@ -3,9 +3,9 @@ FILENAME...	drvOms.h
 USAGE... This file contains OMS driver "include" information that is
 		specific to OMS models VME8 and VME44.
 
-Version:	1.2.4.1
+Version:	1.4
 Modified By:	sluiter
-Last Modified:	2003/10/21 18:11:27
+Last Modified:	2003/10/28 16:40:05
 */
 
 /*
@@ -32,8 +32,9 @@ Last Modified:	2003/10/21 18:11:27
  *
  * Modification Log:
  * -----------------
- * .00 10-21-03 rls - VX2 spurious interrupt fix; enable all interrupts, including
+ * .00 10-23-03 rls - VX2 spurious interrupt fix; enable all interrupts, including
  *		      transmit buffer empty.
+ * .01 10-28-03 rls - moved OMS specific "irqdatastr" from motordrvCom.h to here.
  */
 
 #ifndef	INCdrvOmsh
@@ -92,6 +93,16 @@ struct vmex_motor
     epicsUInt8 unused4;
     epicsUInt8 vector;
     epicsUInt8 unused5[6];
+};
+
+struct irqdatastr	/* Used only for VME44. */
+{
+    /* Interrupt Handling control elements */
+    int irqErrno;	/* Error indicator from isr */
+    epicsUInt8 irqEnable;
+    epicsRingPointer<char> *recv_rng;	/* message receiving control */
+    epicsEvent *recv_sem;
+    epicsRingPointer<char> *send_rng;	/* message transmitting control */
 };
 
 #endif	/* INCdrvOmsh */

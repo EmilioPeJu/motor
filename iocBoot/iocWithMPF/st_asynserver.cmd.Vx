@@ -1,0 +1,177 @@
+# This configures the ASYN server stuff.
+# "#!" marks lines that can be uncommented.
+
+### START of IPAC R2.5 and below ##############################################
+# 
+# Initialize IP carrier
+
+# For MVME162 and MVME172 CPU boards with IP slots.
+# ipacAddCarrier(ipac_carrier_t *pcarrier, char *cardParams)
+#   pcarrier   - pointer to carrier driver structure
+#   cardParams - carrier-specific init parameters
+#!carrier = "ipac"
+#!ipacAddCarrier(&ipmv162, "A:l=3,3 m=0xe0000000,64;B:l=3,3 m=0xe0010000,64;C:l=3,3 m=0xe0020000,64;D:l=3,3 m=0xe0030000,64")
+
+# For SBS VIPC616-01 IP carrier board.  A32 and A24 examples follow:
+#!carrier = "VIPC616_01"
+# - A32 addressing.
+# - default I/O Base Address (0x6000).
+# - IP modules occupy 32MB of memory from 0x9000 0000 to 0x91FF FFFF.
+# - IP module A at 0x90000000,
+#      module B at 0x90800000,
+#      module C at 0x91000000,
+#      module D at 0x91800000
+#!ipacAddCarrier(&vipc616_01, "6000,A0000000")
+
+# - A24 addressing.
+# - default I/O Base Address (0x6000).
+# - default IP module base address at 0x00D0 0000
+#   occupies 512 bytes of memory from 0x00D0 0000 to 0x00D0 01FF.
+# - IP module A at 0x0x00D0 007F,
+#      module B at 0x0x00D0 0100,
+#      module C at 0x0x00D0 017F,
+#      module D at 0x0x00D0 01FF
+#!ipacAddCarrier(&vipc616_01, "0x6000,D00000,128")
+
+# initIpacCarrier(const char *carrierName, int carrierNum)
+#!initIpacCarrier(carrier, 0)
+#!ipacReport(2)
+
+###############################################################################
+# Initialize Octal UART module
+#initOctalUART("moduleName","carrierName","carrierSite",nports,intVec)
+#!initOctalUART("octalUart0",carrier,"IP_a",8,100)
+#!initOctalUART("octalUart1",carrier,"IP_b",8,100)
+
+# initOctalUARTPort(char* portName,char* moduleName,int port,int baud,
+#                   char* parity,int stop_bits,int bits_char,char* flow_control)
+# 'baud' is the baud rate. 1200, 2400, 4800, 9600, 19200, 38400
+# 'parity' is "E" for even, "O" for odd, "N" for none.
+# 'bits_per_character' = {5,6,7,8}
+# 'stop_bits' = {1,2}
+# 'flow_control' is "N" for none, "H" for hardware
+# Port 0 is Generic Serial Record
+#!initOctalUARTPort("UART0[0]","octalUart0",0, 9600,"N",1,8,"N")
+#!initOctalUARTPort("UART0[1]","octalUart0",1, 9600,"N",1,8,"N")
+#!initOctalUARTPort("UART0[2]","octalUart0",2, 9600,"N",1,8,"N")
+#!initOctalUARTPort("UART0[3]","octalUart0",3, 9600,"N",1,8,"N")
+
+#!initOctalUARTPort("UART1[0]","octalUart1",0, 9600,"N",1,8,"N")
+#!initOctalUARTPort("UART1[1]","octalUart1",1, 9600,"N",1,8,"N")
+#!initOctalUARTPort("UART1[2]","octalUart1",2, 9600,"N",1,8,"N")
+#!initOctalUARTPort("UART1[3]","octalUart1",3, 9600,"N",1,8,"N")
+### END of IPAC R2.5 and below ################################################
+
+### IPAC R2.8 #################################################################
+# Initialize the drvIpac carriers.
+# -------------------------------
+# ipacAdd{CarrierType}(char *cardParams)
+#   CarrierType - VIPC310, VIPC610, VIPC610_01, VIPC616, VIPC616_01,
+#                 MVME162, or ATC40.
+#   cardParams  - carrier-specific init parameters.
+# ipacAddVIPC616_01(const char *cardParams);
+# ipacAddMVME162(const char *cardParams)
+#
+# For SBS VIPC616-01 IP carrier board.  A32 and A24 examples follow:
+# - A32 addressing.
+# - default I/O Base Address (0x6000).
+# - IP modules occupy 32MB of memory from 0x9000 0000 to 0x91FF FFFF.
+# - IP module A at 0x90000000,
+#      module B at 0x90800000,
+#      module C at 0x91000000,
+#      module D at 0x91800000
+#!ipacAddVIPC616_01("6000,A0000000")
+
+# - A24 addressing.
+# - default I/O Base Address (0x6000).
+# - default IP module base address at 0x00D0 0000
+#   occupies 512 bytes of memory from 0x00D0 0000 to 0x00D0 01FF.
+# - IP module A at 0x0x00D0 007F,
+#      module B at 0x0x00D0 0100,
+#      module C at 0x0x00D0 017F,
+#      module D at 0x0x00D0 01FF
+
+#!ipacAddVIPC616_01("6000,A0000000")
+
+# For MVME162 and MVME172 CPU board IP carrier.
+#!ipacAddMVME162("A:l=3,3 m=0xe0000000,64;B:l=3,3 m=0xe0010000,64;C:l=3,3 m=0xe0020000,64;D:l=3,3 m=0xe0030000,64")
+
+# Allocate the number of tyGSOctal modules to support.
+# ----------------------------------------------------
+
+#!tyGSOctalDrv(1)
+
+# Initialize IP Octal modules.
+# ----------------------------
+# tyGSOctalModuleInit(char *moduleID, char *ModuleType, int irq_num,
+#                     char *carrier#, int slot#)
+#   moduleID   - assign the IP module a name for future reference. 
+#   ModuleType - "232", "422", or "485".
+#   irq_num    - interrupt request number.
+#   carrier#   - carrier# assigned from the ipacAddCarrierType() call.
+#   slot#      - slot number on carrier; slot[A,B,C,D] -> slot#[0,1,2,3].
+
+#!tyGSOctalModuleInit "Mod0", "232", 0x80, 0, 0
+
+# Create tty devices.
+# ------------------
+# tyGSOctalDevCreate(char *portname, int moduleID, int port#, int rdBufSize,
+#                    int wrtBufSize)
+#   portname   - assign the port a name for future reference.
+#   moduleID   - moduleID from the tyGSOctalModuleInit() call.
+#   port#      - port number for this module [0-7].
+#   rdBufSize  - read buffer size, in bytes.
+#   wrtBufSize - write buffer size, in bytes.
+
+# Create two tty ports on Mod0 with portname based on the convention;
+# "/tyGScarrier#/moduleID/port#".
+
+#!tyGSOctalDevCreate    "/tyGS0/Mod0/0",  "Mod0", 0, 512, 512
+#!tyGSOctalDevCreate    "/tyGS0/Mod0/1",  "Mod0", 1, 512, 512
+
+# Create all uninitialized tty devices.
+# ------------------------------------
+# tyGSOctalDevCreateAll(char *base, char *moduleID, int rdBufSize,
+#			int wrtBufSize)
+#   base	- base name for these devices.
+#   moduleID	- module identifier from the call to tyGSOctalModuleInit().
+#   rdBufSize 	- read buffer size, in bytes.
+#   wrtBufSize	- write buffer size, in bytes.
+
+# Initialze all the remaining uninitialized Mod0 ports; i.e., /tyGS0/0/[2-7].
+#!tyGSOctalDevCreateAll "/tyGS0/Mod0/", "Mod0", 512, 512
+
+# Configurd asyn serial port.
+# ---------------------------
+# drvAsynSerialPortConfigure("portName","ttyName",priority,noAutoConnect,
+#	noProcessEosIn)
+#
+#   portName 	- The portName that is registered with asynGpib.
+#   ttyName 	- The name of the local serial port (e.g. "/dev/ttyS0").
+#   priority 	- Priority at which the asyn I/O thread will run. If this is
+#		  zero or missing,then epicsThreadPriorityMedium is used.
+#   noAutoConnect - Zero or missing indicates that portThread should
+#		  automatically connect. Non-zero if explicit connect command
+#		  must be issued.
+#   noProcessEos - If 0 then asynInterposeEosConfig is called specifying both
+#		  processEosIn and processEosOut.
+
+#!drvAsynSerialPortConfigure("L0","/tyGS0/Mod0/0",0,0,0)
+#!drvAsynSerialPortConfigure("L1","/tyGS0/Mod0/1",0,0,0)
+
+#!asynSetOption("L0", 0, "baud", "9600")
+#!asynSetOption("L0", 0, "bits", "8")
+#!asynSetOption("L0", 0, "parity", "none")
+#!asynSetOption("L0", 0, "stop", "1")
+#!asynSetOption("L0", 0, "clocal", "Y")
+#!asynSetOption("L0", 0, "crtscts", "N")
+
+#!asynSetOption("L1", 0, "baud", "9600")
+#!asynSetOption("L1", 0, "bits", "8")
+#!asynSetOption("L1", 0, "parity", "none")
+#!asynSetOption("L1", 0, "stop", "1")
+#!asynSetOption("L1", 0, "clocal", "Y")
+#!asynSetOption("L1", 0, "crtscts", "N")
+
+### END of IPAC R2.8 ##########################################################
+

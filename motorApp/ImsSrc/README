@@ -1,12 +1,13 @@
-MDrive 17,23,34
-===============
+
+                             MDrive 17,23,34
+==============================================================================
 
 Configuring MDrive for party mode.
 ----------------------------------
 
 The following is a modified version of the procedure defined in Section 2.1,
-"Interfacing RS-485 Communications", page #25, of the "MDrive Motion Control"
-manual; Revision 02.05.2004.
+"Multiple MDrive Motion Control System (Party Mode)", page #27, of the
+"MDrive Motion Control" manual; Revision 01.24.2005.
 
 1. Connect the first MDrive Motion Control to the Host PC configured for Single
         Mode Operation.
@@ -23,16 +24,77 @@ manual; Revision 02.05.2004.
 3. Using the command DN, name the MDrive Motion Control. This must be a number
         1-9. (DN="1"{enter}). Label the motor with the device name.
 
-4. Set Echo Mode EM=1{enter}.
+4. Set Echo Mode EM=2{enter}.
 
-5. Set the party flag PY=1{enter}.
+5. Define the plus, minus and home limit switches, if available, using the
+	S<1-4> command.
 
-6. Type CTRL+J to activate the Party Mode.
+6. Set the party flag PY=1{enter}.
 
-7. Type {DN}S CTRL+J where {DN} is the device name given in step #3 (Save
-        device name, Echo and Party Mode).
+7. Type CTRL+J to activate the Party Mode.
 
-8. Remove power.
+8. Type {DN}S CTRL+J where {DN} is the device name given in step #3 (Save
+        device name, Echo mode, I/O Setup and Party Mode).
 
-9. Repeat steps 1 through 8 for each additional MDrive in the system using
+9. Remove power.
+
+10. Repeat steps 1 through 8 for each additional MDrive in the system using
         successive device names "1" through "9".
+	
+
+IMPORTANT NOTES
+---------------
+
+1. The EPICS motor record does NOT support the optional encoder mode.  The
+	Encoder Enable Flag (EE) must be 0.
+
+
+MDrive Facts
+------------
+
+* Step resolution    -  200 steps / 1 motor revolution.
+* Encoder resolution - 2048 ticks / 1 motor revolution.
+
+
+                             IM483
+==============================================================================
+
+
+Configuring IM483's for Party Mode communication.
+------------------------------------------------
+
+The following is a modified version of the procedure defined in the
+"Communication" section, page #9, of the "Software Reference Manual"; Revision
+051794.
+
+1) Power down the IM483's.  Configure each IM483 module for stand alone (single
+mode) communications.  For the APS Diviero chassis, jumper J4 for Stand Alone
+(1-2) and J7 for Master (1-2).
+
+2) Connect an RS-232 serial connection (9600,none,8,1) from a host terminal to
+the first ("A") controller's front panel connector.
+
+3) Power up the IM483.
+
+4) Assign the axis name.  At the host terminal, enter the letter "A" (0x41)
+followed by a space charter (0x20).
+
+5) The IM483 controller should respond by echoing the "A" character and the
+sign-on message at the host terminal, i.e.,
+
+A   1342     4038 ADVANCED MICRO SYSTEMS, INC
+MAX-2000 v1.15i
+
+6) Change the "Limit Polarity" to active high.  At the host terminal, enter
+"l1<enter>".  The IM483 should echo your input at the host terminal.
+
+7) Store parameters.  At the  host  terminal, enter "S<enter>".
+
+8) Move RS-232 connection to next controller.  At the host terminal, enter
+control c (^c).  Repeat steps 4 through 7 while incrementing the axis name
+(i.e, A, B, C, etc.).
+
+9) Set all the IM483's for Party Mode communication.  For the APS Diviero
+chassis, configure all of the IM483's for Party Mode by setting J4 to (2-3).
+Connect the RS-232 port to the Master IM483 and set all the remaining IM483's
+to Slave mode by setting J7 to (2-3).

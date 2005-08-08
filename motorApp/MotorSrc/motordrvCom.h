@@ -4,9 +4,9 @@ FILENAME...	motordrvCom.h
 USAGE...	This file contains definitions and structures that
 		are common to all motor record driver support modules.
 
-Version:	1.7.4.1
-Modified By:	rivers
-Last Modified:	2003/06/25 15:43:15
+Version:	1.14
+Modified By:	sluiter
+Last Modified:	2004/09/20 20:45:05
 */
 
 /*
@@ -37,13 +37,23 @@ Last Modified:	2003/06/25 15:43:15
  * Modification Log:
  * -----------------
  * .01 10-02-01 rls added RETRY to CommStatus enumeration.
+ * .02 10-24-03 rls moved irqdatastr to OmsSrc.
+ * .03 12-12-03 rls Converted MSTA #define's to bit field.
+ * .04 09-20-04 rls support for 32 axes / controller, maximum.
  */
 
 
 #ifndef	INCmotordrvComh
 #define	INCmotordrvComh 1
 
-#include <rngLib.h>
+#include <callback.h>
+#include <epicsTypes.h>
+#include <epicsEvent.h>
+#include <epicsTime.h>
+#include <epicsRingPointer.h>
+#include <epicsMessageQueue.h>
+
+#include "motor.h"
 
 #define MAX_IDENT_LEN 100
 
@@ -62,10 +72,6 @@ enum CommStatus
     COMM_ERR		/* Communication timeout error. */
 };
 
-#ifndef __cplusplus
-typedef enum PortType PortType;
-typedef enum CommStatus CommStatus;
-#endif
 
 /*
 Valid message types for the driver. The order is of importance; 0 is
@@ -82,9 +88,6 @@ enum msg_types {
     INFO		/* get curr motor/encoder pos and stat */
 };
 
-#ifndef __cplusplus
-typedef enum msg_types msg_types;
-#endif
 
 /* Macros used to set/clear bits in any_motor_in_motion variable. */
 #define SET_MM_ON(v,a)  v|=(1<<a)
@@ -108,7 +111,7 @@ struct mess_node
     long position;
     long encoder_position;
     long velocity;
-    unsigned long status;
+    msta_field status;
     struct dbCommon *mrecord;	/* "Hidden" pointer to motor record. */
     struct mess_node *next;
     char *postmsgptr;
@@ -127,7 +130,7 @@ typedef struct mess_axis_query
 {
     long position;
     long encoder_position;
-    unsigned long status;
+    msta_field status;
 } MOTOR_AXIS_QUERY;
 
 struct axis_status
@@ -146,17 +149,6 @@ struct circ_queue	/* Circular queue structure. */
 
 /*----------------motor state info-----------------*/
 
-struct irqdatastr	/* Used only for VME44. */
-{
-    /* Interrupt Handling control elements */
-    int irqErrno;	/* Error indicator from isr */
-    epicsUInt8 irqEnable;
-    RING_ID recv_rng;	/* message receiving control */
-    SEM_ID recv_sem;
-    RING_ID send_rng;	/* message transmitting control */
-    SEM_ID send_sem;
-};
-
 struct mess_info
 {
     struct mess_node *motor_motion;	/* in motion, NULL/node */
@@ -165,9 +157,9 @@ struct mess_info
     epicsInt32 encoder_position;	/* one pos for each axis */
     epicsInt32 velocity;		/* Raw velocity readback(not implemented) */
     int no_motion_count;
-    ULONG status_delay;		/* Insure 10ms delay between motion/velocity
+    epicsTime status_delay;     /* Insure 10ms delay between motion/velocity
 				 * commands and status query. */
-    unsigned long status;	/* one pos for each axis */
+    msta_field status;		/* one pos for each axis */
     int pid_present;		/* PID control indicator for VME58 (YES/NO). */
     double high_limit;		/* MM4000 only; Controller's high travel limit. */
     double low_limit;		/* MM4000 only; Controller's low travel limit. */
@@ -179,11 +171,9 @@ struct controller	/* Controller board information. */
     char ident[MAX_IDENT_LEN];	/* identification string for this card */
     int total_axis;	/* total axis on this card */
     char *localaddr;	/* address of this card */
-    BOOLEAN cmnd_response; /* Indicates controller communication response
+    bool cmnd_response; /* Indicates controller communication response
 	    * to VELOCITY, MOTION and MOVE_TERM type commands. */
-    struct irqdatastr *irqdata;	/* VME44 only; IRQ data. */
-    void *DevicePrivate; /* Pointer to device specific structure.  For
-		MM3000/4000 = (struct MMcontroller *); otherwise Null. */
+    void *DevicePrivate; /* Pointer to device specific structure. */
     struct mess_info motor_info[MAX_AXIS];
 };
 
@@ -194,33 +184,41 @@ struct controller	/* Controller board information. */
 struct driver_table
 {
     int (*init) (void);
-    int (*send) (struct mess_node *, struct driver_table *);
+    RTN_STATUS (*send) (struct mess_node *, struct driver_table *);
     int (*free) (struct mess_node *, struct driver_table *);
     int (*get_card_info) (int, MOTOR_CARD_QUERY *, struct driver_table *);
     int (*get_axis_info) (int, int, MOTOR_AXIS_QUERY *, struct driver_table *);
     struct circ_queue *queptr;
-    FAST_LOCK *quelockptr;
+    epicsEvent *quelockptr;
     struct circ_queue *freeptr;
-    FAST_LOCK *freelockptr;
-    SEM_ID *semptr;
+    epicsEvent *freelockptr;
+    epicsEvent *semptr;
     struct controller ***card_array;
     int *cardcnt_ptr;
     int *any_inmotion_ptr;
-    int (*sendmsg) (int, char const *, char);
+    RTN_STATUS (*sendmsg) (int, char const *, char *);
     int (*getmsg) (int, char *, int);
     int (*setstat) (int, int);
     void (*query_done) (int, int, struct mess_node *);
     void (*strtstat) (int);			/* Optional; start status function or NULL. */
-    const BOOLEAN *const init_indicator;	/* Driver initialized indicator. */
-    char *axis_names;				/* Axis name array or NULL. */
+    const bool *const init_indicator;		/* Driver initialized indicator. */
+    char **axis_names;				/* Axis name array or NULL. */
 };
+
+
+struct thread_args
+{
+    int motor_scan_rate;	/* Poll rate in HZ. */
+    struct driver_table *table;
+};
+
 
 /* Function prototypes. */
 
-extern int motor_send(struct mess_node *, struct driver_table *);
+extern RTN_STATUS motor_send(struct mess_node *, struct driver_table *);
 extern int motor_free(struct mess_node *, struct driver_table *);
 extern int motor_card_info(int, MOTOR_CARD_QUERY *, struct driver_table *);
 extern int motor_axis_info(int, int, MOTOR_AXIS_QUERY *, struct driver_table *);
-extern int motor_task(int a1, int, int, int, int, int, int, int, int, int a10);
+extern int motor_task(struct thread_args *);
 
 #endif	/* INCmotordrvComh */
