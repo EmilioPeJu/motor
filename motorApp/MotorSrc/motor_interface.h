@@ -531,6 +531,8 @@ typedef int (*motorAxisMoveFunc)( AXIS_ID pAxis, double position, int relative, 
     is completed should not generate an error - the motor should immediately start moving to the latest demanded position.
     The function should return immediately the move has been started successfully.
 
+    NOTE: I aven't done anything about the pre- and post- move strings yet.
+
     \param pAxis         [in]   Pointer to axis handle returned by motorAxisOpen.
     \param position      [in]   Position to move to in motor units.
     \param relative      [in]   If zero position is an absolute position, otherwise it is relative
