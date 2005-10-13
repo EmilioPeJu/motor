@@ -291,7 +291,7 @@ LOGIC...
 
 void soft_motor_callback(CALLBACK *cbptr)
 {
-#ifdef __GNUG__
+#if defined __GNUG__ && (__GNUC__<3 || (__GNUC__==3 && __GNUC_MINOR__<2))
     struct motorRecord *mr;
 
     callbackGetUser((void *) mr, cbptr);
