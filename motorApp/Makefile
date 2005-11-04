@@ -24,6 +24,9 @@ ifdef ASYN
 #!DIRS += MicosSrc
 endif
 
+# Install the edl files
+DIRS += op
+
 ifdef MX
 DIRS += MXmotorSrc
 endif
