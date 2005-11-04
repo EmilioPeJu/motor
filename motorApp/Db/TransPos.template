@@ -6,7 +6,7 @@
 #$(FCALC)	- Forward transformation calculation (from soft to hard motor).
 #$(RCALC)	- Reverse transformation calculation (from hard to soft motor).
 
-grecord(motor,"$(P)$(SOFT)")
+record(motor,"$(P)$(SOFT)")
 {
 	field(DTYP,"Soft Channel")
 	field(OUT,"$(P)frwdcalc.A  PP MS")
@@ -20,14 +20,14 @@ grecord(motor,"$(P)$(SOFT)")
 	field(DINP,"$(P)$(HARD).DMOV  NPP MS")
 }
 
-grecord(calcout,"$(P)frwdcalc")
+record(calcout,"$(P)frwdcalc")
 {
 	field(DESC,"Forward calc")
 	field(CALC,"$(FCALC)")
 	field(OUT,"$(P)$(HARD).DVAL  PP MS")
 }
 
-grecord(calcout,"$(P)revscalc")
+record(calcout,"$(P)revscalc")
 {
 	field(DESC,"Reverse calc")
 	field(CALC,"$(RCALC)")

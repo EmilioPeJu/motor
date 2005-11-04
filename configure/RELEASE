@@ -30,4 +30,4 @@ EPICS_BASE=/home/epics/R3.14.7/base
 
 # The following is needed for the various *.substitutions files in iocBoot.
 MOTOR=$(TOP)
-
+PYTHON=/home/tools/applications/local/lib/python2.4/config

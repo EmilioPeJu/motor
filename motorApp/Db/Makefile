@@ -15,9 +15,10 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------------------
 # Create and install (or just install)
 # databases, templates, substitutions like this
-DB += motor.db
-DB += basic_motor.db
-DB += TransPos.db
+DB += motor.template
+DB += basic_motor.template
+DB += TransPos.template
+DB += pmacsimmotor.template
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB

@@ -47,7 +47,7 @@ Last Modified:	2004/09/15 18:48:35
 
 /* Default profile. */
 
-#define Pmac_NUM_CARDS		1	/* Maximum number of cards. */
+#define Pmac_NUM_CARDS		10	/* Maximum number of cards. */
 #define Pmac_BRD_SIZE		0x4000	/* card address boundary */
 #define Pmac_MAX_AXES		32
 #define Pmac_INTERRUPT_TYPE	intVME
@@ -214,5 +214,13 @@ struct pmac_dpram
     epicsUInt8 na2;
     epicsUInt8 response[256];	/* Response Buffer at 0x0F44. */
 };
+
+typedef struct simargs_s
+{
+  int numcards;
+  struct pmac_dpram *pdpram[Pmac_NUM_CARDS];
+} simargs_t;
+
+
 
 #endif	/* INCdrvPmach */

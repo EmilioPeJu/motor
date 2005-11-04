@@ -15,10 +15,10 @@
 # We use forward links to the transform record (rather than making the INPA and
 # INPB fields of the transform record CP) so that the scan record waits 
 # for the motors to move.
-grecord(ao,"$(P)$(SUM)DVAL") {
+record(ao,"$(P)$(SUM)DVAL") {
 	field(FLNK, "$(P)$(T)Drive")
 }
-grecord(ao,"$(P)$(DIFF)DVAL") {
+record(ao,"$(P)$(DIFF)DVAL") {
 	field(FLNK, "$(P)$(T)Drive")
 }
 
@@ -28,7 +28,7 @@ grecord(ao,"$(P)$(DIFF)DVAL") {
 # fields of the soft motor records, rather than from the DVAL record above.
 # This is because the .DVAL fields are always correct, while the DVAL records
 # do not get updated when the soft motor .DVAL fields are modified in SET mode.
-grecord(transform,"$(P)$(T)Drive") {
+record(transform,"$(P)$(T)Drive") {
 	field(INPA,"$(P)$(SUM).DVAL NPP NMS")
 	field(INPB,"$(P)$(DIFF).DVAL NPP NMS")
 	field(INPC,"$(P)$(SUM)C1.VAL NPP NMS")
@@ -45,7 +45,7 @@ grecord(transform,"$(P)$(T)Drive") {
 # This record calculates the readback positions of the soft motors.  It 
 # processes whenever the readbacks of the real motors change, or whenever
 # one of the the geometry constants changes.
-grecord(transform,"$(P)$(T)Readback") {
+record(transform,"$(P)$(T)Readback") {
 	field(INPA,"$(P)$(M1RBV) CP MS")
 	field(INPB,"$(P)$(M2RBV) CP MS")
 	field(INPC,"$(P)$(SUM)C1.VAL CP MS")
@@ -59,7 +59,7 @@ grecord(transform,"$(P)$(T)Readback") {
 }
 
 # This record processes if either of the soft motor STOP fields is set.
-grecord(dfanout,"$(P)$(T)Stop") {
+record(dfanout,"$(P)$(T)Stop") {
         field(VAL,"1")
         field(OUTA,"$(P)$(M1STOP) PP MS")
         field(OUTB,"$(P)$(M2STOP) PP MS")
@@ -68,7 +68,7 @@ grecord(dfanout,"$(P)$(T)Stop") {
 # This record computes whether the compound motor is done moving.  
 # It goes to 1 when both real motors are done moving.
 # positions of the real motors.
-grecord(calcout,"$(P)$(T)Done") {
+record(calcout,"$(P)$(T)Done") {
         field(INPA,"$(P)$(M1DONE) CP MS")
         field(INPB,"$(P)$(M2DONE) CP MS")
         field(CALC,"A & B")

@@ -1,4 +1,4 @@
-grecord(motor,"$(P)$(M)")
+record(motor,"$(P)$(M)")
 {
 	field(DESC,"$(DESC)")
 	field(DTYP,"$(DTYP)")

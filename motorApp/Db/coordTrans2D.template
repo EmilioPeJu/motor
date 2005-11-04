@@ -11,10 +11,10 @@
 # We use forward links to the transform record (rather than making the INPA and
 # INPB fields of the transform record CP) so that the scan record waits 
 # for the motors to move.
-grecord(ao,"$(P)$(MXP)DVAL") {
+record(ao,"$(P)$(MXP)DVAL") {
 	field(FLNK, "$(P)$(T)Drive")
 }
-grecord(ao,"$(P)$(MYP)DVAL") {
+record(ao,"$(P)$(MYP)DVAL") {
 	field(FLNK, "$(P)$(T)Drive")
 }
 
@@ -24,7 +24,7 @@ grecord(ao,"$(P)$(MYP)DVAL") {
 # fields of the soft motor records, rather than from the DVAL record above.
 # This is because the .DVAL fields are always correct, while the DVAL records
 # do not get updated when the soft motor .DVAL fields are modified in SET mode.
-grecord(transform,"$(P)$(T)Drive") {
+record(transform,"$(P)$(T)Drive") {
 	field(INPA,"$(P)$(MXP).DVAL NPP NMS")
 	field(INPB,"$(P)$(MYP).DVAL NPP NMS")
 	field(INPC,"$(P)$(MXP)C1.VAL NPP NMS")
@@ -40,7 +40,7 @@ grecord(transform,"$(P)$(T)Drive") {
 
 # This record is processed to set the origin of the XP, YP coordinate system
 # to be the current position of the motors.
-grecord(transform,"$(P)$(T)synch") {
+record(transform,"$(P)$(T)synch") {
 	field(INPA,"$(P)$(XDRV) NPP NMS")
 	field(INPB,"$(P)$(YDRV) NPP NMS")
 	field(CLCC,"A")
@@ -53,8 +53,8 @@ grecord(transform,"$(P)$(T)synch") {
 # This record calculates the readback positions of the soft motors.  It 
 # processes whenever the readbacks of the real motors change, or whenever
 # one of the the geometry constants changes.
-grecord(transform,"$(P)$(T)Readback") {
-	field(INPA,"$(P)$(XRBV) CP MS")
+record(transform,"$(P)$(T)Readback") {
+        field(INPA,"$(P)$(XRBV) CP MS")
 	field(INPB,"$(P)$(YRBV) CP MS")
 	field(INPC,"$(P)$(MXP)C1.VAL CP MS")
 	field(INPD,"$(P)$(MYP)C1.VAL CP MS")
@@ -66,7 +66,7 @@ grecord(transform,"$(P)$(T)Readback") {
 }
 
 # This record processes if either of the sof motor STOP fields is set.
-grecord(dfanout,"$(P)$(T)Stop") {
+record(dfanout,"$(P)$(T)Stop") {
         field(VAL,"1")
         field(OUTA,"$(P)$(XSTOP) PP MS")
         field(OUTB,"$(P)$(YSTOP) PP MS")
@@ -75,7 +75,7 @@ grecord(dfanout,"$(P)$(T)Stop") {
 # This record computes whether the compound motor is done moving.  
 # It goes to 1 when both real motors are done moving.
 # positions of the real motors.
-grecord(calcout,"$(P)$(T)Done") {
+record(calcout,"$(P)$(T)Done") {
         field(INPA,"$(P)$(XDONE) CP MS")
         field(INPB,"$(P)$(YDONE) CP MS")
         field(CALC,"A & B")

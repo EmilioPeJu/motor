@@ -46,11 +46,11 @@ Last Modified:	2005/03/30 18:59:47
  *		      `tree_list' not supported..." compiler error message.
  */
 
-#include	<vxLib.h>
-#include	<sysLib.h>
+/*#include	<vxLib.h>*/
+/*#include	<sysLib.h>*/
 #include	<string.h>
-#include	<rebootLib.h>
-#include	<logLib.h>
+/*#include	<rebootLib.h>*/
+/*#include	<logLib.h>*/
 #include	<drvSup.h>
 #include	<epicsVersion.h>
 #include	<devLib.h>
@@ -61,7 +61,9 @@ Last Modified:	2005/03/30 18:59:47
 #include	"motor.h"
 #include	"drvPmac.h"
 #include	"epicsExport.h"
-
+#include        "dbDefs.h"
+#include        "registryFunction.h"
+#include        "Python.h"
 #define CMD_CLEAR       '\030'	/* Control-X, clears command errors only */
 
 #define	ALL_INFO	"QA RP RE EA"	/* jps: move QA to top. */
@@ -85,6 +87,9 @@ Last Modified:	2005/03/30 18:59:47
 
 /* Global data. */
 int Pmac_num_cards = 0;
+int simulation_mode = 0;
+extern "C" {epicsExportAddress(int, simulation_mode);}
+extern "C" {epicsExportAddress(int, drvPmacdebug);}
 
 /* Local data required for every driver; see "motordrvComCode.h" */
 #include	"motordrvComCode.h"
@@ -113,8 +118,8 @@ static RTN_STATUS send_mess(int, char const *, char *);
 static int recv_mess(int, char *, int);
 static void motorIsr(int);
 static int motor_init();
-static void Pmac_reset();
-
+/*static void Pmac_reset();*/
+void *SimInit(void *);
 static RTN_STATUS PmacPut(int, char *);
 static int motorIsrEnable(int);
 static void motorIsrDisable(int);
@@ -167,7 +172,7 @@ static long report(int level)
 	for (card = 0; card < Pmac_num_cards; card++)
 	    if (motor_state[card])
 		printf("    Pmac VME8/44 motor card %d @ 0x%X, id: %s \n",
-		       card, (uint_t) motor_state[card]->localaddr,
+		       card, (epicsUInt32) motor_state[card]->localaddr,
 		       motor_state[card]->ident);
     }
     return (0);
@@ -306,16 +311,14 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 
     if (strlen(com) > MAX_MSG_SIZE)
     {
-	logMsg((char *) "drvPmac.cc:send_mess(); message size violation.\n",
-	       0, 0, 0, 0, 0, 0);
+	errlogMessage("drvPmac.cc:send_mess(); message size violation.\n");
 	return (ERROR);
     }
 
     /* Check that card exists */
     if (!motor_state[card])
     {
-	logMsg((char *) "drvPmac.cc:send_mess() - invalid card #%d\n", card,
-	       0, 0, 0, 0, 0);
+	errlogMessage("drvPmac.cc:send_mess() - invalid card \n");
 	return (ERROR);
     }
 
@@ -422,12 +425,12 @@ static int recv_mess(int card, char *com, int amount)
 	{
 	    const double flush_delay = quantum;
 
-	    if (control == NULL)
+	    if (control == (char) NULL)
 	    {
 		Debug(6, "recv_mess() - flush wait on NULL\n");
 		epicsThreadSleep(flush_delay);
 		control = stptr->Bits.cntrl_char;
-		if (control == NULL)
+		if (control == (char)NULL)
 		    flushed = true;
 		else
 		    Debug(6, "recv_mess() - NULL -> %c\n", control);
@@ -443,7 +446,7 @@ static int recv_mess(int card, char *com, int amount)
 	    {
 		stptr->All = 0;
 		Debug(6, "recv_mess() - flush wait on CR\n");
-		for (trys = 0; trys < 10 && stptr->Bits.cntrl_char == NULL; trys++)
+		for (trys = 0; trys < 10 && stptr->Bits.cntrl_char == (char)NULL; trys++)
 		{
 		    epicsThreadSleep(quantum * trys);
 		    Debug(6, "recv_mess() - flush wait #%d\n", trys);
@@ -456,7 +459,7 @@ static int recv_mess(int card, char *com, int amount)
 	    {
 		stptr->All = 0;
 		errlogPrintf("%s(%d): ERROR = 0x%X\n", __FILE__, __LINE__,
-			     (unsigned int) control);
+			     (epicsUInt32) control);
 		epicsThreadSleep(flush_delay);
 		control = stptr->Bits.cntrl_char;
 	    }
@@ -544,14 +547,15 @@ static RTN_STATUS PmacPut(int card, char *pmess)
     else
     {
 	strcpy((char *) &pmotor->cmndbuff[0], pmess);
+	Debug(7,"Sent message \"%s\"\n",pmess);
 	pmotor->out_cntrl_wd = 1;
     }
     
     /* Wait for response. */
-    for (itera = 0; itera < 10 && stptr->Bits.cntrl_char == NULL; itera++)
+    for (itera = 0; itera < 10 && stptr->Bits.cntrl_char == (char)NULL; itera++)
     {
 	epicsThreadSleep(quantum * itera);
-	Debug(7, "PmacPut() - response wait #%d\n", itera);
+	Debug(7, "PmacPut() - response wait #%d\n", itera);      
     }
 
     if (itera >= 10)
@@ -575,13 +579,13 @@ static void motorIsr(int card)
 
 static int motorIsrEnable(int card)
 {
-    long status;
+    /*long status;*/
     
-    status = pdevLibVirtualOS->pDevConnectInterruptVME(
-	PmacInterruptVector + card, (void (*)()) motorIsr, (void *) card);
+    /*status = pdevLibVirtualOS->pDevConnectInterruptVME(
+	PmacInterruptVector + card, (void (*)()) motorIsr, (void *) card);*/
 
-    status = devEnableInterruptLevel(Pmac_INTERRUPT_TYPE,
-				     PmacInterruptLevel);
+    /*status = devEnableInterruptLevel(Pmac_INTERRUPT_TYPE,
+				     PmacInterruptLevel);*/
 
     return (OK);
 }
@@ -590,8 +594,8 @@ static void motorIsrDisable(int card)
 {
     long status;
 
-    status = pdevLibVirtualOS->pDevDisconnectInterruptVME(
-	PmacInterruptVector + card, (void (*)(void *)) motorIsr);
+    /*status = pdevLibVirtualOS->pDevDisconnectInterruptVME(
+	PmacInterruptVector + card, (void (*)(void *)) motorIsr);*/
 
     if (!RTN_SUCCESS(status))
 	errPrintf(status, __FILE__, __LINE__, "Can't disconnect vector %d\n",
@@ -632,48 +636,58 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
     long status;
 
     if (num_cards < 1 || num_cards > Pmac_NUM_CARDS)
-	Pmac_num_cards = Pmac_NUM_CARDS;
+    {
+      errlogPrintf("Invalid number of cards(%d) setting to %d",num_cards,Pmac_NUM_CARDS);
+      Pmac_num_cards = Pmac_NUM_CARDS;
+    }
     else
+    {
 	Pmac_num_cards = num_cards;
+    }
 
     switch(addrs_type)
     {
 	case 24:
 	    Pmac_ADDRS_TYPE = atVMEA24;
 
-	    if ((uint32_t) mbox & 0xF0000000)
+	    if ((epicsUInt32) mbox & 0xF0000000)
 		erraddr = mbox;
-	    else if ((uint32_t) addrs & 0xF)
+	    else if ((epicsUInt32) addrs & 0xF)
 		erraddr = addrs;
 
 	    if (erraddr != 0)
-		Debug(1, "PmacSetup: invalid A24 address 0x%X\n", (uint_t) mbox);
+		Debug(1, "PmacSetup: invalid A24 address 0x%X\n", (epicsUInt32) mbox);
 
 	    break;
 	case 32:
 	    Pmac_ADDRS_TYPE = atVMEA32;
 	    break;
 	default:
-	    Debug(1, "PmacSetup: invalid Address Type %d\n", (uint_t) addrs);
+	    Debug(1, "PmacSetup: invalid Address Type %d\n", (epicsUInt32) addrs);
 	    break;
     }
 
     // Test MailBox address.
     Mbox_addrs = (char *) mbox;
-    status = devNoResponseProbe(Pmac_ADDRS_TYPE, (unsigned int)
-				(Mbox_addrs + 0x121), 1);
+    /*status = devNoResponseProbe(Pmac_ADDRS_TYPE, (epicsUInt32)
+				(Mbox_addrs + 0x121), 1);*/
+    Debug(1,"Bypassing mailbox probe\n");
+
+    if( !simulation_mode )
+    {
+
 
     if (PROBE_SUCCESS(status))
     {
 	char A19A14;	 /* Select VME A19-A14 for DPRAM. */
-	status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE, (size_t)
-			    Mbox_addrs, 122, (volatile void **) &localaddr);
+	/*status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE, (size_t)
+			    Mbox_addrs, 122, (volatile void **) &localaddr);*/
 	Debug(9, "motor_init: devRegisterAddress() status = %d\n", (int) status);
 
 	if (!RTN_SUCCESS(status))
 	{
 	    errPrintf(status, __FILE__, __LINE__, "Can't register address 0x%x\n",
-		      (unsigned int) probeAddr);
+		      (epicsUInt32) probeAddr);
 	    return (ERROR);
 	}
 
@@ -686,10 +700,12 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
     else
     {
 	errlogPrintf("%s(%d): Mailbox bus error - 0x%X\n", __FILE__, __LINE__,
-		     (unsigned int) (Mbox_addrs + 0x121));
+		     (epicsUInt32) (Mbox_addrs + 0x121));
 	Mbox_addrs = (char *) NULL;
 	Pmac_num_cards = 0;
     }
+
+    }/* End of if (!simulation_mode) */
 
     PmacInterruptVector = vector;
     if (vector < 64 || vector > 255)
@@ -729,7 +745,9 @@ static int motor_init()
 {
     volatile struct controller *pmotorState;
     volatile struct pmac_dpram *pmotor;
+    volatile struct pmac_dpram *psimdpram[Pmac_NUM_CARDS];
     struct PMACcontroller *cntrl;
+    pthread_t python_thread;
     long status;
     int card_index, motor_index;
     char axis_pos[50];
@@ -738,6 +756,8 @@ static int motor_init()
     volatile void *localaddr;
     void *probeAddr;
     bool errind;
+    simargs_t simargs;
+    
 
     tok_save = NULL;
     quantum = epicsThreadSleepQuantum();
@@ -750,6 +770,46 @@ static int motor_init()
 	return (ERROR);
     }
 
+    if( simulation_mode )
+    {
+      printf("simulation mode\n");
+      /* Initialise DPRAM */
+      for(card_index=0;card_index<Pmac_NUM_CARDS;card_index++)
+	psimdpram[card_index]=NULL;
+
+      /* Allocate memory for simulation DPRAM */            
+      for(card_index = 0; card_index < Pmac_num_cards; card_index++)
+      {
+	psimdpram[card_index]=(struct pmac_dpram *)malloc( sizeof( struct
+								   pmac_dpram ) );
+	if( psimdpram[card_index] != NULL )
+	{
+	  simargs.pdpram[card_index] = (struct pmac_dpram *) psimdpram[card_index];
+	} 
+	else
+	{
+	  errlogPrintf("%s(%d): Error in DPRAM malloc\n",__FILE__,__LINE__);
+	}
+	
+
+	Debug(1,"psimdpram[%d] = 0x%x\n",card_index,psimdpram[card_index]);
+
+      }/* End of for loop */
+	
+      simargs.numcards = Pmac_num_cards;
+
+      /* Spawn the python thread */
+      status = pthread_create(&python_thread,NULL,SimInit,(void *)&simargs);
+      if( status )
+      {
+	errlogPrintf("Error starting python thread\n");
+	return( ERROR );
+      }
+      
+      sleep(10);
+      
+    }/* End of if( simulation_mode ) */
+    
     /* allocate space for total number of motors */
     motor_state = (struct controller **) malloc(Pmac_num_cards *
 						sizeof(struct controller *));
@@ -758,8 +818,8 @@ static int motor_init()
 
     total_cards = Pmac_num_cards;
 
-    if (rebootHookAdd((FUNCPTR) Pmac_reset) == ERROR)
-	Debug(1, "vme8/44 motor_init: Pmac_reset disabled\n");
+    /*if (rebootHookAdd((FUNCPTR) Pmac_reset) == ERROR)
+	Debug(1, "vme8/44 motor_init: Pmac_reset disabled\n");*/
 
     for (card_index = 0; card_index < Pmac_num_cards; card_index++)
     {
@@ -772,27 +832,34 @@ static int motor_init()
 	startAddr = (int8_t *) probeAddr + 1;
 	endAddr = startAddr + Pmac_BRD_SIZE;
 
-	Debug(9, "motor_init: devNoResponseProbe() on addr 0x%x\n", (uint_t) probeAddr);
+	Debug(9, "motor_init: devNoResponseProbe() on addr 0x%x\n", (epicsUInt32) probeAddr);
 	/* Scan memory space to assure card id */
 	do
 	{
-	    status = devNoResponseProbe(Pmac_ADDRS_TYPE, (unsigned int) startAddr, 1);
+	  /*status = devNoResponseProbe(Pmac_ADDRS_TYPE, (unsigned int) startAddr, 1);*/
 	    startAddr += 0x100;
 	} while (PROBE_SUCCESS(status) && startAddr < endAddr);
+
+	if( simulation_mode )
+	  status = S_dev_addressOverlap;
 
 	if (PROBE_SUCCESS(status))
 	{
 
-	    status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE,
+	  /*status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE,
 					(size_t) probeAddr, Pmac_BRD_SIZE,
-					(volatile void **) &localaddr);
+					(volatile void **) &localaddr);*/
 	    Debug(9, "motor_init: devRegisterAddress() status = %d\n",
 		  (int) status);
-	    if (!RTN_SUCCESS(status))
+
+	    if( !simulation_mode )
 	    {
-		errPrintf(status, __FILE__, __LINE__,
+	      if (!RTN_SUCCESS(status))
+	      {
+	  	errPrintf(status, __FILE__, __LINE__,
 			  "Can't register address 0x%x\n", (unsigned) probeAddr);
 		return (ERROR);
+	      }
 	    }
 
 	    Debug(9, "motor_init: localaddr = %x\n", (int) localaddr);
@@ -800,7 +867,20 @@ static int motor_init()
 	    Debug(9, "motor_init: malloc'ing motor_state\n");
 	    motor_state[card_index] = (struct controller *) malloc(sizeof(struct controller));
 	    pmotorState = motor_state[card_index];
-	    pmotorState->localaddr = (char *) localaddr;
+
+	    if( simulation_mode )
+	    {
+	      /* Point to simulated DPRAM */
+	       Debug(1,"Setting localaddr to simulated DPRAM\n");
+               pmotorState->localaddr = (char *) psimdpram[card_index];
+            }
+            else
+            {
+              /* Point to DPRAM */
+              Debug(1,"Setting localaddr to PMAC DPRAM\n");
+              pmotorState->localaddr = (char *) localaddr;
+            }
+
 	    pmotorState->motor_in_motion = 0;
 	    pmotorState->cmnd_response = false;
 
@@ -825,7 +905,7 @@ static int motor_init()
 	    Debug(3, "Identification = %s\n", pmotorState->ident);
 
 	    for (total_axis = 0, errind = false; errind == false &&
-		 total_axis < Pmac_MAX_AXES; total_axis++)
+		 total_axis <= Pmac_MAX_AXES; total_axis++)
 	    {
 		char outbuf[10];
 
@@ -889,7 +969,7 @@ static int motor_init()
 		set_status(card_index, motor_index);
 	    }
 
-	    Debug(2, "Init Address=0x%8.8x\n", (uint_t) localaddr);
+	    Debug(2, "Init Address=0x%8.8x\n", (epicsUInt32) localaddr);
 	    Debug(3, "Total encoders = %d\n\n", (int) total_encoders);
 	}
 	else
@@ -917,10 +997,123 @@ static int motor_init()
     return (0);
 }
 
+epicsRegisterFunction(PmacSetup);
+
 /* Disables interrupts. Called on CTL X reboot. */
 
-static void Pmac_reset()
+/*static void Pmac_reset()
 {
-}
+}*/
 
 /*---------------------------------------------------------------------*/
+void *SimInit( void *ptr )
+{
+  struct pmac_dpram **psimdpram;
+  PyObject *module,*funcdict,*function, *funccall, *shmemobj, *args;
+  simargs_t *psimargs;
+  int numcards,card;
+
+  psimargs = (simargs_t *) ptr;
+
+  numcards = psimargs->numcards;
+
+  psimdpram = (struct pmac_dpram **) psimargs->pdpram;
+
+  /* Launch the python interpreter */
+  Debug(1,"Initilising Python interpreter\n");
+  Py_Initialize();
+  
+  /* Initialise the python search path to include local directory */
+  Debug(1,"Importing sys module\n");
+  PyRun_SimpleString("import sys\n");
+  PyRun_SimpleString("sys.path\n");
+  
+  /* Import simulation module */
+  Debug(1,"Importing dpramsimulation module\n");
+  module = PyImport_ImportModule("dpramsimulation");
+  if( !module )
+  {
+    errlogPrintf("Error importing module\n");
+    PyErr_Print();
+    PyErr_Clear();
+    pthread_exit(NULL);
+  }
+  
+  /* Get a dictionary of module functions */
+  Debug(1,"Retrieving module functions\n");
+  funcdict = PyModule_GetDict(module);
+  if( !funcdict )
+  {
+    errlogPrintf("Error importing dictionary\n");
+    PyErr_Print();
+    PyErr_Clear();
+    pthread_exit(NULL);
+  }
+  
+  /* Get starting function */
+  #if 1
+  Debug(1,"Get the starting function\n");
+  function = PyDict_GetItemString(funcdict,"startfunc");
+  if( !function )
+  {
+    errlogPrintf("Error getting function\n");
+    PyErr_Print();
+    PyErr_Clear();
+    pthread_exit(NULL);
+  }
+  #else
+  Debug(1,"Get the starting function\n");
+  function = PyDict_GetItemString(funcdict,"testfunc");
+  if( !function )
+  {
+    errlogPrintf("Error getting function\n");
+    PyErr_Print();
+    PyErr_Clear();
+    pthread_exit(NULL);
+  }
+  #endif
+
+
+  for( card=0; card<numcards; card++ )
+  {
+    
+    /* Create shared memory object */
+    Debug(1,"Create shared memory object\n");
+    shmemobj = PyBuffer_FromReadWriteMemory((void *) psimdpram[card],sizeof( struct pmac_dpram ));
+    if( !shmemobj )
+    {
+      errlogPrintf("Error creating shared memory object\n");
+      PyErr_Print();
+      PyErr_Clear();
+      pthread_exit(NULL);
+    }
+    
+    /* Build argument list */
+    args = Py_BuildValue("(O)",shmemobj);
+    if( !args )
+    {
+      errlogPrintf("Error building argument list\n");
+      PyErr_Print();
+      PyErr_Clear();
+      pthread_exit(NULL);
+    }
+    
+    /* Call starting function */
+    printf("Calling starting function\n");
+    funccall = PyObject_CallObject(function,args);
+    if( !funccall )
+    {
+      errlogPrintf("Error calling function\n");
+      PyErr_Print();
+      PyErr_Clear();
+      pthread_exit(NULL);
+    }
+    
+  }/* End of for loop */
+  
+  /* Enable python threading */
+  Py_BEGIN_ALLOW_THREADS
+  pause();
+  Py_END_ALLOW_THREADS
+
+}
