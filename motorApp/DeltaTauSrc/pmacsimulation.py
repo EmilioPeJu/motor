@@ -1,4 +1,4 @@
-#!/home/tools/applications/local/bin/python2.4
+#!/usr/bin/env python2.4
 
 # Package imports
 import time

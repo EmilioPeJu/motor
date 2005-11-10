@@ -24,12 +24,11 @@ ifdef ASYN
 #!DIRS += MicosSrc
 endif
 
-# Install the edl files
-DIRS += op
 
 ifdef MX
 DIRS += MXmotorSrc
 endif
 
 DIRS += Db
+DIRS+=opi
 include $(TOP)/configure/RULES_DIRS

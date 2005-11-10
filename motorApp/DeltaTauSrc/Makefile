@@ -52,3 +52,5 @@ pmacsim_LIBS += python2.4
 include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD RULES AFTER THIS LINE
+
+vpath %.py $(USR_VPATH) $(ALL_SRC_DIRS)
