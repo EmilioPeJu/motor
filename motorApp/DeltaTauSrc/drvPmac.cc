@@ -46,11 +46,14 @@ Last Modified:	2005/03/30 18:59:47
  *		      `tree_list' not supported..." compiler error message.
  */
 
-/*#include	<vxLib.h>*/
-/*#include	<sysLib.h>*/
+#ifdef vxWorks
+#include	<vxLib.h>
+#include	<sysLib.h>
+#include	<rebootLib.h>
+#include	<logLib.h>
+#endif
+
 #include	<string.h>
-/*#include	<rebootLib.h>*/
-/*#include	<logLib.h>*/
 #include	<drvSup.h>
 #include	<epicsVersion.h>
 #include	<devLib.h>
@@ -63,7 +66,9 @@ Last Modified:	2005/03/30 18:59:47
 #include	"epicsExport.h"
 #include        "dbDefs.h"
 #include        "registryFunction.h"
+#ifdef BUILD_SIMULATION
 #include        "Python.h"
+#endif
 #define CMD_CLEAR       '\030'	/* Control-X, clears command errors only */
 
 #define	ALL_INFO	"QA RP RE EA"	/* jps: move QA to top. */
@@ -78,8 +83,8 @@ Last Modified:	2005/03/30 18:59:47
 
 
 /*----------------debugging-----------------*/
+volatile int drvPmacdebug = 0;
 #ifdef	DEBUG
-    volatile int drvPmacdebug = 0;
     #define Debug(l, f, args...) { if(l<=drvPmacdebug) printf(f,## args); }
 #else
     #define Debug(l, f, args...)
@@ -118,8 +123,10 @@ static RTN_STATUS send_mess(int, char const *, char *);
 static int recv_mess(int, char *, int);
 static void motorIsr(int);
 static int motor_init();
-/*static void Pmac_reset();*/
+static void Pmac_reset();
+#ifdef BUILD_SIMULATION
 void *SimInit(void *);
+#endif
 static RTN_STATUS PmacPut(int, char *);
 static int motorIsrEnable(int);
 static void motorIsrDisable(int);
@@ -579,28 +586,31 @@ static void motorIsr(int card)
 
 static int motorIsrEnable(int card)
 {
-    /*long status;*/
+#ifdef vxWorks
+    long status;
     
-    /*status = pdevLibVirtualOS->pDevConnectInterruptVME(
-	PmacInterruptVector + card, (void (*)()) motorIsr, (void *) card);*/
+    status = pdevLibVirtualOS->pDevConnectInterruptVME(
+	PmacInterruptVector + card, (void (*)()) motorIsr, (void *) card);
 
-    /*status = devEnableInterruptLevel(Pmac_INTERRUPT_TYPE,
-				     PmacInterruptLevel);*/
+    status = devEnableInterruptLevel(Pmac_INTERRUPT_TYPE,
+				     PmacInterruptLevel);
+#endif
 
     return (OK);
 }
 
 static void motorIsrDisable(int card)
 {
+#ifdef vxWorks
     long status;
 
-    /*status = pdevLibVirtualOS->pDevDisconnectInterruptVME(
-	PmacInterruptVector + card, (void (*)(void *)) motorIsr);*/
+    status = pdevLibVirtualOS->pDevDisconnectInterruptVME(
+	      PmacInterruptVector + card, (void (*)(void *)) motorIsr);
 
     if (!RTN_SUCCESS(status))
 	errPrintf(status, __FILE__, __LINE__, "Can't disconnect vector %d\n",
 		  PmacInterruptVector + card);
-
+#endif
 }
 
 
@@ -669,9 +679,11 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
 
     // Test MailBox address.
     Mbox_addrs = (char *) mbox;
-    /*status = devNoResponseProbe(Pmac_ADDRS_TYPE, (epicsUInt32)
-				(Mbox_addrs + 0x121), 1);*/
+#ifdef vxWorks
+    status = devNoResponseProbe(Pmac_ADDRS_TYPE, (epicsUInt32)
+				(Mbox_addrs + 0x121), 1);
     Debug(1,"Bypassing mailbox probe\n");
+#endif
 
     if( !simulation_mode )
     {
@@ -680,9 +692,11 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
     if (PROBE_SUCCESS(status))
     {
 	char A19A14;	 /* Select VME A19-A14 for DPRAM. */
-	/*status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE, (size_t)
-			    Mbox_addrs, 122, (volatile void **) &localaddr);*/
+#ifdef vxWorks
+	status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE, (size_t)
+			    Mbox_addrs, 122, (volatile void **) &localaddr);
 	Debug(9, "motor_init: devRegisterAddress() status = %d\n", (int) status);
+#endif
 
 	if (!RTN_SUCCESS(status))
 	{
@@ -745,9 +759,7 @@ static int motor_init()
 {
     volatile struct controller *pmotorState;
     volatile struct pmac_dpram *pmotor;
-    volatile struct pmac_dpram *psimdpram[Pmac_NUM_CARDS];
     struct PMACcontroller *cntrl;
-    pthread_t python_thread;
     long status;
     int card_index, motor_index;
     char axis_pos[50];
@@ -756,7 +768,11 @@ static int motor_init()
     volatile void *localaddr;
     void *probeAddr;
     bool errind;
+#ifdef BUILD_SIMULATION
+    volatile struct pmac_dpram *psimdpram[Pmac_NUM_CARDS];
+    pthread_t python_thread;
     simargs_t simargs;
+#endif
     
 
     tok_save = NULL;
@@ -770,6 +786,7 @@ static int motor_init()
 	return (ERROR);
     }
 
+#ifdef BUILD_SIMULATION
     if( simulation_mode )
     {
       printf("simulation mode\n");
@@ -809,6 +826,7 @@ static int motor_init()
       sleep(10);
       
     }/* End of if( simulation_mode ) */
+#endif
     
     /* allocate space for total number of motors */
     motor_state = (struct controller **) malloc(Pmac_num_cards *
@@ -818,8 +836,10 @@ static int motor_init()
 
     total_cards = Pmac_num_cards;
 
-    /*if (rebootHookAdd((FUNCPTR) Pmac_reset) == ERROR)
-	Debug(1, "vme8/44 motor_init: Pmac_reset disabled\n");*/
+#ifdef vxWorks
+    if (rebootHookAdd((FUNCPTR) Pmac_reset) == ERROR)
+	Debug(1, "vme8/44 motor_init: Pmac_reset disabled\n");
+#endif
 
     for (card_index = 0; card_index < Pmac_num_cards; card_index++)
     {
@@ -846,12 +866,13 @@ static int motor_init()
 	if (PROBE_SUCCESS(status))
 	{
 
-	  /*status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE,
+#ifdef vxWorks
+	    status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE,
 					(size_t) probeAddr, Pmac_BRD_SIZE,
-					(volatile void **) &localaddr);*/
+					(volatile void **) &localaddr);
 	    Debug(9, "motor_init: devRegisterAddress() status = %d\n",
 		  (int) status);
-
+#endif
 	    if( !simulation_mode )
 	    {
 	      if (!RTN_SUCCESS(status))
@@ -868,6 +889,7 @@ static int motor_init()
 	    motor_state[card_index] = (struct controller *) malloc(sizeof(struct controller));
 	    pmotorState = motor_state[card_index];
 
+#ifdef BUILD_SIMULATION
 	    if( simulation_mode )
 	    {
 	      /* Point to simulated DPRAM */
@@ -875,6 +897,7 @@ static int motor_init()
                pmotorState->localaddr = (char *) psimdpram[card_index];
             }
             else
+#endif
             {
               /* Point to DPRAM */
               Debug(1,"Setting localaddr to PMAC DPRAM\n");
@@ -1001,10 +1024,11 @@ epicsRegisterFunction(PmacSetup);
 
 /* Disables interrupts. Called on CTL X reboot. */
 
-/*static void Pmac_reset()
+static void Pmac_reset()
 {
-}*/
+}
 
+#ifdef BUILD_SIMULATION
 /*---------------------------------------------------------------------*/
 void *SimInit( void *ptr )
 {
@@ -1117,3 +1141,4 @@ void *SimInit( void *ptr )
   Py_END_ALLOW_THREADS
 
 }
+#endif
