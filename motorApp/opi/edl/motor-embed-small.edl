@@ -1,0 +1,423 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 304
+y 790
+w 190
+h 110
+font "helvetica-medium-r-14.0"
+ctlFont "courier-bold-r-14.0"
+btnFont "helvetica-medium-r-14.0"
+fgColor index 14
+bgColor index 3
+textColor index 14
+ctlFgColor1 index 25
+ctlFgColor2 index 30
+ctlBgColor1 index 3
+ctlBgColor2 index 3
+topShadowColor index 1
+botShadowColor index 11
+title "Motor box small"
+showGrid
+gridSize 5
+endScreenProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 0
+y 7
+w 185
+h 98
+lineColor index 14
+fillColor index 50
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 5
+y -1
+w 78
+h 14
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "$(label) Motor"
+}
+autoSize
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 0
+y 7
+w 185
+h 98
+lineColor index 82
+fillColor index 50
+visPv "$(motor):state"
+visMin "3"
+visMax "5"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 5
+y -1
+w 78
+h 14
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 82
+bgColor index 3
+visPv "$(motor):state"
+visMin "3"
+visMax "5"
+value {
+  "$(label) Motor"
+}
+autoSize
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 3
+y 14
+w 179
+h 88
+lineColor index 0
+fill
+fillColor index 0
+visPv "$(motor):state"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 65
+y 76
+w 55
+h 24
+fgColor index 21
+onColor index 3
+offColor index 3
+topShadowColor index 0
+botShadowColor index 14
+controlPv "$(motor).STOP"
+pressValue "1"
+onLabel "STOP"
+offLabel "STOP"
+3d
+font "arial-bold-r-14.0"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 125
+y 76
+w 54
+h 24
+fgColor index 14
+bgColor index 3
+topShadowColor index 1
+botShadowColor index 11
+font "arial-bold-r-14.0"
+buttonLabel "More"
+numPvs 4
+numDsps 1
+displayFileName {
+  0 "motor.edl"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 33
+y 46
+w 119
+h 25
+controlPv "$(motor).RBV"
+font "arial-bold-r-14.0"
+fontAlign "center"
+fgColor index 15
+bgColor index 10
+limitsFromDb
+precision 4
+nullColor index 0
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 135
+y 91
+w 417
+h 80
+font "arial-medium-r-18.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+visPv "LOC\\dummy=i:0"
+visMin "4"
+visMax "5"
+value {
+  "README "
+  "Macros:"
+  "$(motor) = motor name e.g. BL18I-AL-APTR-01:X"
+  "$(label) = box label"
+}
+autoSize
+endObjectProperties
+
+# (Textentry)
+object TextentryClass
+beginObjectProperties
+major 10
+minor 0
+release 0
+x 33
+y 13
+w 120
+h 33
+controlPv "$(motor).VAL"
+precision 4
+fgColor index 25
+bgColor index 3
+colorPv "$(motor):MODE"
+fill
+font "arial-bold-r-14.0"
+fontAlign "right"
+lineWidth 0
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 4
+y 62
+w 26
+h 10
+font "arial-medium-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Move"
+}
+endObjectProperties
+
+# (Byte)
+object ByteClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 12
+y 48
+w 12
+h 12
+controlPv "$(motor).MOVN"
+lineColor index 14
+onColor index 15
+offColor index 14
+lineWidth 2
+numBits 1
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 155
+y 62
+w 26
+h 10
+font "arial-medium-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Valid"
+}
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 6
+y 76
+w 54
+h 24
+fgColor index 18
+onColor index 3
+offColor index 3
+topShadowColor index 0
+botShadowColor index 14
+controlPv "$(motor).STOP"
+pressValue "0"
+onLabel "GO"
+offLabel "GO"
+3d
+font "arial-bold-r-14.0"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 34
+y 47
+w 117
+h 23
+lineColor index 38
+fillColor index 3
+lineWidth 3
+visPv "$(motor):state"
+visMin "3"
+visMax "4"
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 34
+y 47
+w 117
+h 23
+lineColor index 20
+fillColor index 3
+lineWidth 3
+visPv "$(motor):state"
+visMin "4"
+visMax "5"
+endObjectProperties
+
+# (Byte)
+object ByteClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 162
+y 48
+w 12
+h 12
+controlPv "$(motor).ATHM"
+lineColor index 14
+onColor index 15
+offColor index 14
+lineWidth 2
+numBits 1
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 6
+y 17
+w 24
+h 24
+fgColor index 25
+onColor index 4
+offColor index 3
+topShadowColor index 0
+botShadowColor index 14
+controlPv "$(motor).TWR"
+pressValue "1"
+onLabel "-"
+offLabel "-"
+3d
+font "arial-bold-r-16.0"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 156
+y 17
+w 24
+h 24
+fgColor index 25
+onColor index 4
+offColor index 3
+topShadowColor index 0
+botShadowColor index 14
+controlPv "$(motor).TWF"
+pressValue "1"
+onLabel "+"
+offLabel "+"
+3d
+font "arial-bold-r-16.0"
+visMin "0"
+visMax "1"
+endObjectProperties
+

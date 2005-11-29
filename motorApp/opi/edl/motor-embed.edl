@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 457
-y 786
+x 572
+y 321
 w 466
 h 260
 font "helvetica-medium-r-14.0"
@@ -22,6 +22,22 @@ botShadowColor index 11
 title "Motor box"
 showGrid
 endScreenProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 14
+w 134
+h 27
+lineColor index 35
+fillColor index 0
+lineWidth 3
+visPv "$(motor).LVIO"
+endObjectProperties
 
 # (Rectangle)
 object activeRectangleClass
@@ -485,22 +501,6 @@ nullColor index 0
 showUnits
 newPos
 objType "monitors"
-endObjectProperties
-
-# (Rectangle)
-object activeRectangleClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 5
-y 14
-w 134
-h 27
-lineColor index 35
-fillColor index 0
-lineWidth 3
-visPv "$(motor).LVIO"
 endObjectProperties
 
 # (Static Text)
