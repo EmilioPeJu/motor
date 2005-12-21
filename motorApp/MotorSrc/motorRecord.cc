@@ -2710,6 +2710,7 @@ static long get_units(const DBADDR *paddr, char *units)
     {
 
     case motorRecordVELO:
+    case motorRecordVMAX:
     case motorRecordBVEL:
     case motorRecordVBAS:
 	strncpy(s, pmr->egu, DB_UNITS_SIZE);
@@ -2782,6 +2783,11 @@ static long get_graphic_double(const DBADDR *paddr, struct dbr_grDouble * pgd)
 	}
 	break;
 
+    case motorRecordVELO:
+	pgd->upper_disp_limit = pmr->vmax;
+	pgd->lower_disp_limit = pmr->vbas;
+	break;
+
     default:
 	recGblGetGraphicDouble((dbAddr *) paddr, pgd);
 	break;
@@ -2826,6 +2832,11 @@ static long
 	    pcd->upper_ctrl_limit = pmr->dllm / pmr->mres;
 	    pcd->lower_ctrl_limit = pmr->dhlm / pmr->mres;
 	}
+	break;
+
+    case motorRecordVELO:
+	pcd->upper_ctrl_limit = pmr->vmax;
+	pcd->lower_ctrl_limit = pmr->vbas;
 	break;
 
     default:
