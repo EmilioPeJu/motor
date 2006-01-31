@@ -15,7 +15,7 @@ DIRS += SoftMotorSrc
 
 # All the following modules require ASYN.
 ifdef ASYN
-#!DIRS += NewportSrc
+DIRS += NewportSrc
 #!DIRS += ImsSrc
 #!DIRS += AcsSrc
 #!DIRS += MclennanSrc

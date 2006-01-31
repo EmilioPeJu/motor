@@ -10,12 +10,12 @@
 # Add your declarations here
 
 #!GATEWAY=
-#!SUPPORT=
+SUPPORT=/home/diamond/R3.14.7/prod/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
 # Recommended ASYN release: R4-2
-#!ASYN=$(SUPPORT)/asynR4-2
+ASYN=$(SUPPORT)/asyn/4-2-1
 
 # Recommended EPICS release: R3.14.7
 EPICS_BASE=/home/epics/R3.14.7/base
