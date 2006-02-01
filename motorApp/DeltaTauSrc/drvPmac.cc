@@ -2,9 +2,9 @@
 FILENAME...	drvPmac.cc
 USAGE...	Driver level support for Delta Tau PMAC model.
 
-Version:	1.7
+Version:	1.8
 Modified By:	sluiter
-Last Modified:	2005/03/30 18:59:47
+Last Modified:	2005/05/10 16:32:41
 */
 
 /*
@@ -164,7 +164,7 @@ struct
 
 extern "C" {epicsExportAddress(drvet, drvPmac);}
 
-static struct thread_args targs = {SCAN_RATE, &Pmac_access};
+static struct thread_args targs = {SCAN_RATE, &Pmac_access, 0.0};
 
 /*----------------functions-----------------*/
 

@@ -1,10 +1,10 @@
 /*
-FILENAME...	NewportRegister.h
-USAGE... This file contains function prototypes for Newport IOC shell commands.
+FILENAME...	PIC630Register.h
+USAGE... This file contains function prototypes for PIC630 IOC shell commands.
 
-Version:	1.5
-Modified By:	rivers
-Last Modified:	2005/09/12 19:40:40
+Version:	1.3
+Modified By:	sluiter
+Last Modified:	2004/07/16 19:06:58
 */
 
 /*
@@ -40,18 +40,6 @@ Last Modified:	2005/09/12 19:40:40
 #include "motordrvCom.h"
 
 /* Function prototypes. */
-extern RTN_STATUS MM3000Setup(int, int);
-extern RTN_STATUS MM4000Setup(int, int);
-extern RTN_STATUS  PM500Setup(int, int);
-extern RTN_STATUS ESP300Setup(int, int);
-extern RTN_STATUS  XPSC8Setup(int, int);
-extern RTN_STATUS MM3000Config(int, const char *, int);
-extern RTN_STATUS MM4000Config(int, const char *, int);
-extern RTN_STATUS  PM500Config(int, const char *, int);
-extern RTN_STATUS ESP300Config(int, const char *, int);
-extern RTN_STATUS  XPSC8Config(int, const char *, int, int);
-extern RTN_STATUS XPSC8NameConfig(int, int, int, int, int, \
-				const char *, const char *);
+extern RTN_STATUS PIC630Setup(int, int, int);
+extern RTN_STATUS PIC630Config(int, const char *, int,int,int,int,int,int,int,int,int);
 
-extern RTN_STATUS xpsgathering(int);
-extern RTN_STATUS tclcall(const char *,const char *,const char *);

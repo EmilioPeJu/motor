@@ -6,14 +6,28 @@
 #include <string.h>		/* Added by JHK */
 #include <sys/socket.h>
 
+/* Bug Fix 
+23rd May JHK
+GatheringExternalConfigurationSet- change array size to allow for the long list of 
+ExternalLatchPosition axes 
+
+9th June JHK
+GroupMoveAbsolute and Home use Send() insted of SendAndReceive() because the read 
+socket function hangs once the IOC has been rebooted once.
+
+30th June JHK
+GroupMoveAbort use Send() insted of SendAndReceive() because the abort hangs until
+the motors stop.
+
+5th July JHK
+MultipleAxesPVTExecution use Send() insted of SendAndReceive() */
 
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <stdarg.h> 
 #include "Socket.h" 
-#define DLL _declspec(dllexport)
 #include "xps_c8_driver.h" 	/* Renamed by JHK */
-#define SIZE_BUFFER  500
+#define SIZE_BUFFER  256
 
 #define SIZE_NAME    100
 
@@ -519,9 +533,9 @@ int __stdcall GatheringExternalConfigurationSet (int SocketIndex, int NbElements
 	char  seps[] = " \t;";
 	int   indice;
 	char  list [SIZE_BUFFER];
-
-	char (*stringArray0)[SIZE_NAME];
-	stringArray0 = new char [NbElements][SIZE_NAME];
+	
+	char (*stringArray0)[SIZE_BUFFER];
+	stringArray0 = new char [NbElements][SIZE_BUFFER];
 	indice = 0;
 	strcpy (list, TypeList);
 	token = strtok( list, seps );
@@ -799,7 +813,7 @@ int __stdcall GPIOAnalogSet (int SocketIndex, int NbElements, char * GPIONameLis
 	sprintf (ExecuteMethod, "GPIOAnalogSet (");
 	for (int i = 0; i < NbElements; i++)
 	{
-		sprintf (temp, "%s,%lf", stringArray0[i], AnalogOutputValue[i]);
+		sprintf (temp, "%s,%f", stringArray0[i], AnalogOutputValue[i]);
 		strcat (ExecuteMethod, temp);
 		if ((i + 1) < NbElements) 
 		{
@@ -1045,14 +1059,14 @@ int __stdcall GroupHomeSearch (int SocketIndex, char * GroupName)
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
 
 
-	/*SendAndReceive (SocketIndex, ExecuteMethod, ReturnedValue); */
-	SendOnly (SocketIndex, ExecuteMethod, ReturnedValue);	 
+	/*SendAndReceive (SocketIndex, ExecuteMethod, ReturnedValue);*/
+	SendOnly (SocketIndex, ExecuteMethod, ReturnedValue);	
 	if (strlen (ReturnedValue) > 0) 
 		sscanf (ReturnedValue, "%i", &ret); 
 
 	/* Get the returned values in the out parameters */ 
 	
-	ret = 0;	/* Added by JHK */
+	ret = 0;	 /* Added by JHK */
 	
 
 	/* Get the returned values in the out parameters */ 
@@ -1072,7 +1086,7 @@ int __stdcall GroupHomeSearchAndRelativeMove (int SocketIndex, char * GroupName,
 	sprintf (ExecuteMethod, "GroupHomeSearchAndRelativeMove (%s,", GroupName);
 	for (int i = 0; i < NbElements; i++)
 	{
-		sprintf (temp, "%lf", TargetDisplacement[i]);
+		sprintf (temp, "%f", TargetDisplacement[i]);
 		strcat (ExecuteMethod, temp);
 		if ((i + 1) < NbElements) 
 		{
@@ -1125,7 +1139,7 @@ int __stdcall GroupJogParametersSet (int SocketIndex, char * GroupName, int NbEl
 	sprintf (ExecuteMethod, "GroupJogParametersSet (%s,", GroupName);
 	for (int i = 0; i < NbElements; i++)
 	{
-		sprintf (temp, "%lf,%lf", Velocity[i], Acceleration[i]);
+		sprintf (temp, "%f,%f", Velocity[i], Acceleration[i]);
 		strcat (ExecuteMethod, temp);
 		if ((i + 1) < NbElements) 
 		{
@@ -1320,11 +1334,14 @@ int __stdcall GroupMoveAbort (int SocketIndex, char * GroupName)
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
-	SendAndReceive (SocketIndex, ExecuteMethod, ReturnedValue); 
+	/*SendAndReceive (SocketIndex, ExecuteMethod, ReturnedValue);*/
+	
+	SendOnly (SocketIndex, ExecuteMethod, ReturnedValue); 
 	if (strlen (ReturnedValue) > 0) 
 		sscanf (ReturnedValue, "%i", &ret); 
 
-	/* Get the returned values in the out parameters */ 
+	/* Get the returned values in the out parameters */
+	ret = 0;	/* Added by JHK */ 
 	return (ret); 
 }
 
@@ -1341,7 +1358,7 @@ int __stdcall GroupMoveAbsolute (int SocketIndex, char * GroupName, int NbElemen
 	sprintf (ExecuteMethod, "GroupMoveAbsolute (%s,", GroupName);
 	for (int i = 0; i < NbElements; i++)
 	{
-		sprintf (temp, "%lf", TargetPosition[i]);
+		sprintf (temp, "%f", TargetPosition[i]);
 		strcat (ExecuteMethod, temp);
 		if ((i + 1) < NbElements) 
 		{
@@ -1357,7 +1374,7 @@ int __stdcall GroupMoveAbsolute (int SocketIndex, char * GroupName, int NbElemen
 /*	printf("xps_c8_driver.cpp: GroupMoveAbs Calling SendAndRecieve\n");*/ 
 		
 	/*SendAndReceive (SocketIndex, ExecuteMethod, ReturnedValue);*/
-	SendOnly (SocketIndex, ExecuteMethod, ReturnedValue);	 
+	SendOnly (SocketIndex, ExecuteMethod, ReturnedValue);
 	if (strlen (ReturnedValue) > 0) 
 		sscanf (ReturnedValue, "%i", &ret); 
 
@@ -1381,7 +1398,7 @@ int __stdcall GroupMoveRelative (int SocketIndex, char * GroupName, int NbElemen
 	sprintf (ExecuteMethod, "GroupMoveRelative (%s,", GroupName);
 	for (int i = 0; i < NbElements; i++)
 	{
-		sprintf (temp, "%lf", TargetDisplacement[i]);
+		sprintf (temp, "%f", TargetDisplacement[i]);
 		strcat (ExecuteMethod, temp);
 		if ((i + 1) < NbElements) 
 		{
@@ -1726,7 +1743,7 @@ int __stdcall PositionerAnalogTrackingPositionParametersSet (int SocketIndex, ch
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerAnalogTrackingPositionParametersSet (%s,%s,%lf,%lf,%lf,%lf)", PositionerName, GPIOName, Offset, Scale, Velocity, Acceleration);
+	sprintf (ExecuteMethod, "PositionerAnalogTrackingPositionParametersSet (%s,%s,%f,%f,%f,%f)", PositionerName, GPIOName, Offset, Scale, Velocity, Acceleration);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -1799,7 +1816,7 @@ int __stdcall PositionerAnalogTrackingVelocityParametersSet (int SocketIndex, ch
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerAnalogTrackingVelocityParametersSet (%s,%s,%lf,%lf,%lf,%d,%lf,%lf)", PositionerName, GPIOName, Offset, Scale, DeadBandThreshold, Order, Velocity, Acceleration);
+	sprintf (ExecuteMethod, "PositionerAnalogTrackingVelocityParametersSet (%s,%s,%f,%f,%f,%d,%f,%f)", PositionerName, GPIOName, Offset, Scale, DeadBandThreshold, Order, Velocity, Acceleration);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -1857,7 +1874,7 @@ int __stdcall PositionerBacklashSet (int SocketIndex, char * PositionerName, dou
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerBacklashSet (%s,%lf)", PositionerName, BacklashValue);
+	sprintf (ExecuteMethod, "PositionerBacklashSet (%s,%f)", PositionerName, BacklashValue);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -1920,7 +1937,7 @@ int __stdcall PositionerCorrectorNotchFiltersSet (int SocketIndex, char * Positi
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerCorrectorNotchFiltersSet (%s,%lf,%lf,%lf,%lf,%lf,%lf)", PositionerName, NotchFrequency1, NotchBandwith1, NotchGain1, NotchFrequency2, NotchBandwith2, NotchGain2);
+	sprintf (ExecuteMethod, "PositionerCorrectorNotchFiltersSet (%s,%f,%f,%f,%f,%f,%f)", PositionerName, NotchFrequency1, NotchBandwith1, NotchGain1, NotchFrequency2, NotchBandwith2, NotchGain2);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -1988,7 +2005,7 @@ int __stdcall PositionerCorrectorPIDFFAccelerationSet (int SocketIndex, char * P
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerCorrectorPIDFFAccelerationSet (%s,%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf)", PositionerName, ClosedLoopStatus, KP, KI, KD, KS, IntegrationTime, DerivativeFilterCutOffFrequency, GKP, GKI, GKD, KForm, FeedForwardGainAcceleration);
+	sprintf (ExecuteMethod, "PositionerCorrectorPIDFFAccelerationSet (%s,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f)", PositionerName, ClosedLoopStatus, KP, KI, KD, KS, IntegrationTime, DerivativeFilterCutOffFrequency, GKP, GKI, GKD, KForm, FeedForwardGainAcceleration);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2074,7 +2091,7 @@ int __stdcall PositionerCorrectorPIDFFVelocitySet (int SocketIndex, char * Posit
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerCorrectorPIDFFVelocitySet (%s,%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf)", PositionerName, ClosedLoopStatus, KP, KI, KD, KS, IntegrationTime, DerivativeFilterCutOffFrequency, GKP, GKI, GKD, KForm, FeedForwardGainVelocity);
+	sprintf (ExecuteMethod, "PositionerCorrectorPIDFFVelocitySet (%s,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f)", PositionerName, ClosedLoopStatus, KP, KI, KD, KS, IntegrationTime, DerivativeFilterCutOffFrequency, GKP, GKI, GKD, KForm, FeedForwardGainVelocity);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2160,7 +2177,7 @@ int __stdcall PositionerCorrectorPIDDualFFVoltageSet (int SocketIndex, char * Po
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerCorrectorPIDDualFFVoltageSet (%s,%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf)", PositionerName, ClosedLoopStatus, KP, KI, KD, KS, IntegrationTime, DerivativeFilterCutOffFrequency, GKP, GKI, GKD, KForm, FeedForwardGainVelocity, FeedForwardGainAcceleration, Friction);
+	sprintf (ExecuteMethod, "PositionerCorrectorPIDDualFFVoltageSet (%s,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f)", PositionerName, ClosedLoopStatus, KP, KI, KD, KS, IntegrationTime, DerivativeFilterCutOffFrequency, GKP, GKI, GKD, KForm, FeedForwardGainVelocity, FeedForwardGainAcceleration, Friction);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2252,7 +2269,7 @@ int __stdcall PositionerCorrectorPIPositionSet (int SocketIndex, char * Position
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerCorrectorPIPositionSet (%s,%d,%lf,%lf,%lf)", PositionerName, ClosedLoopStatus, KP, KI, IntegrationTime);
+	sprintf (ExecuteMethod, "PositionerCorrectorPIPositionSet (%s,%d,%f,%f,%f)", PositionerName, ClosedLoopStatus, KP, KI, IntegrationTime);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2577,7 +2594,7 @@ int __stdcall PositionerMotionDoneSet (int SocketIndex, char * PositionerName, d
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerMotionDoneSet (%s,%lf,%lf,%lf,%lf,%lf)", PositionerName, PositionWindow, VelocityWindow, CheckingTime, MeanPeriod, TimeOut);
+	sprintf (ExecuteMethod, "PositionerMotionDoneSet (%s,%f,%f,%f,%f,%f)", PositionerName, PositionWindow, VelocityWindow, CheckingTime, MeanPeriod, TimeOut);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2639,7 +2656,7 @@ int __stdcall PositionerPositionCompareSet (int SocketIndex, char * PositionerNa
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerPositionCompareSet (%s,%lf,%lf,%lf)", PositionerName, MinimumPosition, MaximumPosition, PositionStep);
+	sprintf (ExecuteMethod, "PositionerPositionCompareSet (%s,%f,%f,%f)", PositionerName, MinimumPosition, MaximumPosition, PositionStep);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2778,7 +2795,7 @@ int __stdcall PositionerSGammaParametersSet (int SocketIndex, char * PositionerN
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerSGammaParametersSet (%s,%lf,%lf,%lf,%lf)", PositionerName, Velocity, Acceleration, MinimumTjerkTime, MaximumTjerkTime);
+	sprintf (ExecuteMethod, "PositionerSGammaParametersSet (%s,%f,%f,%f,%f)", PositionerName, Velocity, Acceleration, MinimumTjerkTime, MaximumTjerkTime);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2799,7 +2816,7 @@ int __stdcall PositionerSGammaExactVelocityAjustedDisplacementGet (int SocketInd
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerSGammaExactVelocityAjustedDisplacementGet (%s,%lf,double *)", PositionerName, DesiredDisplacement);
+	sprintf (ExecuteMethod, "PositionerSGammaExactVelocityAjustedDisplacementGet (%s,%f,double *)", PositionerName, DesiredDisplacement);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2866,7 +2883,7 @@ int __stdcall PositionerUserTravelLimitsSet (int SocketIndex, char * PositionerN
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "PositionerUserTravelLimitsSet (%s,%lf,%lf)", PositionerName, UserMinimumTarget, UserMaximumTarget);
+	sprintf (ExecuteMethod, "PositionerUserTravelLimitsSet (%s,%f,%f)", PositionerName, UserMinimumTarget, UserMaximumTarget);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -2958,7 +2975,8 @@ int __stdcall MultipleAxesPVTExecution (int SocketIndex, char * GroupName, char 
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
-	SendAndReceive (SocketIndex, ExecuteMethod, ReturnedValue); 
+	/*SendAndReceive (SocketIndex, ExecuteMethod, ReturnedValue); */
+	SendOnly (SocketIndex, ExecuteMethod, ReturnedValue); 
 	if (strlen (ReturnedValue) > 0) 
 		sscanf (ReturnedValue, "%i", &ret); 
 
@@ -3054,7 +3072,7 @@ int __stdcall SingleAxisSlaveParametersSet (int SocketIndex, char * GroupName, c
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "SingleAxisSlaveParametersSet (%s,%s,%lf)", GroupName, PositionerName, Ratio);
+	sprintf (ExecuteMethod, "SingleAxisSlaveParametersSet (%s,%s,%f)", GroupName, PositionerName, Ratio);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -3179,7 +3197,7 @@ int __stdcall XYLineArcExecution (int SocketIndex, char * GroupName, char * File
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "XYLineArcExecution (%s,%s,%lf,%lf,%d)", GroupName, FileName, Velocity, Acceleration, ExecutionNumber);
+	sprintf (ExecuteMethod, "XYLineArcExecution (%s,%s,%f,%f,%d)", GroupName, FileName, Velocity, Acceleration, ExecutionNumber);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -3310,7 +3328,7 @@ int __stdcall XYZSplineExecution (int SocketIndex, char * GroupName, char * File
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "XYZSplineExecution (%s,%s,%lf,%lf)", GroupName, FileName, Velocity, Acceleration);
+	sprintf (ExecuteMethod, "XYZSplineExecution (%s,%s,%f,%f)", GroupName, FileName, Velocity, Acceleration);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 
@@ -3395,7 +3413,7 @@ int __stdcall EEPROMDACOffsetCIESet (int SocketIndex, int PlugNumber, double DAC
 	char ReturnedValue [SIZE_BUFFER]; 
 
 	/* Convert to string */ 
-	sprintf (ExecuteMethod, "EEPROMDACOffsetCIESet (%d,%lf,%lf)", PlugNumber, DAC1Offset, DAC2Offset);
+	sprintf (ExecuteMethod, "EEPROMDACOffsetCIESet (%d,%f,%f)", PlugNumber, DAC1Offset, DAC2Offset);
 
 	/* Send this string and wait return function from controller */ 
 	/* return function : ==0 -> OK ; < 0 -> NOK */ 

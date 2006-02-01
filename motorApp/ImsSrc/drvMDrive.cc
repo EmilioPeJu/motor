@@ -1,11 +1,11 @@
 /*
-FILENAME...	drvMDrive.cc
-USAGE...	Motor record driver level support for Intelligent Motion
-		Systems, Inc. MDrive series; M17, M23, M34.
+FILENAME... drvMDrive.cc
+USAGE...    Motor record driver level support for Intelligent Motion
+	Systems, Inc. MDrive series; M17, M23, M34.
 
-Version:	1.16
-Modified By:	sluiter
-Last Modified:	2005/03/30 19:01:26
+Version:    1.19
+Modified By:    sluiter
+Last Modified:  2005/10/20 20:06:47
 */
 
 /*
@@ -22,16 +22,16 @@ Last Modified:	2005/03/30 19:01:26
  *      and (W-31-109-ENG-38) at Argonne National Laboratory.
  *
  *      Initial development by:
- *	      The Controls and Automation Group (AT-8)
- *	      Ground Test Accelerator
- *	      Accelerator Technology Division
- *	      Los Alamos National Laboratory
+ *        The Controls and Automation Group (AT-8)
+ *        Ground Test Accelerator
+ *        Accelerator Technology Division
+ *        Los Alamos National Laboratory
  *
  *      Co-developed with
- *	      The Controls and Computing Group
- *	      Accelerator Systems Division
- *	      Advanced Photon Source
- *	      Argonne National Laboratory
+ *        The Controls and Computing Group
+ *        Accelerator Systems Division
+ *        Advanced Photon Source
+ *        Argonne National Laboratory
  *
  * Modification Log:
  * -----------------
@@ -44,20 +44,20 @@ Last Modified:	2005/03/30 19:01:26
  * .05 09/20/04 rls - support for 32axes/controller.
  *                  - remove '?' command string padding.
  * .06 12/16/04 rls - asyn R4.0 support.
- *		    - make debug variables always available.
- *		    - MS Visual C compatibility; make all epicsExportAddress
- *		      extern "C" linkage.
+ *          - make debug variables always available.
+ *          - MS Visual C compatibility; make all epicsExportAddress
+ *            extern "C" linkage.
  * .07 03/18/05 rls - Flexible MDrive I/O configuration.
- *		    - Change Echo mode to 2; eliminate eat_garbage().
+ *          - Change Echo mode to 2; eliminate eat_garbage().
  */
 
 /*
 DESIGN LIMITATIONS...
     1 - Like all controllers, the MDrive must be powered-on when EPICS is first
-	booted up.
+    booted up.
     2 - The MDrive cannot be power cycled while EPICS is up and running.  The
-	consequences are permanent communication lose with the MDrive until
-	EPICS is rebooted.
+    consequences are permanent communication lose with the MDrive until
+    EPICS is rebooted.
 */
 
 #include <string.h>
@@ -68,13 +68,13 @@ DESIGN LIMITATIONS...
 #include "asynOctetSyncIO.h"
 #include "epicsExport.h"
 
-#define MDrive_NUM_CARDS	8
-#define MAX_AXES		8
-#define BUFF_SIZE 13		/* Maximum length of string to/from MDrive */
+#define MDrive_NUM_CARDS    8
+#define MAX_AXES        8
+#define BUFF_SIZE 13        /* Maximum length of string to/from MDrive */
 
 /*----------------debugging-----------------*/
 #ifdef __GNUG__
-    #ifdef	DEBUG
+    #ifdef  DEBUG
 	#define Debug(l, f, args...) {if (l <= drvMDrivedebug) printf(f, ## args);}
     #else
 	#define Debug(l, f, args...)
@@ -90,7 +90,7 @@ int MDrive_num_cards = 0;
 static char *MDrive_axis[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
 /* Local data required for every driver; see "motordrvComCode.h" */
-#include	"motordrvComCode.h"
+#include    "motordrvComCode.h"
 
 /*----------------functions-----------------*/
 static int recv_mess(int, char *, int);
@@ -136,7 +136,7 @@ struct
 
 extern "C" {epicsExportAddress(drvet, drvMDrive);}
 
-static struct thread_args targs = {SCAN_RATE, &MDrive_access};
+static struct thread_args targs = {SCAN_RATE, &MDrive_access, 0.0};
 
 
 /*********************************************************
@@ -161,7 +161,7 @@ static long report(int level)
 		struct IM483controller *cntrl;
 
 		cntrl = (struct IM483controller *) brdptr->DevicePrivate;
-	    	printf("    IM483SM controller #%d, port=%s, id: %s \n", card,
+		printf("    MDrive controller #%d, port=%s, id: %s \n", card,
 		       cntrl->asyn_port, brdptr->ident);
 	    }
 	}
@@ -172,12 +172,12 @@ static long report(int level)
 
 static long init()
 {
-   /* 
-    * We cannot call motor_init() here, because that function can do GPIB I/O,
-    * and hence requires that the drvGPIB have already been initialized.
-    * That cannot be guaranteed, so we need to call motor_init from device
-    * support
-    */
+    /*
+     * We cannot call motor_init() here, because that function can do GPIB I/O,
+     * and hence requires that the drvGPIB have already been initialized.
+     * That cannot be guaranteed, so we need to call motor_init from device
+     * support
+     */
     /* Check for setup */
     if (MDrive_num_cards <= 0)
     {
@@ -192,34 +192,33 @@ static void query_done(int card, int axis, struct mess_node *nodeptr)
 }
 
 
-/********************************************************************************
-*										*
-* FUNCTION NAME: set_status							*
-*										*
-* LOGIC:									*
-*   Initialize.									*
-*   Send "Moving Status" query.							*
-*   Read response.								*
-*   IF normal response to query.						*
-*	Set communication status to NORMAL.					*
-*   ELSE									*
-*	IF communication status is NORMAL.					*
-*	    Set communication status to RETRY.					*
-*	    NORMAL EXIT.							*
-*	ELSE									*
-*	    Set communication status error.					*
-*	    ERROR EXIT.								*
-*	ENDIF									*
-*   ENDIF									*
-*										*
-*   IF "Moving Status" indicates any motion (i.e. status != 0).			*
-*	Clear "Done Moving" status bit.						*
-*   ELSE									*
-*	Set "Done Moving" status bit.						*
-*   ENDIF									*
-*										*
-*   										*
-********************************************************************************/
+/******************************************************************************
+*
+* FUNCTION NAME: set_status
+*
+* LOGIC:
+*   Initialize.
+*   Send "Moving Status" query.
+*   Read response.
+*   IF normal response to query.
+*       Set communication status to NORMAL.
+*   ELSE
+*       IF communication status is NORMAL.
+*           Set communication status to RETRY.
+*           NORMAL EXIT.
+*       ELSE
+*           Set communication status error.
+*           ERROR EXIT.
+*       ENDIF
+*   ENDIF
+*
+*   IF "Moving Status" indicates any motion (i.e. status != 0).
+*       Clear "Done Moving" status bit.
+*   ELSE
+*       Set "Done Moving" status bit.
+*   ENDIF
+*
+******************************************************************************/
 
 static int set_status(int card, int signal)
 {
@@ -269,7 +268,7 @@ static int set_status(int card, int signal)
 
     status.Bits.RA_DONE = (rtnval != 0) ? 0 : 1;
 
-    /* 
+    /*
      * Parse motor position
      * Position string format: 1TP5.012,2TP1.123,3TP-100.567,...
      * Skip to substring for this motor, convert to double
@@ -282,7 +281,7 @@ static int set_status(int card, int signal)
 
     if (motorData == motor_info->position)
     {
-	if (nodeptr != 0)	/* Increment counter only if motor is moving. */
+	if (nodeptr != 0)   /* Increment counter only if motor is moving. */
 	    motor_info->no_motion_count++;
     }
     else
@@ -304,12 +303,12 @@ static int set_status(int card, int signal)
     }
     else
     {
-        sprintf(buff, "PR I%d", confptr->plusLS);
-        send_mess(card, buff, MDrive_axis[signal]);
-        recv_mess(card, buff, 1);
-        Lswitch = atoi(buff);
+	sprintf(buff, "PR I%d", confptr->plusLS);
+	send_mess(card, buff, MDrive_axis[signal]);
+	recv_mess(card, buff, 1);
+	Lswitch = atoi(buff);
 
-        /* Set limit Lswitch error indicators. */
+	/* Set limit Lswitch error indicators. */
 	if (Lswitch != 0)
 	{
 	    status.Bits.RA_PLUS_LS = 1;
@@ -319,11 +318,11 @@ static int set_status(int card, int signal)
 	else
 	    status.Bits.RA_PLUS_LS = 0;
 
-        sprintf(buff, "PR I%d", confptr->minusLS);
-        send_mess(card, buff, MDrive_axis[signal]);
-        recv_mess(card, buff, 1);
-        Lswitch = atoi(buff);
-	
+	sprintf(buff, "PR I%d", confptr->minusLS);
+	send_mess(card, buff, MDrive_axis[signal]);
+	recv_mess(card, buff, 1);
+	Lswitch = atoi(buff);
+
 	if (Lswitch != 0)
 	{
 	    status.Bits.RA_MINUS_LS = 1;
@@ -338,10 +337,10 @@ static int set_status(int card, int signal)
 	status.Bits.RA_HOME = 0;
     else
     {
-        sprintf(buff, "PR I%d", confptr->homeLS);
-        send_mess(card, buff, MDrive_axis[signal]);
-        recv_mess(card, buff, 1);
-        Lswitch = atoi(buff);
+	sprintf(buff, "PR I%d", confptr->homeLS);
+	send_mess(card, buff, MDrive_axis[signal]);
+	recv_mess(card, buff, 1);
+	Lswitch = atoi(buff);
 	status.Bits.RA_HOME = (Lswitch) ? 1 : 0;
     }
 
@@ -349,9 +348,9 @@ static int set_status(int card, int signal)
     status.Bits.EA_POSITION = 0;
 
     /* encoder status */
-    status.Bits.EA_SLIP	      = 0;
+    status.Bits.EA_SLIP       = 0;
     status.Bits.EA_SLIP_STALL = 0;
-    status.Bits.EA_HOME	      = 0;
+    status.Bits.EA_HOME       = 0;
 
     if (motor_state[card]->motor_info[signal].encoder_present == NO)
 	motor_info->encoder_position = 0;
@@ -363,7 +362,7 @@ static int set_status(int card, int signal)
 	motor_info->encoder_position = (int32_t) motorData;
     }
 
-    status.Bits.RA_PROBLEM	= 0;
+    status.Bits.RA_PROBLEM  = 0;
 
     /* Parse motor velocity? */
     /* NEEDS WORK */
@@ -374,7 +373,7 @@ static int set_status(int card, int signal)
 	motor_info->velocity *= -1;
 
     rtn_state = (!motor_info->no_motion_count || ls_active == true ||
-		status.Bits.RA_DONE | status.Bits.RA_PROBLEM) ? 1 : 0;
+		 status.Bits.RA_DONE | status.Bits.RA_PROBLEM) ? 1 : 0;
 
     /* Test for post-move string. */
     if ((status.Bits.RA_DONE || ls_active == true) && nodeptr != 0 &&
@@ -392,15 +391,15 @@ exit:
 
 
 /*****************************************************/
-/* send a message to the MDrive board		     */
-/* send_mess()			                     */
+/* send a message to the MDrive board                */
+/* send_mess()                                       */
 /*****************************************************/
 static RTN_STATUS send_mess(int card, char const *com, char *name)
 {
     char local_buff[MAX_MSG_SIZE];
     struct IM483controller *cntrl;
     int comsize, namesize;
-    int nwrite;
+    size_t nwrite;
 
     comsize = (com == NULL) ? 0 : strlen(com);
     namesize = (name == NULL) ? 0 : strlen(name);
@@ -410,7 +409,7 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 	errlogMessage("drvMDrive.c:send_mess(); message size violation.\n");
 	return(ERROR);
     }
-    else if (comsize == 0)	/* Normal exit on empty input message. */
+    else if (comsize == 0)  /* Normal exit on empty input message. */
 	return(OK);
 
     if (!motor_state[card])
@@ -422,7 +421,7 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
     /* Make a local copy of the string and add the command line terminator. */
     if (namesize != 0)
     {
-	strcpy(local_buff, name);	    /* put in axis */
+	strcpy(local_buff, name);	/* put in axis */
 	strcat(local_buff, com);
     }
     else
@@ -432,7 +431,7 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 
     cntrl = (struct IM483controller *) motor_state[card]->DevicePrivate;
     pasynOctetSyncIO->write(cntrl->pasynUser, local_buff, strlen(local_buff),
-		       COMM_TIMEOUT, &nwrite);
+			    COMM_TIMEOUT, &nwrite);
 
     return(OK);
 }
@@ -440,13 +439,13 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 
 /*****************************************************/
 /* receive a message from the MDrive board           */
-/* recv_mess()			                     */
+/* recv_mess()                                       */
 /*****************************************************/
 static int recv_mess(int card, char *com, int flag)
 {
     struct IM483controller *cntrl;
     const double timeout = 1.0;
-    int nread = 0;
+    size_t nread = 0;
     asynStatus status = asynError;
     int eomReason;
 
@@ -461,7 +460,7 @@ static int recv_mess(int card, char *com, int flag)
     else
 	status = pasynOctetSyncIO->read(cntrl->pasynUser, com, BUFF_SIZE,
 					timeout, &nread, &eomReason);
-    
+
     if ((status != asynSuccess) || (nread <= 0))
     {
 	com[0] = '\0';
@@ -478,8 +477,8 @@ static int recv_mess(int card, char *com, int flag)
 /* MDriveSetup()                                     */
 /*****************************************************/
 RTN_STATUS
-MDriveSetup(int num_cards,	/* maximum number of chains in system.  */
-	    int scan_rate)	/* polling rate - 1/60 sec units.  */
+MDriveSetup(int num_cards,  /* maximum number of chains in system.  */
+	    int scan_rate)  /* polling rate - 1/60 sec units.  */
 {
     int itera;
 
@@ -494,12 +493,12 @@ MDriveSetup(int num_cards,	/* maximum number of chains in system.  */
     else
 	targs.motor_scan_rate = SCAN_RATE;
 
-   /* 
-    * Allocate space for motor_state structures.  Note this must be done
-    * before IM483Config is called, so it cannot be done in motor_init()
-    * This means that we must allocate space for a card without knowing
-    * if it really exists, which is not a serious problem
-    */
+    /*
+     * Allocate space for motor_state structures.  Note this must be done
+     * before IM483Config is called, so it cannot be done in motor_init()
+     * This means that we must allocate space for a card without knowing
+     * if it really exists, which is not a serious problem
+     */
     motor_state = (struct controller **) malloc(MDrive_num_cards *
 						sizeof(struct controller *));
 
@@ -515,13 +514,13 @@ MDriveSetup(int num_cards,	/* maximum number of chains in system.  */
 /* MDriveConfig()                                    */
 /*****************************************************/
 RTN_STATUS
-MDriveConfig(int card,		/* chain being configured */
-             const char *name)	/* ASYN port name */
+MDriveConfig(int card,	    /* chain being configured */
+	     const char *name)	/* ASYN port name */
 {
     struct IM483controller *cntrl;
 
     if (card < 0 || card >= MDrive_num_cards)
-        return(ERROR);
+	return(ERROR);
 
     motor_state[card] = (struct controller *) malloc(sizeof(struct controller));
     motor_state[card]->DevicePrivate = malloc(sizeof(struct IM483controller));
@@ -533,10 +532,10 @@ MDriveConfig(int card,		/* chain being configured */
 
 
 /*****************************************************/
-/* initialize all software and hardware		     */
+/* initialize all software and hardware              */
 /* This is called from the initialization routine in */
 /* device support.                                   */
-/* motor_init()			                     */
+/* motor_init()                                      */
 /*****************************************************/
 static int motor_init()
 {
@@ -560,7 +559,7 @@ static int motor_init()
     {
 	if (!motor_state[card_index])
 	    continue;
-	
+
 	brdptr = motor_state[card_index];
 	brdptr->ident[0] = (char) NULL;	/* No controller identification message. */
 	brdptr->cmnd_response = false;
@@ -569,7 +568,7 @@ static int motor_init()
 
 	/* Initialize communications channel */
 	success_rtn = pasynOctetSyncIO->connect(cntrl->asyn_port, 0,
-				&cntrl->pasynUser, NULL);
+						&cntrl->pasynUser, NULL);
 
 	if (success_rtn == asynSuccess)
 	{
@@ -579,12 +578,12 @@ static int motor_init()
 					  strlen(input_terminator));
 	    /* Send a message to the board, see if it exists */
 	    /* flush any junk at input port - should not be any data available */
-            pasynOctetSyncIO->flush(cntrl->pasynUser);
-    
+	    pasynOctetSyncIO->flush(cntrl->pasynUser);
+
 	    for (total_axis = 0; total_axis < MAX_AXES; total_axis++)
 	    {
 		int retry = 0;
-		
+
 		/* Try 3 times to connect to controller. */
 		do
 		{
@@ -600,7 +599,7 @@ static int motor_init()
 	    }
 	    brdptr->total_axis = total_axis;
 	    cntrl->inconfig = (input_config *) malloc(
-		    sizeof(struct IM483controller) * total_axis);
+						     sizeof(struct IM483controller) * total_axis);
 	}
 
 	if (success_rtn == asynSuccess && total_axis > 0)
@@ -623,7 +622,7 @@ static int motor_init()
 		/* Assume no encoder support. */
 		motor_info->encoder_present = NO;
 
-                /* Determine if encoder present based last character of "ident". */
+		/* Determine if encoder present based last character of "ident". */
 		if (brdptr->ident[strlen(brdptr->ident) - 1] == 'E')
 		{
 		    motor_info->pid_present = YES;
@@ -632,7 +631,7 @@ static int motor_init()
 		    motor_info->status.Bits.EA_PRESENT = 1;
 		}
 
-                /* Determine input configuration. */
+		/* Determine input configuration. */
 		confptr->homeLS = confptr->minusLS = confptr->plusLS = 0;
 
 		for (itera = 1; itera <= 4; itera++)
@@ -647,7 +646,7 @@ static int motor_init()
 			errlogPrintf("Error reading I/O configuration.\n");
 			break;
 		    }
-		    
+
 		    status = sscanf(buff, "%d,%d", &type, &active);
 		    switch (type)
 		    {
@@ -692,8 +691,8 @@ static int motor_init()
     free_list.tail = (struct mess_node *) NULL;
 
     epicsThreadCreate((char *) "MDrive_motor", epicsThreadPriorityMedium,
-	epicsThreadGetStackSize(epicsThreadStackMedium),
-	(EPICSTHREADFUNC) motor_task, (void *) &targs);
+		      epicsThreadGetStackSize(epicsThreadStackMedium),
+		      (EPICSTHREADFUNC) motor_task, (void *) &targs);
 
     return(OK);
 }

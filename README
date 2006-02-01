@@ -1,4 +1,4 @@
-Motor Record R5-6 Release Notice
+Motor Record R5-7 Release Notice
 ===============================================================================
 
 The motor record software in this release is compatible with EPICS base R3-14-7.
@@ -91,6 +91,156 @@ Known Problems
 3) The OMS VME58 servo motor controller board (i.e., model -8S) is unable to
 	move off an activated limit switch.  Users are advised to avoid this
 	situation.  This problem is fixed with the MAXv model.
+
+4) With R5-3 of the motorRecord, negative encoder resolutions (ERES) are
+	supported.  This allows the user to change the sign of ERES rather than
+	reverse encoder wires when the motor and encoder direction are reversed.
+
+	There is a peculiarity with the OMS controller boards when they are
+	configured with MRES and ERES of opposite polarity.  Since both the
+	commanded and feedback positions are set with the same command (LP),
+	the user must enter the opposite polarity when setting the OMS motor
+	controllers position.
+
+	For example, if MRES is positive and ERES is negative and the user
+	wants to set the current position to 10.00 inches, then -10.00 must be
+	entered in the VAL or DVAL field.
+
+
+Modification Log from R5-6 to R5-7
+==================================
+
+1) ASYN R4-3 compatibility change to nbytesTransfered argument of
+	pasynOctetSyncIO read and write members.
+
+	Files modified: All drivers using ASYN.
+
+2) IMS MDrive bug fix for not setting acceleration = deceleration correctly.
+
+	File modified: devMDrive.c
+
+3) Bug fix for homing and jog request not cleared after a limit switch error.
+
+	File modified: motorRecord.cc - Added clear_buttons() function.
+				      - db_post_events home and jog buttons.
+
+4) A delay was added to the driver support with R3-5 to prevent motor
+	controller status updates from reading "stale data".  This problem
+	arose under the following scenario;
+	- Start a motor move which is in the opposite direction from the
+	previous move.
+	- Immediately (e.g., < 1ms) ask the controller for status information
+	that includes the motor's direction.
+	- For OMS controllers the required delay is 10ms.  Intermittently, the
+	status information returned from the OMS controller would indicate that
+	the direction had not changed; hence the term "stale data".
+	
+	This problem was fixed by inserting a delay between the start of motor
+	motion and the first status update.  Unfortunately, the delay was
+	implemented in such a way as to have an undesirable side effect for VME
+	based controllers (i.e., OMS) that interrupt on motion complete.
+	Namely, if the motor move time was less than approximately two VxWorks
+	system clock ticks (33.33 ms for a 60HZ system clock), than the
+	response time to the controller signally motion complete was based on
+	the polling rate, rather than the done interrupt latency.
+
+	This problem has been fixed by having query_axis() in motordrvCom.c
+	return the remaining delay time to motor_task(), so that motor_task()
+	can delay for the remainder of the delay rather than the larger polling
+	rate.
+	
+	In order to avoid having all device drivers delay for the maximum
+	stale data delay time, each device driver now passes the stale data
+	delay time in the "thread_args" structure at "motor_task" thread
+	creation.
+
+	Files modified: - numerous changes to motordrvCom.cc
+			- "update_delay" added to thread_args in motordrvCom.h.
+			- "targs" modified in all drivers with "update_delay"
+			  initialization.
+
+5) With this release, if the absolute values of both the save/restore's target
+	position and the controller's commanded position are greater than the
+	re-try deadband (RDBD) at boot-up, then DVAL will be initialized from
+	the controller's value.  In other words, if the absolute value of
+	the controller's commanded position is greater than the re-try deadband
+	at boot-up, than the controller's position takes precedence over the
+	save/restore value.
+
+	- Modified motor_init_record_com() in motordevCom.c so that a "Load
+		Pos" command is issued only if,
+		|controller's commanded position| > RDBD.
+
+6) Bug fix for DMOV going true before last readback update when LS error occurs.
+
+	File modified: process() in motorRecord.cc restores DMOV to false and
+			UNMARK's it so it is not posted until after the last
+			readback update.
+
+7) A bug was introduced with R5-1 item #2 below.  This bug resulted in the STOP
+	field not functioning after a target position change.  For example, if
+	the user tweaked (TWF) the target position while the motor was moving,
+	activating the STOP field would not stop motor motion the first time; a
+	second STOP field activation would work.
+
+	File modified: process() in motorRecord.cc.  Before calling
+			postProcess(), if the target position has changed
+			and MIP is not MIP_STOP or MIP_JOG_STOP, then set MIP
+			to MIP_DONE and let do_work() process the new target
+			position.
+
+8) In order to avoid device level "Overriding invalid acceleration" warning
+	messages, record support does not send SET_ACCEL commands when
+	acceleration = 0.
+
+	File modified: postProcess() and do_work() in motorRecord.cc.
+
+9) Avoid STUP errors from devices that do not have a "GET_INFO" command (i.e.,
+	Soft Channel).
+
+	File modified: do_work in motorRecord.cc.  If WRITE_MSG(GET_INFO, NULL)
+			returns an error, set STUP to motorSTUP_OFF.
+
+10) Added debug messages to Soft Channel device support and fixed error when
+	devSoft.cc was compiled with "gcc version 3.4.2 20041017 (Red Hat
+	3.4.2-6.fc3)".
+
+	File modified: devSoft.cc
+
+11) Kurt Goetze added support for the Physik Instrumente (PI) model C-630
+	motion controller.
+
+	Files added: to PiSrc directory; drvPIC630.h, devPIC630.cc,
+					 drvPIC630.cc
+
+12) Bug fix for PI C-844 driver processing of axis #4.
+
+	File modified: drvPIC844.cc, missing break"'s in axis #4 switch/case
+					stmts. in set_status().
+
+13) Added support for the Physik Instrumente (PI) GmbH & Co. C-848 motor
+	controller.
+
+	Files added:	- devPIC848.cc, drvPIC848.h, drvPIC848.cc
+
+14) A bug was reported by David Maden that occurred when a motor was jogged
+	into a limit switch with the DIR field set to "Neg".  Under these
+	conditions, the motor record was not processing the limit error
+	condition correctly.  This resulted in the motor record not setting
+	either of the limit error indicator fields (HLS/LLS) and becoming stuck
+	in the "Moving" state.
+	
+	File modified: do_work() in motorRecord.cc; complement CDIR when
+			jogging if DIR="Neg".
+
+15) Added maximum communication timeout for all devices drivers (MAX_TIMEOUT).
+	This value is set in motordrvCom.h to 5 seconds.  This helps prevent
+	the "dev_NoInit (init_record_com: callback2 timeout" error message at
+	motor record initialization.
+	
+	Files modified: - Added MAX_TIMEOUT to motordrvCom.h.
+			- Reference MAX_TIMEOUT in motor_init_record_com() in
+			  motordevCom.cc.
 
 
 Modification Log from R5-5 to R5-6

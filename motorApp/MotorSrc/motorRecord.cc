@@ -2,9 +2,9 @@
 FILENAME...	motorRecord.cc
 USAGE...	Motor Record Support.
 
-Version:	1.22
+Version:	1.26
 Modified By:	sluiter
-Last Modified:	2005/03/18 22:36:36
+Last Modified:	2005/10/11 20:56:13
 */
 
 /*
@@ -70,9 +70,18 @@ Last Modified:	2005/03/18 22:36:36
  *			compatibility.
  * .20 12-02-04 rls - fixed incorrect slew acceleration calculation.
  * .21 03-13-05 rls - Removed record level round-up position code in do_work().
+ * .22 04-04-05 rls - Clear homing and jog request after LS or travel limit error.
+ * .23 05-31-05 rls - Bug fix for DMOV going true before last readback update
+ *			when LS error occurs.
+ * .24 06-17-05 rls - Bug fix for STOP not working after target position changed.
+ *                  - Don't send SET_ACCEL command when acceleration = 0.0.
+ *                  - Avoid STUP errors from devices that do not have "GET_INFO"
+ *                    command (e.g. Soft Channel).
+ * .25 10-11-05 rls - CDIR not set correctly when jogging with DIR="Neg".
+ *
  */
 
-#define VERSION 5.6
+#define VERSION 5.7
 
 #include	<stdlib.h>
 #include	<string.h>
@@ -123,6 +132,7 @@ static void set_dial_highlimit(motorRecord *, struct motor_dset *);
 static void set_dial_lowlimit(motorRecord *, struct motor_dset *);
 static void set_userlimits(motorRecord *);
 static void range_check(motorRecord *, float *, double, double);
+static void clear_buttons(motorRecord *);
 
 /*** Record Support Entry Table (RSET) functions. ***/
 
@@ -212,7 +222,7 @@ field to all listeners.  monitor() does this.
 /* Bit field for "mmap". */
 typedef union
 {
-    unsigned long All;
+    epicsUInt32 All;
     struct
     {
 	unsigned int M_VAL	:1;
@@ -253,7 +263,7 @@ typedef union
 /* Bit field for "nmap". */
 typedef union
 {
-    unsigned long All;
+    epicsUInt32 All;
     struct
     {
 	unsigned int M_S	:1;
@@ -268,6 +278,10 @@ typedef union
 	unsigned int M_ACCL	:1;
 	unsigned int M_BACC	:1;
 	unsigned int M_STUP	:1;
+	unsigned int M_JOGF	:1;
+	unsigned int M_JOGR	:1;
+	unsigned int M_HOMF	:1;
+	unsigned int M_HOMR	:1;
     } Bits;
 } nmap_field;
 
@@ -662,6 +676,9 @@ static long postProcess(motorRecord * pmr)
 	    WRITE_MSG(GO, NULL);
 	    SEND_MSG();
 	    pmr->pp = TRUE;
+	    pmr->cdir = (pmr->mip & MIP_HOMF) ? 1 : 0;
+	    if (pmr->mres < 0.0)
+		pmr->cdir = !pmr->cdir;
 	}
 	else
 	{
@@ -669,14 +686,14 @@ static long postProcess(motorRecord * pmr)
 	    {
 		pmr->mip &= ~MIP_HOMF;
 		pmr->homf = 0;
-		db_post_events(pmr, &pmr->homf, DBE_VAL_LOG);
+		MARK_AUX(M_HOMF);
 	    }
 	    else if (pmr->mip & MIP_HOMR)
 	    {
     
 		pmr->mip &= ~MIP_HOMR;
 		pmr->homr = 0;
-		db_post_events(pmr, &pmr->homr, DBE_VAL_LOG);
+		MARK_AUX(M_HOMR);
 	    }
 	}
     }
@@ -711,7 +728,8 @@ static long postProcess(motorRecord * pmr)
 		if (vel <= vbase)
 		    vel = vbase + 1;
 		WRITE_MSG(SET_VELOCITY, &vel);
-		WRITE_MSG(SET_ACCEL, &acc);
+		if (acc > 0.0)	/* Don't SET_ACCEL if vel = vbase. */
+		    WRITE_MSG(SET_ACCEL, &acc);
 		if (use_rel)
 		    WRITE_MSG(MOVE_REL, &relbpos);
 		else
@@ -726,7 +744,8 @@ static long postProcess(motorRecord * pmr)
 		if (bvel <= vbase)
 		    bvel = vbase + 1;
 		WRITE_MSG(SET_VELOCITY, &bvel);
-		WRITE_MSG(SET_ACCEL, &bacc);
+		if (bacc > 0.0)	/* Don't SET_ACCEL if bvel = vbase. */
+		    WRITE_MSG(SET_ACCEL, &bacc);
 		if (use_rel)
 		{
 		    relpos = (relpos - relbpos) * pmr->frac;
@@ -780,7 +799,8 @@ static long postProcess(motorRecord * pmr)
 	if (bvel <= vbase)
 	    bvel = vbase + 1;
 	WRITE_MSG(SET_VELOCITY, &bvel);
-	WRITE_MSG(SET_ACCEL, &bacc);
+	if (bacc > 0.0)	/* Don't SET_ACCEL if bvel = vbase. */
+	    WRITE_MSG(SET_ACCEL, &bacc);
 	if (use_rel)
 	{
 	    relpos = (relpos - relbpos) * pmr->frac;
@@ -1113,6 +1133,9 @@ static long process(dbCommon *arg)
 	    /* Do another update after LS error. */
 	    if (pmr->mip != MIP_DONE && (pmr->rhls || pmr->rlls))
 	    {
+		/* Restore DMOV to false and UNMARK it so it is not posted. */
+		pmr->dmov = FALSE;
+		UNMARK(M_DMOV);
 		INIT_MSG();
 		WRITE_MSG(GET_INFO, NULL);
 		SEND_MSG();
@@ -1124,7 +1147,9 @@ static long process(dbCommon *arg)
 	    
 	    if (pmr->pp)
 	    {
-		if (pmr->val != pmr->lval)
+		if ((pmr->val != pmr->lval) &&
+		   !(pmr->mip & MIP_STOP)   &&
+		   !(pmr->mip & MIP_JOG_STOP))
 		{
 		    pmr->mip = MIP_DONE;
 		    /* Bug fix, record locks-up when BDST != 0, DLY != 0 and
@@ -1197,8 +1222,7 @@ enter_do_work:
 	if (pmr->lvio && !pmr->set)
 	{
 	    pmr->stop = 1;
-	    /* Clear all the buttons that cause motion. */
-	    pmr->jogf = pmr->jogr = pmr->homf = pmr->homr = 0;
+	    clear_buttons(pmr);
 	}
     }
     /* Do we need to examine the record to figure out what work to perform? */
@@ -1519,7 +1543,8 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 	     */
 	    if (pmr->spmg == motorSPMG_Stop || stop == true)
 	    {
-		if (pmr->mip == MIP_DONE || pmr->mip == MIP_STOP || pmr->mip == MIP_RETRY)
+		if ((pmr->mip == MIP_DONE) || (pmr->mip & MIP_STOP) ||
+		    (pmr->mip & MIP_RETRY))
 		{
 		    if (pmr->mip == MIP_RETRY)
 		    {
@@ -1537,7 +1562,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 		else if (pmr->movn)
 		{
 		    pmr->pp = TRUE;	/* Do when motor stops. */
-		    pmr->jogf = pmr->jogr = 0;
+		    clear_buttons(pmr);
 		}
 		else
 		{
@@ -1550,16 +1575,9 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 		}
 	    }
 	    /* Cancel any operations. */
-	    if (pmr->mip & MIP_HOMF)
-	    {
-		pmr->homf = 0;
-		db_post_events(pmr, &pmr->homf, DBE_VAL_LOG);
-	    }
-	    else if (pmr->mip & MIP_HOMR)
-	    {
-		pmr->homr = 0;
-		db_post_events(pmr, &pmr->homr, DBE_VAL_LOG);
-	    }
+	    if (pmr->mip & MIP_HOME)
+		clear_buttons(pmr);
+	    
 	    pmr->mip = MIP_STOP;
 	    MARK(M_MIP);
 	    INIT_MSG();
@@ -1729,6 +1747,9 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 		MARK(M_DMOV);
 		pmr->rcnt = 0;
 		MARK(M_RCNT);
+		pmr->cdir = (pmr->mip & MIP_HOMF) ? 1 : 0;
+		if (pmr->mres < 0.0)
+		    pmr->cdir = !pmr->cdir;
 	    }
 	    return(OK);
 	}
@@ -1777,6 +1798,8 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 		}
 
 		if (pmr->mres < 0.0)
+		    pmr->cdir = !pmr->cdir;
+		if (dir == -1)
 		    pmr->cdir = !pmr->cdir;
 
 		INIT_MSG();
@@ -1902,11 +1925,18 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
     
     if (pmr->stup == motorSTUP_ON)
     {
+	RTN_STATUS status;
+
 	pmr->stup = motorSTUP_BUSY;
 	MARK_AUX(M_STUP);
 	INIT_MSG();
-	WRITE_MSG(GET_INFO, NULL);
-	SEND_MSG();
+	status = WRITE_MSG(GET_INFO, NULL);
+	/* Avoid errors from devices that do not have "GET_INFO" (e.g. Soft
+	   Channel). */
+	if (status == ERROR)
+	    pmr->stup = motorSTUP_OFF;
+	else
+	    SEND_MSG();
     }
 
     /* IF DVAL field has changed, OR, NOT done moving. */
@@ -2093,7 +2123,8 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 		pmr->cdir = (pmr->rdif < 0.0) ? 0 : 1;
 		WRITE_MSG(SET_VEL_BASE, &vbase);
 		WRITE_MSG(SET_VELOCITY, &velocity);
-		WRITE_MSG(SET_ACCEL, &accel);
+		if (accel > 0.0)	/* Don't SET_ACCEL = 0.0 */
+		    WRITE_MSG(SET_ACCEL, &accel);
 		if (use_rel == true)
 		    WRITE_MSG(MOVE_REL, &position);
 		else
@@ -2105,11 +2136,18 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
     }
     else if (proc_ind == NOTHING_DONE && pmr->stup == motorSTUP_OFF)
     {
+	RTN_STATUS status;
+	
 	pmr->stup = motorSTUP_BUSY;
 	MARK_AUX(M_STUP);
 	INIT_MSG();
-	WRITE_MSG(GET_INFO, NULL);
-	SEND_MSG();
+	status = WRITE_MSG(GET_INFO, NULL);
+	/* Avoid errors from devices that do not have "GET_INFO" (e.g. Soft
+	   Channel). */
+	if (status == ERROR)
+	    pmr->stup = motorSTUP_OFF;
+	else
+	    SEND_MSG();
     }
     return(OK);
 }
@@ -3116,6 +3154,14 @@ static void post_MARKed_fields(motorRecord * pmr, unsigned short mask)
 	db_post_events(pmr, &pmr->dmov, local_mask);
     if ((local_mask = mask | (MARKED_AUX(M_STUP) ? DBE_VAL_LOG : 0)))
 	db_post_events(pmr, &pmr->stup, local_mask);
+    if ((local_mask = mask | (MARKED_AUX(M_JOGF) ? DBE_VAL_LOG : 0)))
+	db_post_events(pmr, &pmr->jogf, local_mask);
+    if ((local_mask = mask | (MARKED_AUX(M_JOGR) ? DBE_VAL_LOG : 0)))
+	db_post_events(pmr, &pmr->jogr, local_mask);
+    if ((local_mask = mask | (MARKED_AUX(M_HOMF) ? DBE_VAL_LOG : 0)))
+	db_post_events(pmr, &pmr->homf, local_mask);
+    if ((local_mask = mask | (MARKED_AUX(M_HOMR) ? DBE_VAL_LOG : 0)))
+	db_post_events(pmr, &pmr->homr, local_mask);
 
     UNMARK_ALL;
 }
@@ -3167,7 +3213,7 @@ static void
     if (pmr->rbv != old_rbv)
 	MARK(M_RBV);
 
-    /* Get current or most recent direction. */
+    /* Set most recent raw direction. */
     pmr->tdir = (msta.Bits.RA_DIRECTION) ? 1 : 0;
     if (pmr->tdir != old_tdir)
 	MARK(M_TDIR);
@@ -3187,7 +3233,11 @@ static void
 
     /* Get motor-now-moving indicator. */
     if (ls_active == true || msta.Bits.RA_DONE || msta.Bits.RA_PROBLEM)
+    {
 	pmr->movn = 0;
+	if (ls_active == true)
+	    clear_buttons(pmr);
+    }
     else
 	pmr->movn = 1;
     if (pmr->movn != old_movn)
@@ -3575,6 +3625,35 @@ static void range_check(motorRecord *pmr, float *parm_ptr, double min, double ma
     {
 	*parm_ptr = parm_val;
 	db_post_events(pmr, parm_ptr, DBE_VAL_LOG);
+    }
+}
+
+
+/*
+FUNCTION... void clear_buttons(motorRecord *)
+USAGE... Clear all motion request buttons.
+*/
+static void clear_buttons(motorRecord *pmr)
+{
+    if (pmr->jogf)
+    {
+	pmr->jogf = 0;
+	MARK_AUX(M_JOGF);
+    }
+    if (pmr->jogr)
+    {
+	pmr->jogr = 0;
+	MARK_AUX(M_JOGR);
+    }
+    if (pmr->homf)
+    {
+	pmr->homf = 0;
+	MARK_AUX(M_HOMF);
+    }
+    if (pmr->homr)
+    {
+	pmr->homr = 0;
+	MARK_AUX(M_HOMR);
     }
 }
 

@@ -1,16 +1,16 @@
 /*
-FILENAME...	drvPIC844.cc
+FILENAME...	drvPIC848.cc
 USAGE...	Motor record driver level support for Physik Instrumente (PI)
-		GmbH & Co. C-844 motor controller.
+	GmbH & Co. C-848 motor controller.
 
-Version:	1.13
+Version:	1.2
 Modified By:	sluiter
-Last Modified:	2005/10/04 19:52:02
+Last Modified:	2005/10/18 21:31:10
 */
 
 /*
  *      Original Author: Ron Sluiter
- *      Date: 12/17/03
+ *      Date: 10/18/05
  *
  *      Experimental Physics and Industrial Control System (EPICS)
  *
@@ -35,61 +35,49 @@ Last Modified:	2005/10/04 19:52:02
  *
  * Modification Log:
  * -----------------
- * .01 12/17/03 rls - copied from drvIM483PL.cc
- * .02 02/03/04 rls - Eliminate erroneous "Motor motion timeout ERROR".
- * .03 07/12/04 rls - Converted from MPF to asyn.
- * .04 09/09/04 rls - Retry on initial comm. (PIC844 comm. locks up when IOC
- *                    is power cycled).
- * .05 09/21/04 rls - support for 32axes/controller.
- * .06 12/16/04 rls - asyn R4.0 support.
- *		    - make debug variables always available.
- *		    - MS Visual C compatibility; make all epicsExportAddress
- *		      extern "C" linkage.
- * .07 08/31/04 rls - Bug fix for no "break"'s in axis #4 switch/case stmts.
- *			in set_status().
+ * .01 10/18/05 rls - copied from drvPIC844.cc
  */
 
 /*
 DESIGN LIMITATIONS...
-    1 - Like all controllers, the PIC844 must be powered-on when EPICS is first
-	booted up.
-    2 - The PIC844 cannot be power cycled while EPICS is up and running.  The
-	consequences are permanent communication lose with the PIC844 until
-	EPICS is rebooted.
+    1 - Like all controllers, the PIC848 must be powered-on when EPICS is first
+    booted up.
 */
 
 #include <string.h>
 #include <epicsThread.h>
 #include <drvSup.h>
+#include "motorRecord.h"
 #include "motor.h"
-#include "drvPI.h"
+#include "drvPIC848.h"
 #include "epicsExport.h"
 
 #define GET_IDENT "*IDN?"
 
-#define PIC844_NUM_CARDS	8
-#define MAX_AXES		8
-#define BUFF_SIZE 100		/* Maximum length of string to/from PIC844 */
+#define PIC848_NUM_CARDS	8
+#define MAX_AXES		4
+#define BUFF_SIZE 100		/* Maximum length of string to/from PIC848 */
 
 /*----------------debugging-----------------*/
 #ifdef __GNUG__
     #ifdef	DEBUG
-	#define Debug(l, f, args...) { if(l<=drvPIC844debug) printf(f,## args); }
+	#define Debug(l, f, args...) { if(l<=drvPIC848debug) printf(f,## args); }
     #else
 	#define Debug(l, f, args...)
     #endif
 #else
     #define Debug()
 #endif
-volatile int drvPIC844debug = 0;
-extern "C" {epicsExportAddress(int, drvPIC844debug);}
+volatile int drvPIC848debug = 0;
+extern "C" {epicsExportAddress(int, drvPIC848debug);}
 
 /* --- Local data. --- */
-int PIC844_num_cards = 0;
-static char *PIC844_axis[4] = {"1", "2", "3", "4"};
+int PIC848_num_cards = 0;
+static char *PIC848_axis[4] = {"A", "B", "C", "D"};
 
 /* Local data required for every driver; see "motordrvComCode.h" */
 #include	"motordrvComCode.h"
+
 
 /*----------------functions-----------------*/
 static int recv_mess(int, char *, int);
@@ -102,7 +90,7 @@ static void query_done(int, int, struct mess_node *);
 
 /*----------------functions-----------------*/
 
-struct driver_table PIC844_access =
+struct driver_table PIC848_access =
 {
     motor_init,
     motor_send,
@@ -123,7 +111,7 @@ struct driver_table PIC844_access =
     query_done,
     NULL,
     &initialized,
-    PIC844_axis
+    PIC848_axis
 };
 
 struct
@@ -131,11 +119,11 @@ struct
     long number;
     long (*report) (int);
     long (*init) (void);
-} drvPIC844 = {2, report, init};
+} drvPIC848 = {2, report, init};
 
-extern "C" {epicsExportAddress(drvet, drvPIC844);}
+extern "C" {epicsExportAddress(drvet, drvPIC848);}
 
-static struct thread_args targs = {SCAN_RATE, &PIC844_access, 0.0};
+static struct thread_args targs = {SCAN_RATE, &PIC848_access, 0.0};
 
 /*********************************************************
  * Print out driver status report
@@ -144,22 +132,22 @@ static long report(int level)
 {
     int card;
 
-    if (PIC844_num_cards <=0)
-	printf("    No PIC844 controllers configured.\n");
+    if (PIC848_num_cards <=0)
+	printf("    No PIC848 controllers configured.\n");
     else
     {
-	for (card = 0; card < PIC844_num_cards; card++)
+	for (card = 0; card < PIC848_num_cards; card++)
 	{
 	    struct controller *brdptr = motor_state[card];
 
 	    if (brdptr == NULL)
-		printf("    PIC844 controller %d connection failed.\n", card);
+		printf("    PIC848 controller %d connection failed.\n", card);
 	    else
 	    {
-		struct PIC844controller *cntrl;
+		struct PIC848controller *cntrl;
 
-		cntrl = (struct PIC844controller *) brdptr->DevicePrivate;
-	    	printf("    PIC844 controller #%d, port=%s, id: %s \n", card,
+		cntrl = (struct PIC848controller *) brdptr->DevicePrivate;
+		printf("    PIC848 controller #%d, port=%s, id: %s \n", card,
 		       cntrl->asyn_port, brdptr->ident);
 	    }
 	}
@@ -170,16 +158,16 @@ static long report(int level)
 
 static long init()
 {
-   /* 
-    * We cannot call motor_init() here, because that function can do GPIB I/O,
-    * and hence requires that the drvGPIB have already been initialized.
-    * That cannot be guaranteed, so we need to call motor_init from device
-    * support
-    */
+    /* 
+     * We cannot call motor_init() here, because that function can do GPIB I/O,
+     * and hence requires that the drvGPIB have already been initialized.
+     * That cannot be guaranteed, so we need to call motor_init from device
+     * support
+     */
     /* Check for setup */
-    if (PIC844_num_cards <= 0)
+    if (PIC848_num_cards <= 0)
     {
-	Debug(1, "init(): PIC844 driver disabled. PIC844Setup() missing from startup script.\n");
+	Debug(1, "init(): PIC848 driver disabled. PIC848Setup() missing from startup script.\n");
     }
     return((long) 0);
 }
@@ -221,35 +209,47 @@ static void query_done(int card, int axis, struct mess_node *nodeptr)
 
 static int set_status(int card, int signal)
 {
-    struct PIC844controller *cntrl;
+    struct PIC848controller *cntrl;
     struct mess_node *nodeptr;
-    register struct mess_info *motor_info;
+    struct mess_info *motor_info;
+    struct motorRecord *mr;
     /* Message parsing variables */
-    char buff[BUFF_SIZE];
-    C844_Cond_Reg mstat;
-    int rtn_state;
-    double motorData;
-    bool plusdir, ls_active = false, inmotion, plusLS, minusLS;
+    char buff[BUFF_SIZE], axisID;
+    C848_Status_Reg mstat;
+    int rtn_state, convert_cnt, charcnt, tempInt;
+    epicsInt32 motorData;
+    bool plusdir, ls_active = false, plusLS, minusLS;
     msta_field status;
 
-    cntrl = (struct PIC844controller *) motor_state[card]->DevicePrivate;
+    cntrl = (struct PIC848controller *) motor_state[card]->DevicePrivate;
     motor_info = &(motor_state[card]->motor_info[signal]);
     nodeptr = motor_info->motor_motion;
+    if (nodeptr != NULL)
+	mr = (struct motorRecord *) nodeptr->mrecord;
+    else
+	mr = NULL;
     status.All = motor_info->status.All;
 
-    send_mess(card, "AXIS:STAT?", PIC844_axis[signal]);
-    recv_mess(card, buff, 1);
+    if (cntrl->status != NORMAL)
+	charcnt = recv_mess(card, buff, FLUSH);
 
-    if (strcmp(buff, "ON") == 0)
-	status.Bits.EA_POSITION = 1;
-    else if (strcmp(buff, "OFF") == 0)
-	status.Bits.EA_POSITION = 0;
+    send_mess(card, "STA? #", PIC848_axis[signal]);
+    charcnt = recv_mess(card, buff, 1);
+    if (charcnt > 2)
+	convert_cnt = sscanf(buff, "%c=%d\n", &axisID, &tempInt);
+
+    if (charcnt > 2 && convert_cnt == 2)
+    {
+	cntrl->status = NORMAL;
+	status.Bits.CNTRL_COMM_ERR = 0;
+    }
     else
     {
 	if (cntrl->status == NORMAL)
 	{
 	    cntrl->status = RETRY;
-	    rtn_state = 0;
+	    rtn_state = OK;
+	    goto exit;
 	}
 	else
 	{
@@ -257,88 +257,35 @@ static int set_status(int card, int signal)
 	    status.Bits.CNTRL_COMM_ERR = 1;
 	    status.Bits.RA_PROBLEM     = 1;
 	    rtn_state = 1;
-	}
-	goto exit;
-    }
-    
-    cntrl->status = NORMAL;
-    status.Bits.CNTRL_COMM_ERR = 0;
-
-    send_mess(card, "MOT:COND?", (char) NULL);
-    recv_mess(card, buff, 1);
-
-    mstat.All = atoi(&buff[0]);
-    switch(signal)
-    {
-	case 0:
-	    inmotion = mstat.Bits.axis1IM;
-	    break;
-	case 1:
-	    inmotion = mstat.Bits.axis2IM;
-	    break;
-	case 2:
-	    inmotion = mstat.Bits.axis3IM;
-	    break;
-	case 3:
-	    inmotion = mstat.Bits.axis4IM;
-	    break;
-	default:
-	    rtn_state = 1;
 	    goto exit;
+	}
     }
 
-    status.Bits.RA_DONE = (inmotion == YES) ? 0 : 1;
+    mstat.All = tempInt;
+    status.Bits.RA_DONE = (mstat.Bits.Done) ? 1 : 0;
+    status.Bits.EA_POSITION = (mstat.Bits.torque) ? 1 : 0;
+    plusLS  = mstat.Bits.plus_ls;
+    minusLS = mstat.Bits.minus_ls;
 
-    /* 
-     * Parse motor position
-     * Position string format: 1TP5.012,2TP1.123,3TP-100.567,...
-     * Skip to substring for this motor, convert to double
-     */
-
-    send_mess(card, "CURR:TPOS?", (char) NULL);
+    send_mess(card, "POS? #", PIC848_axis[signal]);
     recv_mess(card, buff, 1);
 
-    motorData = atof(buff);
+    motorData = NINT(atof(&buff[2]) / cntrl->drive_resolution[signal]);
 
     if (motorData == motor_info->position)
     {
-	if (nodeptr != 0)	/* Increment counter only if motor is moving. */
+	if (nodeptr != 0)   /* Increment counter only if motor is moving. */
 	    motor_info->no_motion_count++;
     }
     else
     {
-	epicsInt32 newposition;
 
-	newposition = NINT(motorData);
-	status.Bits.RA_DIRECTION = (newposition >= motor_info->position) ? 1 : 0;
-	motor_info->position = newposition;
+	status.Bits.RA_DIRECTION = (motorData >= motor_info->position) ? 1 : 0;
+	motor_info->position =  motor_info->encoder_position = motorData;
 	motor_info->no_motion_count = 0;
     }
 
     plusdir = (status.Bits.RA_DIRECTION) ? true : false;
-
-    switch(signal)
-    {
-	case 0:
-	    plusLS  = mstat.Bits.axis1PL;
-	    minusLS = mstat.Bits.axis1ML;
-	    break;
-	case 1:
-	    plusLS  = mstat.Bits.axis2PL;
-	    minusLS = mstat.Bits.axis2ML;
-	    break;
-	case 2:
-	    plusLS  = mstat.Bits.axis3PL;
-	    minusLS = mstat.Bits.axis3ML;
-	    break;
-	case 3:
-	    plusLS  = mstat.Bits.axis4PL;
-	    minusLS = mstat.Bits.axis4ML;
-	    break;
-	default:
-	    rtn_state = 1;
-	    goto exit;
-    }
 
     /* Set limit switch error indicators. */
     if (plusLS == true)
@@ -357,19 +304,14 @@ static int set_status(int card, int signal)
 	    ls_active = true;
     }
     else
-	status.Bits.RA_MINUS_LS = 0;
+	status.Bits.RA_MINUS_LS	= 0;
 
     /* encoder status */
-    status.Bits.EA_SLIP	      = 0;
+    status.Bits.EA_SLIP       = 0;
     status.Bits.EA_SLIP_STALL = 0;
-    status.Bits.EA_HOME	      = 0;
+    status.Bits.EA_HOME       = 0;
 
-    send_mess(card, "AXIS:POS?", (char) NULL);
-    recv_mess(card, buff, 1);
-    motorData = atof(buff);
-    motor_info->encoder_position = (int32_t) motorData;
-
-    status.Bits.RA_PROBLEM	= 0;
+    status.Bits.RA_PROBLEM  = 0;
 
     /* Parse motor velocity? */
     /* NEEDS WORK */
@@ -380,7 +322,7 @@ static int set_status(int card, int signal)
 	motor_info->velocity *= -1;
 
     rtn_state = (!motor_info->no_motion_count || ls_active == true ||
-		status.Bits.RA_DONE | status.Bits.RA_PROBLEM) ? 1 : 0;
+		 status.Bits.RA_DONE | status.Bits.RA_PROBLEM) ? 1 : 0;
 
     /* Test for post-move string. */
     if ((status.Bits.RA_DONE || ls_active == true) && nodeptr != 0 &&
@@ -398,62 +340,60 @@ exit:
 
 
 /*****************************************************/
-/* send a message to the PIC844 board		     */
+/* send a message to the PIC848 board		     */
 /* send_mess()			                     */
 /*****************************************************/
 static RTN_STATUS send_mess(int card, char const *com, char *name)
 {
     char local_buff[MAX_MSG_SIZE];
-    struct PIC844controller *cntrl;
+    struct PIC848controller *cntrl;
     int comsize, namesize;
     size_t nwrite;
 
     comsize = (com == NULL) ? 0 : strlen(com);
     namesize = (name == NULL) ? 0 : strlen(name);
-    
+
     if ((comsize + namesize) > MAX_MSG_SIZE)
     {
-	errlogMessage("drvPIC844.cc:send_mess(); message size violation.\n");
+	errlogMessage("drvPIC848.cc:send_mess(); message size violation.\n");
 	return(ERROR);
     }
-    else if (comsize == 0)	/* Normal exit on empty input message. */
+    else if (comsize == 0)  /* Normal exit on empty input message. */
 	return(OK);
 
     if (!motor_state[card])
     {
-	errlogPrintf("drvPIC844.cc:send_mess() - invalid card #%d\n", card);
+	errlogPrintf("drvPIC848.cc:send_mess() - invalid card #%d\n", card);
 	return(ERROR);
     }
 
-    local_buff[0] = (char) NULL;	/* Terminate local buffer. */
+    local_buff[0] = (char) NULL;    /* Terminate local buffer. */
 
-    if (name != NULL)
+    if (name == NULL)
+	strcat(local_buff, com);    /* Make a local copy of the string. */
+    else
     {
-	strcpy(local_buff, "AXIS ");
-	strcat(local_buff, name);	/* put in axis. */
-	strcat(local_buff, ";");	/* put in comman seperator. */
+	strcpy(local_buff, com);
+	local_buff[5] = *name;	/* put in axis. */
     }
-
-    /* Make a local copy of the string. */
-    strcat(local_buff, com);
 
     Debug(2, "send_mess(): message = %s\n", local_buff);
 
-    cntrl = (struct PIC844controller *) motor_state[card]->DevicePrivate;
+    cntrl = (struct PIC848controller *) motor_state[card]->DevicePrivate;
     pasynOctetSyncIO->write(cntrl->pasynUser, local_buff, strlen(local_buff),
-		       COMM_TIMEOUT, &nwrite);
+			    COMM_TIMEOUT, &nwrite);
 
     return(OK);
 }
 
 
 /*****************************************************/
-/* receive a message from the PIC844 board           */
+/* receive a message from the PIC848 board           */
 /* recv_mess()			                     */
 /*****************************************************/
 static int recv_mess(int card, char *com, int flag)
 {
-    struct PIC844controller *cntrl;
+    struct PIC848controller *cntrl;
     size_t nread = 0;
     asynStatus status = asynError;
     int eomReason;
@@ -462,13 +402,13 @@ static int recv_mess(int card, char *com, int flag)
     if (!motor_state[card])
 	return(ERROR);
 
-    cntrl = (struct PIC844controller *) motor_state[card]->DevicePrivate;
-    
+    cntrl = (struct PIC848controller *) motor_state[card]->DevicePrivate;
+
     if (flag == FLUSH)
 	pasynOctetSyncIO->flush(cntrl->pasynUser);
     else
 	status = pasynOctetSyncIO->read(cntrl->pasynUser, com, BUFF_SIZE,
-				     COMM_TIMEOUT, &nread, &eomReason);
+					COMM_TIMEOUT, &nread, &eomReason);
 
     if ((status != asynSuccess) || (nread <= 0))
     {
@@ -483,18 +423,18 @@ static int recv_mess(int card, char *com, int flag)
 
 /*****************************************************/
 /* Setup system configuration                        */
-/* PIC844Setup()                                     */
+/* PIC848Setup()                                     */
 /*****************************************************/
 RTN_STATUS
-PIC844Setup(int num_cards,	/* maximum number of controllers in system.  */
-	    int scan_rate)	/* polling rate - 1/60 sec units.  */
+PIC848Setup(int num_cards,  /* maximum number of controllers in system.  */
+	    int scan_rate)  /* polling rate - 1/60 sec units.  */
 {
     int itera;
 
-    if (num_cards < 1 || num_cards > PIC844_NUM_CARDS)
-	PIC844_num_cards = PIC844_NUM_CARDS;
+    if (num_cards < 1 || num_cards > PIC848_NUM_CARDS)
+	PIC848_num_cards = PIC848_NUM_CARDS;
     else
-	PIC844_num_cards = num_cards;
+	PIC848_num_cards = num_cards;
 
     /* Set motor polling task rate */
     if (scan_rate >= 1 && scan_rate <= 60)
@@ -502,16 +442,16 @@ PIC844Setup(int num_cards,	/* maximum number of controllers in system.  */
     else
 	targs.motor_scan_rate = SCAN_RATE;
 
-   /* 
-    * Allocate space for motor_state structures.  Note this must be done
-    * before PIC844Config is called, so it cannot be done in motor_init()
-    * This means that we must allocate space for a card without knowing
-    * if it really exists, which is not a serious problem
-    */
-    motor_state = (struct controller **) malloc(PIC844_num_cards *
+    /* 
+     * Allocate space for motor_state structures.  Note this must be done
+     * before PIC848Config is called, so it cannot be done in motor_init()
+     * This means that we must allocate space for a card without knowing
+     * if it really exists, which is not a serious problem
+     */
+    motor_state = (struct controller **) malloc(PIC848_num_cards *
 						sizeof(struct controller *));
 
-    for (itera = 0; itera < PIC844_num_cards; itera++)
+    for (itera = 0; itera < PIC848_num_cards; itera++)
 	motor_state[itera] = (struct controller *) NULL;
 
     return(OK);
@@ -520,21 +460,21 @@ PIC844Setup(int num_cards,	/* maximum number of controllers in system.  */
 
 /*****************************************************/
 /* Configure a controller                            */
-/* PIC844Config()                                    */
+/* PIC848Config()                                    */
 /*****************************************************/
 RTN_STATUS
-PIC844Config(int card,		 /* card being configured */
-             const char *name,   /* asyn port name */
-             int addr)           /* asyn address (GPIB) */
+PIC848Config(int card,	     /* card being configured */
+	     const char *name,	 /* asyn port name */
+	     int addr)		 /* asyn address (GPIB) */
 {
-    struct PIC844controller *cntrl;
+    struct PIC848controller *cntrl;
 
-    if (card < 0 || card >= PIC844_num_cards)
-        return (ERROR);
+    if (card < 0 || card >= PIC848_num_cards)
+	return(ERROR);
 
     motor_state[card] = (struct controller *) malloc(sizeof(struct controller));
-    motor_state[card]->DevicePrivate = malloc(sizeof(struct PIC844controller));
-    cntrl = (struct PIC844controller *) motor_state[card]->DevicePrivate;
+    motor_state[card]->DevicePrivate = malloc(sizeof(struct PIC848controller));
+    cntrl = (struct PIC848controller *) motor_state[card]->DevicePrivate;
 
     strcpy(cntrl->asyn_port, name);
     cntrl->asyn_address = addr;
@@ -551,7 +491,7 @@ PIC844Config(int card,		 /* card being configured */
 static int motor_init()
 {
     struct controller *brdptr;
-    struct PIC844controller *cntrl;
+    struct PIC848controller *cntrl;
     int card_index, motor_index;
     char buff[BUFF_SIZE];
     int total_axis;
@@ -563,19 +503,19 @@ static int motor_init()
     initialized = true;	/* Indicate that driver is initialized. */
 
     /* Check for setup */
-    if (PIC844_num_cards <= 0)
+    if (PIC848_num_cards <= 0)
 	return(ERROR);
 
-    for (card_index = 0; card_index < PIC844_num_cards; card_index++)
+    for (card_index = 0; card_index < PIC848_num_cards; card_index++)
     {
 	if (!motor_state[card_index])
 	    continue;
-	
+
 	brdptr = motor_state[card_index];
 	brdptr->ident[0] = (char) NULL;	/* No controller identification message. */
 	brdptr->cmnd_response = false;
 	total_cards = card_index + 1;
-	cntrl = (struct PIC844controller *) brdptr->DevicePrivate;
+	cntrl = (struct PIC848controller *) brdptr->DevicePrivate;
 
 	/* Initialize communications channel */
 	success_rtn = pasynOctetSyncIO->connect(cntrl->asyn_port, 0,
@@ -598,7 +538,7 @@ static int motor_init()
 	    {
 		send_mess(card_index, GET_IDENT, (char) NULL);
 		status = recv_mess(card_index, buff, 1);
-                retry++;
+		retry++;
 	    } while (status == 0 && retry < 3);
 	}
 
@@ -607,7 +547,16 @@ static int motor_init()
 	    strcpy(brdptr->ident, &buff[0]);
 	    brdptr->localaddr = (char *) NULL;
 	    brdptr->motor_in_motion = 0;
-	    brdptr->total_axis = total_axis = 4;
+
+            /* Determine # of axes. Request stage name.  See if it responds */
+	    for (total_axis = 0; total_axis < MAX_AXES; total_axis++)
+	    {
+		send_mess(card_index, "CST? #", PIC848_axis[total_axis]);
+		status = recv_mess(card_index, buff, 1);
+		if (strcmp(&buff[2],"NOSTAGE") == 0)
+		    break;
+	    }
+	    brdptr->total_axis = total_axis;
 
 	    for (motor_index = 0; motor_index < total_axis; motor_index++)
 	    {
@@ -618,11 +567,13 @@ static int motor_init()
 		motor_info->encoder_position = 0;
 		motor_info->position = 0;
 		brdptr->motor_info[motor_index].motor_motion = NULL;
-		/* PIC844 has DC motor support only */
+		/* PIC848 has DC motor support only */
 		motor_info->encoder_present = YES;
 		motor_info->status.Bits.EA_PRESENT = 1;
 		motor_info->pid_present = YES;
 		motor_info->status.Bits.GAIN_SUPPORT = 1;
+
+		cntrl->drive_resolution[motor_index] = 0.0001;
 
 		set_status(card_index, motor_index);  /* Read status of each motor */
 	    }
@@ -639,7 +590,7 @@ static int motor_init()
     free_list.head = (struct mess_node *) NULL;
     free_list.tail = (struct mess_node *) NULL;
 
-    epicsThreadCreate((char *) "PIC844_motor", epicsThreadPriorityMedium,
+    epicsThreadCreate((char *) "PIC848_motor", epicsThreadPriorityMedium,
 		      epicsThreadGetStackSize(epicsThreadStackMedium),
 		      (EPICSTHREADFUNC) motor_task, (void *) &targs);
 

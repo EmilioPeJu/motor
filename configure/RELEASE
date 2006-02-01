@@ -14,8 +14,8 @@ SUPPORT=/home/diamond/R3.14.7/prod/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-# Recommended ASYN release: R4-2
-ASYN=$(SUPPORT)/asyn/4-2-1
+# Recommended ASYN release: R4-3
+ASYN=$(SUPPORT)/asyn/4-3
 
 # Recommended EPICS release: R3.14.7
 EPICS_BASE=/home/epics/R3.14.7/base
@@ -28,6 +28,6 @@ EPICS_BASE=/home/epics/R3.14.7/base
 # The following must be defined for the MXmotor device driver.
 #!MX=$(SUPPORT)/mx/mx
 
-# The following is needed for the various *.substitutions files in iocBoot.
-MOTOR=$(TOP)
+# The following is only needed for the motor examples in iocBoot.
+#!MOTOR=$(TOP)
 PYTHON=/home/tools/applications/local/lib/python2.4/config

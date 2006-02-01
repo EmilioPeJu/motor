@@ -4,9 +4,9 @@ FILENAME...	motordrvCom.h
 USAGE...	This file contains definitions and structures that
 		are common to all motor record driver support modules.
 
-Version:	1.14
+Version:	1.16
 Modified By:	sluiter
-Last Modified:	2004/09/20 20:45:05
+Last Modified:	2005/10/20 20:01:40
 */
 
 /*
@@ -40,6 +40,8 @@ Last Modified:	2004/09/20 20:45:05
  * .02 10-24-03 rls moved irqdatastr to OmsSrc.
  * .03 12-12-03 rls Converted MSTA #define's to bit field.
  * .04 09-20-04 rls support for 32 axes / controller, maximum.
+ * .05 05/10/05 rls Added "update_delay" for "Stale data delay" bug fix.
+ * .06 10/18/05 rls Added MAX_TIMEOUT for all devices drivers.
  */
 
 
@@ -56,6 +58,8 @@ Last Modified:	2004/09/20 20:45:05
 #include "motor.h"
 
 #define MAX_IDENT_LEN 100
+#define MAX_TIMEOUT   5.0 /* Maximum communication timeout for all devices
+			   drivers (in sec.). */
 
 /* Controller communication port type, followed by status. */
 enum PortType
@@ -208,8 +212,11 @@ struct driver_table
 
 struct thread_args
 {
-    int motor_scan_rate;	/* Poll rate in HZ. */
+    int motor_scan_rate; /* Poll rate in HZ. */
     struct driver_table *table;
+    double update_delay; /* Some controllers (OMS VME58) require a delay
+    between a move command and a status update to prevent "stale" data.  A
+    zero value disables this delay. */
 };
 
 

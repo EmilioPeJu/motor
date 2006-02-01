@@ -1,11 +1,11 @@
 /*
-FILENAME...	devPIC844.cc
+FILENAME...	devPIC848.cc
 USAGE...	Motor record device level support for Physik Instrumente (PI)
-		GmbH & Co. C-844 motor controller.
+		GmbH & Co. C-848 motor controller.
 
-Version:	1.5
+Version:	1.1
 Modified By:	sluiter
-Last Modified:	2005/10/04 19:47:12
+Last Modified:	2005/10/04 19:45:52
 */
 
 /*
@@ -44,35 +44,36 @@ Last Modified:	2005/10/04 19:47:12
 #include "motorRecord.h"
 #include "motor.h"
 #include "motordevCom.h"
+#include "drvPIC848.h"
 #include "epicsExport.h"
 
-extern struct driver_table PIC844_access;
+extern struct driver_table PIC848_access;
 
-/* ----------------Create the dsets for devPIC844----------------- */
+/* ----------------Create the dsets for devPIC848----------------- */
 static struct driver_table *drvtabptr;
-static long PIC844_init(void *);
-static long PIC844_init_record(void *);
-static long PIC844_start_trans(struct motorRecord *);
-static RTN_STATUS PIC844_build_trans(motor_cmnd, double *, struct motorRecord *);
-static RTN_STATUS PIC844_end_trans(struct motorRecord *);
+static long PIC848_init(void *);
+static long PIC848_init_record(void *);
+static long PIC848_start_trans(struct motorRecord *);
+static RTN_STATUS PIC848_build_trans(motor_cmnd, double *, struct motorRecord *);
+static RTN_STATUS PIC848_end_trans(struct motorRecord *);
 
-struct motor_dset devPIC844 =
+struct motor_dset devPIC848 =
 {
-    {8, NULL, (DEVSUPFUN) PIC844_init, (DEVSUPFUN) PIC844_init_record, NULL},
+    {8, NULL, (DEVSUPFUN) PIC848_init, (DEVSUPFUN) PIC848_init_record, NULL},
     motor_update_values,
-    PIC844_start_trans,
-    PIC844_build_trans,
-    PIC844_end_trans
+    PIC848_start_trans,
+    PIC848_build_trans,
+    PIC848_end_trans
 };
 
-extern "C" {epicsExportAddress(dset,devPIC844);}
+extern "C" {epicsExportAddress(dset,devPIC848);}
 
 /* --------------------------- program data --------------------- */
 
 /* This table is used to define the command types */
 /* WARNING! this must match "motor_cmnd" in motor.h */
 
-static msg_types PIC844_table[] = {
+static msg_types PIC848_table[] = {
     MOTION, 	/* MOVE_ABS */
     MOTION, 	/* MOVE_REL */
     MOTION, 	/* HOME_FOR */
@@ -98,46 +99,46 @@ static msg_types PIC844_table[] = {
 };
 
 
-static struct board_stat **PIC844_cards;
+static struct board_stat **PIC848_cards;
 
 /* --------------------------- program data --------------------- */
 
 
-/* initialize device support for PIC844 stepper motor */
-static long PIC844_init(void *arg)
+/* initialize device support for PIC848 stepper motor */
+static long PIC848_init(void *arg)
 {
     long rtnval;
     int after = (int) arg;
 
     if (after == 0)
     {
-	drvtabptr = &PIC844_access;
+	drvtabptr = &PIC848_access;
 	(drvtabptr->init)();
     }
 
-    rtnval = motor_init_com(after, *drvtabptr->cardcnt_ptr, drvtabptr, &PIC844_cards);
+    rtnval = motor_init_com(after, *drvtabptr->cardcnt_ptr, drvtabptr, &PIC848_cards);
     return(rtnval);
 }
 
 
 /* initialize a record instance */
-static long PIC844_init_record(void *arg)
+static long PIC848_init_record(void *arg)
 {
     struct motorRecord *mr = (struct motorRecord *) arg;
-    return(motor_init_record_com(mr, *drvtabptr->cardcnt_ptr, drvtabptr, PIC844_cards));
+    return(motor_init_record_com(mr, *drvtabptr->cardcnt_ptr, drvtabptr, PIC848_cards));
 }
 
 
 /* start building a transaction */
-static long PIC844_start_trans(struct motorRecord *mr)
+static long PIC848_start_trans(struct motorRecord *mr)
 {
-    motor_start_trans_com(mr, PIC844_cards);
+    motor_start_trans_com(mr, PIC848_cards);
     return(OK);
 }
 
 
 /* end building a transaction */
-static RTN_STATUS PIC844_end_trans(struct motorRecord *mr)
+static RTN_STATUS PIC848_end_trans(struct motorRecord *mr)
 {
     motor_end_trans_com(mr, drvtabptr);
     return(OK);
@@ -145,15 +146,16 @@ static RTN_STATUS PIC844_end_trans(struct motorRecord *mr)
 
 
 /* add a part to the transaction */
-static RTN_STATUS PIC844_build_trans(motor_cmnd command, double *parms, struct motorRecord *mr)
+static RTN_STATUS PIC848_build_trans(motor_cmnd command, double *parms, struct motorRecord *mr)
 {
     struct motor_trans *trans = (struct motor_trans *) mr->dpvt;
     struct mess_node *motor_call;
     struct controller *brdptr;
+    struct PIC848controller *cntrl;
     char buff[110];
-    int axis, card, maxdigits;
+    int card, maxdigits;
     unsigned int size;
-    double dval, cntrl_units;
+    double dval, cntrl_units, res;
     RTN_STATUS rtnval;
     bool send;
 
@@ -163,19 +165,22 @@ static RTN_STATUS PIC844_build_trans(motor_cmnd command, double *parms, struct m
     
     /* Protect against NULL pointer with WRTITE_MSG(GO/STOP_AXIS/GET_INFO, NULL). */
     dval = (parms == NULL) ? 0.0 : *parms;
+    
+    rtnval = (RTN_STATUS) motor_start_trans_com(mr, PIC848_cards); 
 
     motor_call = &(trans->motor_call);
     card = motor_call->card;
-    axis = motor_call->signal + 1;
     brdptr = (*trans->tabptr->card_array)[card];
     if (brdptr == NULL)
 	return(rtnval = ERROR);
 
+    cntrl = (struct PIC848controller *) brdptr->DevicePrivate;
+    res = cntrl->drive_resolution[motor_call->signal];
     cntrl_units = dval;
-    maxdigits = 2;
+    maxdigits = 5;
     
-    if (PIC844_table[command] > motor_call->type)
-	motor_call->type = PIC844_table[command];
+    if (PIC848_table[command] > motor_call->type)
+	motor_call->type = PIC848_table[command];
 
     if (trans->state != BUILD_STATE)
 	return(rtnval = ERROR);
@@ -207,22 +212,25 @@ static RTN_STATUS PIC844_build_trans(motor_cmnd command, double *parms, struct m
     switch (command)
     {
 	case MOVE_ABS:
-	    sprintf(buff, "TARG %.*f", maxdigits, cntrl_units);
+	    sprintf(buff, "MOV  #%.*f", maxdigits, (cntrl_units * res));
 	    break;
 	
 	case MOVE_REL:
-	    sprintf(buff, "TARG:RPOS %+.*f", maxdigits, cntrl_units);
+	    sprintf(buff, "MVR  #%+.*f", maxdigits, (cntrl_units * res));
 	    break;
 	
 	case HOME_FOR:
-	    sprintf(buff, "TARG:FIND POS");
+	    sprintf(buff, "REF  #");
 	    break;
 	case HOME_REV:
-	    sprintf(buff, "TARG:FIND NEG");
+	    sprintf(buff, "REF  #");
 	    break;
 	
 	case LOAD_POS:
-	    sprintf(buff, "AXIS:POS %+.*f;TARG CURR", maxdigits, cntrl_units);
+	    if (cntrl_units == 0.0)
+		sprintf(buff, "DFH  #");
+	    else
+		rtnval = ERROR;
 	    break;
 	
 	case SET_VEL_BASE:
@@ -230,15 +238,15 @@ static RTN_STATUS PIC844_build_trans(motor_cmnd command, double *parms, struct m
 	    break;
 	
 	case SET_VELOCITY:
-	    sprintf(buff, "MVEL %.*f;", maxdigits, cntrl_units);
+	    sprintf(buff, "VEL  # %.*f", maxdigits, (cntrl_units * res));
 	    break;
 	
+	case ENABLE_TORQUE:
+	case DISABL_TORQUE:
 	case SET_ACCEL:
-	    sprintf(buff, "ACC %.*f;", maxdigits, cntrl_units);
-	    break;
-	
+	    /* The PIC848 does not support acceleration commands. */
 	case GO:
-	    /* The PIC844 starts moving immediately on move commands, GO command
+	    /* The PIC848 starts moving immediately on move commands, GO command
 	     * does nothing. */
 	    send = false;
 	    break;
@@ -251,33 +259,25 @@ static RTN_STATUS PIC844_build_trans(motor_cmnd command, double *parms, struct m
 	    break;
 	
 	case STOP_AXIS:
-	    sprintf(buff, "HALT");
+	    sprintf(buff, "HLT  #");
 	    break;
 	
 	case JOG_VELOCITY:
 	case JOG:
-	    sprintf(buff, "TARG:VEL %.*f", maxdigits, cntrl_units);
+	    sprintf(buff, "VEL  #%.*f", maxdigits, cntrl_units);
 	    break;
 	
 	case SET_PGAIN:
 	    cntrl_units *= 32767;
-	    sprintf(buff, "PID %.*f,,", maxdigits, cntrl_units);
+	    sprintf(buff, "SPA  #1 %.*f", maxdigits, cntrl_units);
 	    break;
 	case SET_IGAIN:
 	    cntrl_units *= 32767;
-	    sprintf(buff, "PID ,%.*f,", maxdigits, cntrl_units);
+	    sprintf(buff, "SPA  #2 %.*f", maxdigits, cntrl_units);
 	    break;
 	case SET_DGAIN:
 	    cntrl_units *= 32767;
-	    sprintf(buff, "PID ,,%.*f", maxdigits, cntrl_units);
-	    break;
-	
-	case ENABLE_TORQUE:
-	    sprintf(buff, "AXIS:STAT ON");
-	    break;
-	
-	case DISABL_TORQUE:
-	    sprintf(buff, "AXIS:STAT OFF");
+	    sprintf(buff, "SPA  #3 %.*f", maxdigits, cntrl_units);
 	    break;
 	
 	case SET_HIGH_LIMIT:
@@ -296,8 +296,11 @@ static RTN_STATUS PIC844_build_trans(motor_cmnd command, double *parms, struct m
     if (send == false)
 	return(rtnval);
     else if (size > sizeof(buff) || (strlen(motor_call->message) + size) > MAX_MSG_SIZE)
-	errlogMessage("PIC844_build_trans(): buffer overflow.\n");
+	errlogMessage("PIC848_build_trans(): buffer overflow.\n");
     else
+    {
 	strcat(motor_call->message, buff);
+        rtnval = motor_end_trans_com(mr, drvtabptr);
+    }
     return(rtnval);
 }
