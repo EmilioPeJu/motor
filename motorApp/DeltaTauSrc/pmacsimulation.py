@@ -107,7 +107,7 @@ class pmaccontroller(object):
         if mnum[-2:] == str(M_DEMANDPOS):                        
             self.motors[axis].setdempos(newval)
         else:
-            print 'setmvar: Unkown M-variable (',mnum,')'
+            print 'setmvar: Unknown M-variable (',mnum,')'
         
         
     def getmvar(self,mnum):
@@ -127,7 +127,7 @@ class pmaccontroller(object):
 
     def setpos(self,axis,newpos):
         if( axis >= 1) & (axis <= MAX_AXIS+1):
-            self.motors[axis].setdempos(newpos)
+            self.motors[axis].setdempos(newpos * 32.0)
         else:
             print 'setpos: Unknown axis (',axis,')'
     
@@ -141,7 +141,7 @@ class pmaccontroller(object):
     def stop(self,axis):
         readback = self.motors[axis].getreadback()
         if( axis >= 1) & (axis <= MAX_AXIS+1):
-            self.motors[axis].setdempos(readback / 32.0)
+            self.motors[axis].setdempos(readback)
             self.motors[axis].setmotstate('STOP')
         else:
             print 'stop: Unknown axis(',axis,')'
@@ -195,10 +195,10 @@ class pmaccontroller(object):
                
                 
                 if dempos > readback:             
-                    readback = readback + curvel / UPDATE_FREQUENCY
+                    readback = readback + ((curvel * 32.0) / UPDATE_FREQUENCY)
                     self.motors[axis].setreadback(readback)
                 elif dempos < readback:                
-                    readback = readback - curvel / UPDATE_FREQUENCY
+                    readback = readback - ((curvel * 32.0) / UPDATE_FREQUENCY)
                     self.motors[axis].setreadback(readback)
                 elif dempos == readback:
                     self.motors[axis].setstatus(3,STAT_INPOSITION,1)
@@ -248,7 +248,7 @@ class motor(object):
         
     def setdempos(self,newpos):
         print 'axis %d setting dempos to %d' % (self.axis,newpos)
-        self.demandpos = newpos * 32.0
+        self.demandpos = newpos
         
         # Set the status to moving
         self.setstatus(3,STAT_INPOSITION,0)
