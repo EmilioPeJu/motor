@@ -9,6 +9,7 @@ record(motor, "$(P)$(M)") {
   field(DIR, "$(DIR)")
   field(VELO, "$(VELO)")
   field(VBAS, "$(VBAS)")
+  field(VMAX, "$(VMAX)")
   field(ACCL, "$(ACCL)")
   field(BDST, "$(BDST)")
   field(BVEL, "$(BVEL)")
@@ -19,6 +20,7 @@ record(motor, "$(P)$(M)") {
   field(EGU, "$(EGU)")
   field(DHLM, "$(DHLM)")
   field(DLLM, "$(DLLM)")
+  field(HLSV, "$(HLSV)")
   field(INIT, "$(INIT)")
   field(TWV, "1")
 }
