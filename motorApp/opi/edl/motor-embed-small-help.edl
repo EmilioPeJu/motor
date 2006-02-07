@@ -1,0 +1,775 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 369
+y 554
+w 290
+h 210
+font "helvetica-medium-r-14.0"
+ctlFont "courier-bold-r-14.0"
+btnFont "helvetica-medium-r-14.0"
+fgColor index 14
+bgColor index 3
+textColor index 14
+ctlFgColor1 index 25
+ctlFgColor2 index 30
+ctlBgColor1 index 3
+ctlBgColor2 index 3
+topShadowColor index 1
+botShadowColor index 11
+title "Tooltip"
+showGrid
+gridSize 5
+endScreenProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 1
+y 1
+w 288
+h 208
+lineColor index 14
+fillColor index 3
+lineWidth 2
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 50
+y 57
+w 185
+h 98
+lineColor index 14
+fillColor index 50
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 55
+y 49
+w 78
+h 14
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "$(label) Motor"
+}
+autoSize
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 182
+y 127
+w 48
+h 23
+fgColor index 21
+onColor index 3
+offColor index 3
+topShadowColor index 0
+botShadowColor index 14
+controlPv "$(motor).STOP"
+pressValue "1"
+onLabel "STOP"
+offLabel "STOP"
+3d
+font "arial-bold-r-14.0"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 206
+y 97
+w 24
+h 24
+fgColor index 14
+bgColor index 3
+topShadowColor index 1
+botShadowColor index 11
+font "arial-bold-r-14.0"
+numPvs 4
+numDsps 1
+displayFileName {
+  0 "motor.edl"
+}
+icon
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 86
+y 96
+w 113
+h 25
+controlPv "$(motor).RBV"
+font "arial-bold-r-14.0"
+fontAlign "center"
+fgColor index 15
+bgColor index 10
+limitsFromDb
+precision 4
+nullColor index 0
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Textentry)
+object TextentryClass
+beginObjectProperties
+major 10
+minor 0
+release 0
+x 83
+y 63
+w 120
+h 33
+controlPv "$(motor).VAL"
+precision 4
+fgColor index 25
+bgColor index 3
+colorPv "$(motor):MODE"
+fill
+font "arial-bold-r-14.0"
+fontAlign "right"
+lineWidth 0
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 56
+y 127
+w 48
+h 23
+fgColor index 18
+onColor index 3
+offColor index 3
+topShadowColor index 0
+botShadowColor index 14
+controlPv "$(motor).STOP"
+pressValue "0"
+onLabel "GO"
+offLabel "GO"
+3d
+font "arial-bold-r-14.0"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 56
+y 67
+w 24
+h 24
+fgColor index 25
+onColor index 4
+offColor index 3
+topShadowColor index 0
+botShadowColor index 14
+controlPv "$(motor).TWR"
+pressValue "1"
+onLabel "-"
+offLabel "-"
+3d
+font "arial-bold-r-16.0"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 206
+y 67
+w 24
+h 24
+fgColor index 25
+onColor index 4
+offColor index 3
+topShadowColor index 0
+botShadowColor index 14
+controlPv "$(motor).TWF"
+pressValue "1"
+onLabel "+"
+offLabel "+"
+3d
+font "arial-bold-r-16.0"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 112
+y 127
+w 63
+h 22
+controlPv "$(motor):state"
+font "arial-bold-r-14.0"
+fontAlign "center"
+fgColor index 15
+bgColor index 10
+limitsFromDb
+precision 4
+nullColor index 0
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Symbol)
+object activeSymbolClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 58
+y 98
+w 20
+h 20
+file "symbols-traffic-light-symbol.edl"
+numStates 5
+minValues {
+  1 2
+  2 3
+  3 4
+  4 1
+}
+maxValues {
+  0 1
+  1 3
+  2 4
+  3 5
+  4 2
+}
+controlPvs {
+  0 "$(motor):state"
+}
+numPvs 1
+useOriginalSize
+useOriginalColors
+fgColor index 14
+bgColor index 3
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 5
+y 40
+w 37
+h 28
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Tweak"
+  "-ve"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 245
+y 65
+w 37
+h 28
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Tweak"
+  "+ve"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 240
+y 105
+w 46
+h 70
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "More"
+  "Controls"
+  "(Eg"
+  "tweak"
+  "step)"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 185
+y 175
+w 61
+h 28
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Stop motor"
+  "movement"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 105
+y 175
+w 62
+h 28
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Motor"
+  "Status Text"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 5
+y 175
+w 86
+h 28
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Move to "
+  "Demand Value"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 235
+y 5
+w 53
+h 42
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Motor"
+  "Demand "
+  "Value"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 5
+y 75
+w 36
+h 42
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Motor"
+  "Status"
+  "Light"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 5
+y 125
+w 36
+h 42
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Motor"
+  "Actual"
+  "Value"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 5
+y 5
+w 35
+h 28
+font "arial-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Axis"
+  "Name"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 92
+y 5
+w 100
+h 25
+font "arial-bold-r-16.0"
+fontAlign "center"
+fgColor index 0
+bgColor index 9
+value {
+  "Help"
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 40
+y 15
+w 45
+h 35
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 40
+  1 85
+}
+yPoints {
+  0 15
+  1 50
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 35
+y 55
+w 35
+h 25
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 35
+  1 70
+}
+yPoints {
+  0 55
+  1 80
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 40
+y 106
+w 20
+h 0
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 40
+  1 60
+}
+yPoints {
+  0 106
+  1 106
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 40
+y 115
+w 50
+h 10
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 40
+  1 90
+}
+yPoints {
+  0 125
+  1 115
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 50
+y 140
+w 25
+h 35
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 50
+  1 75
+}
+yPoints {
+  0 175
+  1 140
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 190
+y 30
+w 50
+h 35
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 240
+  1 190
+}
+yPoints {
+  0 30
+  1 65
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 215
+y 80
+w 35
+h 0
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 250
+  1 215
+}
+yPoints {
+  0 80
+  1 80
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 215
+y 110
+w 30
+h 0
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 245
+  1 215
+}
+yPoints {
+  0 110
+  1 110
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 205
+y 140
+w 15
+h 40
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 220
+  1 205
+}
+yPoints {
+  0 180
+  1 140
+}
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 135
+y 145
+w 0
+h 30
+lineColor index 14
+fillColor index 3
+arrows "to"
+numPoints 2
+xPoints {
+  0 135
+  1 135
+}
+yPoints {
+  0 175
+  1 145
+}
+endObjectProperties
+
