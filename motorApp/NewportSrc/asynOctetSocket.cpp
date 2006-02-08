@@ -3,6 +3,13 @@
    using EPICS asynOctetSyncIO.cc
    
    By Jon Kelly July 2005
+   
+   Modification Log:
+   -----------------
+   10/11/05 Improve the error checking on the Send&Recieve by counting
+   the size of the returned string and matching the requested number of
+   numbers with the returned number of commas.
+   
 */
 
 /* includes */
@@ -20,42 +27,48 @@ typedef int BOOL;
 #include <time.h>
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"
-#include        <epicsThread.h>
-#include        <epicsMutex.h>
-#include        <epicsExport.h>
-#include        <epicsString.h>
+#include <epicsThread.h>
+#include <epicsMutex.h>
+#include <epicsExport.h>
+#include <epicsString.h>
 
 
 /* defines */
 
 #define MAX_MSG_SIZE       256
 #define TIMEOUT            0.2
-#define MAX_RETRY          5
+#define MAX_RETRY          10
+#define MAX_INSPEC	   8
+#define MAX_RESEND	   5
 #define CONNREFUSED        -1
 #define CREATESOCKETFAILED -2
 #define OPTREFUSED         -3
 
 #define MAX_NB_SOCKETS     50
+#define MAX_BUSY_LOOP      100000
+
+#define BUFFERCLEAR	   0	/* Used in SendOnly */
 
 /* global variables */
 
 BOOL    UsedSocket[MAX_NB_SOCKETS] = { FALSE };
 double  TimeoutSocket[MAX_NB_SOCKETS];
 int     ErrorSocket[MAX_NB_SOCKETS];
+BOOL    asynXPSC8InterfaceBusy =  { FALSE };
 
 /* Pointer to the connection info for each socket 
    the asynUser structure is defined in asynDriver.h */
 static struct asynUser *pasynUserArray[MAX_NB_SOCKETS];
 
 asynStatus status;
-
-/***************************************************************************************/
 #define DEBUG
 
 #ifdef __GNUG__
     #ifdef	DEBUG
-        volatile int asynXPSC8Debug = 10;
-	#define Debug(l, f, args...) { if(l<=asynXPSC8Debug) printf(f,## args); }
+        volatile int asynXPSC8Debug = 0;
+	#define Debug(l, f, args...) { if(l<=asynXPSC8Debug) {\
+			printf("asynOctetSocket - "); \
+			printf(f,## args); }}
 	epicsExportAddress(int, asynXPSC8Debug);
     #else
 	#define Debug(l, f, args...)
@@ -65,16 +78,20 @@ asynStatus status;
 #endif
 
 
+/* The returned error values correspond to the xps values */
+
 /***************************************************************************************/
-/* The drvXPSC8.cc must assign the aysn port string to the IP field 
+/* The drvXPSC8.cc must assign the aysn port string to the Ip field 
    and replace the xps port int with the asyn addr int		*/
 int ConnectToServer(char *Ip_Address, int Ip_Port, double TimeOut)
 {
+/*	printf("Socket.cpp ConnectToServer: Top/n");*/
 
     int SocketIndex = 0;
     const char *asynPort = (const char *)Ip_Address;
     int asynAddr;
     asynAddr = Ip_Port;
+
 
     /* Select a free socket */
     while ((UsedSocket[SocketIndex] == TRUE) && (SocketIndex < MAX_NB_SOCKETS))
@@ -104,7 +121,7 @@ int ConnectToServer(char *Ip_Address, int Ip_Port, double TimeOut)
     else             TimeoutSocket[SocketIndex] = TIMEOUT;*/
     
     UsedSocket[SocketIndex] = TRUE;
-    TimeoutSocket[SocketIndex] = TIMEOUT; /* Ignore the requested timeout */
+    TimeoutSocket[SocketIndex] = TIMEOUT;
     return SocketIndex;
 }
 
@@ -123,14 +140,16 @@ void SendAndReceive (int SocketIndex, char *buffer, char *valueRtrn)
     size_t nbytesOut = 0; 
     size_t nbytesIn = 0;
     int eomReason;
-    /*clock_t start, finish;
-    double timeEllapse = 0.0;*/
     char *output, *input;
     int writeReadStatus = -99;
-    int loop = 0, bufferLength;
-
-    /* Check to see if the Socket is valid! */
+    int loop = 0;
+    int inspecLoop = 0;
+    size_t measureLength; 
+    size_t bufferLength;
+    int totalStar;
+    int totalComma;
     
+    /* Valid Socket? */
     bufferLength = strlen(buffer);
     if ((SocketIndex >= 0) && (SocketIndex < MAX_NB_SOCKETS) && (UsedSocket[SocketIndex] == TRUE))
     {
@@ -156,58 +175,87 @@ void SendAndReceive (int SocketIndex, char *buffer, char *valueRtrn)
 						&eomReason);
 	
 	    Debug(12,"buffer %s\n bufferlen %i\n valueRtrn %s\n",buffer,bufferLength,valueRtrn);
-	    Debug(12,"nbytesOut %i nbytesIn %i eomReason %i\n",nbytesOut,nbytesIn,eomReason); 
+	    Debug(12,"nbytesOut %i nbytesIn %i eomReason %i\n",nbytesOut,nbytesIn,eomReason);
+	    Debug(12,"loop=%i \n",loop); 
 	    output = valueRtrn;
 	    if (output != NULL) sscanf (output, "%i", &writeReadStatus);
 	    
-	    /* If the XPS returns a status <0 it is probably still confused from a 
-	     * sendOnly so re-send the command */
-	     
 	    if (writeReadStatus < 0){
-	        Debug(10,"Address %p\n",pasynUserArray[SocketIndex]);
+	        Debug(10,"Address %x\n",pasynUserArray[SocketIndex]);
 	        Debug(1,"Error WriteReadStatus = %i Retry ",writeReadStatus);
 		Debug(2,"Sock=%i Tout=%g In=%s Out=%s \n  Command sent again! loop %i\n",SocketIndex,
 					TimeoutSocket[SocketIndex],valueRtrn,buffer,loop);
 	    } else {
-	    
-	    /* If the XPS returns a non error status check to see if the data
-	     * is what you expected because it frequently returns the answere
-	     * to the previous call! */
-
 	        output = valueRtrn;
-		input = buffer;
-		strchr (output, ',');
-	        while ( (input=strchr (input, '*')) != NULL ) { /* Number required */
-		    input++; /* Move ptr past * */
-		    if ((output=strchr (output, ',')) == NULL) { /* No comma after number */
-		        Debug(2,"Error Not enough numbers in=%s out=%s\n",valueRtrn,buffer);
-		        writeReadStatus = -98;
-		    }
-		    output++; /* move ptr past , */
-		Debug(15,"Look for number in return string %s\n",output);
+		input = buffer;		
+	
+		/* If the relpy is longer than it should be retry & don't bother to check
+		   the number of ,s = *s. */
+		measureLength = strlen (output);
+
+		Debug(12,"measureLength=%i nbytesIn=%i\n",measureLength,nbytesIn);
+		
+		if (measureLength != nbytesIn) {
+		    Debug(2,"Reply too long in=%s out=%s\n",valueRtrn,buffer);
+		    Debug(2,"measureLength=%i nbytesIn=%i\n",measureLength,nbytesIn);
+		    writeReadStatus = -98;
+		    goto after_error_check; /* jump further error checking */
 		}
+		
+		/* See if the number of ,s -1 Out = *s In i.e. the correct number of values */
+		inspecLoop = 0;
+	        while ( (input=strchr (input, '*')) != NULL && inspecLoop < MAX_INSPEC) {
+		  inspecLoop++; /* Increment loop counter */
+		  input++; 	/* Move ptr past * */ 
+		}
+		totalStar = inspecLoop;
+		
+		inspecLoop = 0;
+	        while ( (output=strchr (output, ',')) != NULL && inspecLoop < MAX_INSPEC) {
+		  inspecLoop++; /* Increment loop counter */
+		  output++; 	/* move ptr past , */ 
+		}
+		totalComma = inspecLoop;
+		
+		Debug(4,"totalStar=%i totalComma=%i\n",totalStar,totalComma);
+		
+		if (totalStar != (totalComma -1 )) {
+		  Debug(2,"Error Not enough numbers in=%s out=%s\n",valueRtrn,buffer);
+		  Debug(2,"totalStar=%i totalComma=%i\n",totalStar,totalComma);
+		  writeReadStatus = -98;
+		 } 
+		 
+after_error_check:		
+	        if (loop > 0) Debug(4,"loop=%i\n",loop);
 	    }
 	    loop++;
-	}
+	
+	} /* End of while loop */
+	
+	if (loop >= MAX_RETRY) Debug(1,"writeread debug failed loop=%i max=%i\n",loop,MAX_RETRY); 
 	
 	if ( status != asynSuccess ) 
     	{
-	    /* Asyn command error */
+	    /* Error no data returned */
+	    /*strcpy(valueRtrn,"-71");*/
 	    Debug(5,"Error buffer %s\n bufferlen %i\n valueRtrn %s\n",buffer,bufferLength,valueRtrn);
 	    Debug(5,"Error nbytesOut %i nbytesIn %i eomReason %i\n",nbytesOut,nbytesIn,eomReason); 
 	    
 	    printf("Error SendAndRecieve read In=%s Out=%s nbytesOut=%i",valueRtrn,buffer,nbytesOut);
 	    printf(" asynStatus=%i \n",status);
+	    asynXPSC8InterfaceBusy = FALSE;
 	    return;
 	}
-    
+	
     } else {
-        /* Not allowed action socket was not created */
+        /* Not allowed action */
 	printf("Error Socket Invalid SendAndRecieve In=%s Out=%s\n",valueRtrn,buffer);
 	printf("asynStatus=%i  ",status);
 	strcpy(valueRtrn,"-22");
+        asynXPSC8InterfaceBusy = FALSE;
 	return;
     }
+    asynXPSC8InterfaceBusy = FALSE;
     return;
 }
 /***************************************************************************************/
@@ -221,6 +269,7 @@ void SendOnly (int SocketIndex, char *buffer, char *valueRtrn)
     char *output;
     int writeReadStatus = -99;
     int loop = 0;
+    size_t bufferLength = 0;
     
     /* Valid Socket? */
     if ((SocketIndex >= 0) && (SocketIndex < MAX_NB_SOCKETS) && (UsedSocket[SocketIndex] == TRUE))
@@ -233,21 +282,25 @@ void SendOnly (int SocketIndex, char *buffer, char *valueRtrn)
 	}
 
 Above_Write:
+	bufferLength = (size_t) strlen(buffer);;
 	status = pasynOctetSyncIO->write(pasynUserArray[SocketIndex],(char const *)buffer, 
-				  	strlen(buffer),TimeoutSocket[SocketIndex], &nbytesIn);
+				 bufferLength,TimeoutSocket[SocketIndex], &nbytesIn);
 
 	if ((status != asynSuccess) || (nbytesIn <= 0))
     	{
 	    printf("****Error SendOnly status=%i",status);
 	    /* Error during write message */
 	    strcpy(valueRtrn,"-72");
+	    asynXPSC8InterfaceBusy = FALSE;
 	    return;
 	}
 
-/* When a send only is performed but the XPS is expecting to give a response it
- * becomes confused for a period of time.  A writeRead is sent and the readback 
- * checked until the XPS returns a sensible value */
+	if (BUFFERCLEAR == 0) {
+	    epicsThreadSleep(0.1); /* Wait for the XPS to digest the command */
+	    goto SendOnly_End; /* Don't  try to clear the buffer */
+	    }
 
+	/* Send a command to the XPS until it replys with the correct answer */	
 Above_Dummy_writeRead:	 
 	 status = pasynOctetSyncIO->writeRead(pasynUserArray[SocketIndex],
 						(char const *)dummyBuffer, 
@@ -261,6 +314,7 @@ Above_Dummy_writeRead:
 
 	 output = dummyReturn;
 	 if (output != NULL) sscanf (output, "%i", &writeReadStatus);
+	 
 	 else Debug(5,"SendOnly Dummywriteread Output Null\n");
 	    
 	 if (writeReadStatus < 0 && output != NULL){
@@ -268,19 +322,22 @@ Above_Dummy_writeRead:
 		Debug(3,"Sock=%i Timeout=%g DumyReturn=%s \n DummyIn=%s OrigCommand=%s\n"\
 		" Dummy sent again\n",SocketIndex,TimeoutSocket[SocketIndex],
 							dummyReturn,dummyBuffer,buffer);
-	 } 
+	    } 
 	 loop++;
 	 if (writeReadStatus == -3 && loop < MAX_RETRY) /* Command Not executed by XPS so retry */
 	     goto Above_Write;
-	 if (writeReadStatus < 0 && loop < MAX_RETRY) /* The XPS is still confused so re-send*/
+	 if (writeReadStatus < 0 && loop < MAX_RESEND) /* The rubish has not been cleared!*/
 	     goto Above_Dummy_writeRead;
-	    
+	 if (loop >= MAX_RESEND) Debug(1,"Send debug failed loop=%i max=%i\n",loop,MAX_RESEND);  
     } else {
         /* Not allowed action */
 	strcpy(valueRtrn,"-22");
+	asynXPSC8InterfaceBusy = FALSE;
         return;
     }
+SendOnly_End:
     strcpy(valueRtrn,"0");
+    asynXPSC8InterfaceBusy = FALSE;
     return;
 }
 

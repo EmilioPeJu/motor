@@ -17,7 +17,15 @@
  * a command is issued. It then performs all the motions specified in the lapsed
  * time as a single syncronised motion.  The pause is performed in drvXPSC8.cc:
  * send_mess.
+ * 
+ * 17/11/05 Jon Kelly
  *
+ * Comment out "HOME Command Error performing GroupInitialise\n" because with 
+ * the asyn driver it throws-up an error message even though the command works.
+ * 
+ * 29/11/05 
+ *
+ * The driver now handles the groupstatus +50 (home error not initialised) 
  */
 
 
@@ -30,8 +38,9 @@
 #include        "motorRecord.h"
 #include        "motor.h"
 #include        "motordevCom.h"
-
 #include        "drvXPSC8.h"
+
+/*#define DLL _declspec(dllexport)*/
 #include        "xps_c8_driver.h"
 
 #define STATIC static
@@ -49,18 +58,18 @@ extern struct driver_table XPSC8_access;
 
 #ifdef __GNUG__
     #ifdef	DEBUG
-	volatile int devXPSC8Debug = 3;
 	#define Debug(L, FMT, V...) { if(L <= devXPSC8Debug) \
 			{ printf("%s(%d):",__FILE__,__LINE__); \
 			  printf(FMT,##V); } }
-	epicsExportAddress(int, devXPSC8Debug);
+	
     #else 
 	#define Debug(L, FMT, V...)
     #endif  
 #else 
     #define Debug()
 #endif
-
+volatile int devXPSC8Debug = 0;
+epicsExportAddress(int, devXPSC8Debug);
 
 
 /* ----------------Create the dsets for devXPSC8----------------- */
@@ -175,6 +184,7 @@ STATIC long XPSC8_init_record(struct motorRecord *mr)
 /* start building a transaction */
 STATIC long XPSC8_start_trans(struct motorRecord *mr)
 {
+    Debug(10, "--------XPSC8_start_trans\n");
     long rtnval;
     rtnval = motor_start_trans_com(mr, XPSC8_cards);
     return(rtnval);
@@ -184,6 +194,7 @@ STATIC long XPSC8_start_trans(struct motorRecord *mr)
 /* end building a transaction */
 STATIC RTN_STATUS XPSC8_end_trans(struct motorRecord *mr)
 {
+    Debug(10, "--------XPSC8_end_trans\n");
     RTN_STATUS rtnval;
     rtnval = motor_end_trans_com(mr, drvtabptr);
     return(rtnval);
@@ -250,8 +261,10 @@ STATIC RTN_STATUS XPSC8_build_trans(motor_cmnd command,\
     Debug(10, "XPSC8_build_trans: resolution=%f\n",resolution);
     if (XPSC8_table[command] > motor_call->type)
         motor_call->type = XPSC8_table[command];
+    Debug(10, "XPSC8_build_trans: After cntrl command\n");
     if (trans->state != BUILD_STATE)
         return(rtnval = ERROR);
+    Debug(10, "XPSC8_build_trans: After cntrl command\n");
    
     epicsMutexLock(control->XPSC8Lock);
 
@@ -274,9 +287,13 @@ STATIC RTN_STATUS XPSC8_build_trans(motor_cmnd command,\
     switch (command) {
     case MOVE_ABS:/* command 0*/
   
+        Debug(2, "*********** axisingroup=%i, gpstatus=%i gpnumber=%i\n",\
+              axisingroup, groupstatus, groupnumber);
 	
-	if ((groupstatus < 10) || (groupstatus == 47)) {
-            /* ie not initialized state or Jogging!*/
+	if ((groupstatus < 10) || (groupstatus == 47)
+				|| (groupstatus > 49)) {
+            /* ie not initialized state or Jogging!
+	       or if there is a homing error !*/
 		break;}
 		
 	/* If there is no cue, update the cue array to make sure you don't move */
@@ -286,7 +303,11 @@ STATIC RTN_STATUS XPSC8_build_trans(motor_cmnd command,\
                                          cntrl->groupname,
                                          groupsize,
                                          groupcntrl->positionarray); /* Array! */
-
+            Debug(2, "********** Update position array ********\n");
+	    Debug(5, "Phi %lf\n",groupcntrl->positionarray[0]);
+	    Debug(5, "Kappa %lf\n",groupcntrl->positionarray[1]);  
+	    Debug(5, "Omega %lf\n",groupcntrl->positionarray[2]); 
+	    
 	    if (status != 0) {
             	printf(" Error performing GroupPositionCurrentGet\n");
             }	    
@@ -316,19 +337,24 @@ STATIC RTN_STATUS XPSC8_build_trans(motor_cmnd command,\
 	    break;}
 	
 	/* If motion has been killed the group will need to be initialized*/
-        /* and homed before the motors can be driven again */
+        /* and homed before the motors can be driven again 
+	   If the previous home failed gp=50 so re-init 29/11/05
+	
+	*/
         
-	if (cntrl->groupstatus < 10 ) {
+	if ((cntrl->groupstatus < 10 ) || (cntrl->groupstatus > 49 )) {
             /* ie not initialized state!*/
             status = GroupInitialize(cntrl->devpollsocket,cntrl->groupname);
             if (status != 0) {
-                printf("HOME Command Error performing GroupInitialise\n");
+                /*printf("HOME Command Error performing GroupInitialise\n");*/
             } 
             
+            Debug(1, "XPSC8_build_trans:****** Perform GroupInitialize\n"); 
             status = GroupHomeSearch(cntrl->socket,cntrl->groupname);
             if (status != 0) {
                 printf(" Error performing GroupHomeSearch\n");
-            }
+            } 
+            Debug(2, "XPSC8_build_trans:******* Perform GroupHomeSearch\n");
             
             goto home_rev_end; 
         }
@@ -342,8 +368,10 @@ STATIC RTN_STATUS XPSC8_build_trans(motor_cmnd command,\
     
         status = GroupInitialize(cntrl->devpollsocket,cntrl->groupname);
         if (status != 0) {
-            printf("HOME Command Error performing GroupInitialise\n");
+            /*printf("HOME Command Error performing GroupInitialise\n");*/
         } 
+     
+        Debug(2, "XPSC8_build_trans:****** Perform GroupInitialize\n"); 
      
         status = GroupHomeSearch(cntrl->socket,cntrl->groupname);
         if (status != 0) {
@@ -368,11 +396,16 @@ home_rev_end:			/* Used for goto statment above */
         break;
 
     case SET_VEL_BASE: 
-        /* The XPS does not have a different Base velocity!!!*/
+        /* The XPS does not have an API to set Base velocity!!!*/
         break;
     case SET_VELOCITY: /*6*/
-        /* The XPS does not have a different Base velocity!!!!!
-           So I perform the same operation for VEL_BASE and VEL*/
+        /* The XPS uses the same API for Vel & Accel so we send them twice*/
+	if ((groupstatus < 10) || (groupstatus == 47)
+				|| (groupstatus > 49)) {
+            /* ie not initialized state or Jogging!
+	       or if there is a homing error !*/
+	  break;}
+
     
         status = PositionerSGammaParametersSet(cntrl->devpollsocket,
                                                cntrl->positionername, steps,
@@ -387,6 +420,12 @@ home_rev_end:			/* Used for goto statment above */
         break;
 
     case SET_ACCEL:    /* command 7 */
+    	if ((groupstatus < 10) || (groupstatus == 47)
+				|| (groupstatus > 49)) {
+            /* ie not initialized state or Jogging!
+	       or if there is a homing error !*/
+	  break;}
+
         status = PositionerSGammaParametersSet(cntrl->devpollsocket,
                                                cntrl->positionername,
                                                cntrl->velocity,
@@ -397,7 +436,16 @@ home_rev_end:			/* Used for goto statment above */
 	    							status);
 	    printf(" steps=%f resoulution=%f DVAL=%f\n",steps,resolution,dval);							
 	if (status == -17) 
-            printf("devXPSC8 BuildTrans: One of the parameters was out of range!");
+            printf("devXPSC8 BuildTrans: One of the parameters was out of range!");							
+					
+	   
+	   /*printf("positionername %s velocity %g steps %g minjerktime %g maxjerktime %g dval\n",
+	   					cntrl->positionername,
+                                               cntrl->velocity,
+                                               steps, cntrl->minjerktime,
+                                               cntrl->maxjerktime,
+					       dval);*/
+
 	      }	  
         else cntrl->accel = steps;
         break;
@@ -414,20 +462,31 @@ home_rev_end:			/* Used for goto statment above */
         break;
 
     case GET_INFO:     /* 10 * This is run when you press Go from stop!*/ 
+    
+        
         break;
 
     case STOP_AXIS: /* 11 */
         /* The whole group must stop, not just 1 axis */
 	/* Update status to see if the group is moving */
 	
-	if (cntrl->groupstatus > 42) { 
+	
+	
+	if ((cntrl->groupstatus > 42) && (cntrl->groupstatus < 50)) { 
             /* Then the group is moving! */              
             status = GroupMoveAbort(cntrl->devpollsocket,cntrl->groupname);
             if (status != 0) {
 	        printf(" Error performing GroupMoveAbort = %i %s(\n",\
 	    					status,cntrl->groupname);
-		
-		}		
+							
+	        /*printf("build_trans:command=%d, cntrl->moving=%d"\
+                " GroupStat=%d\n", command,cntrl->moving,cntrl->groupstatus);
+    
+                printf("Build_trans: com=%d, axis=%d, moving=%d socket=%i psocket=%i\n",\
+                command,signal,cntrl->moving,cntrl->socket,cntrl->devpollsocket);*/
+		}	
+        
+	
 	/* When a group is stopped the drive cue is emptied and reset*/
 	    
 	    status = GroupPositionCurrentGet(cntrl->devpollsocket,
@@ -466,7 +525,7 @@ home_rev_end:			/* Used for goto statment above */
                                                cntrl->positionername,
                                                cntrl->minlimit, steps);
         if (status != 0) 
-            printf(" Error performing PositionerUserTravelLimitsGet "
+            printf(" Error performing PositionerUserTravelLimitsSet "
                    " Max Limit status=%d\n",status);
         else cntrl->maxlimit = steps;
         break;
@@ -476,7 +535,7 @@ home_rev_end:			/* Used for goto statment above */
                                                cntrl->positionername,
                                                steps, cntrl->maxlimit);
         if (status != 0) 
-            printf("Error performing PositionerUserTravelLimitsGet Min Limit\n");
+            printf("Error performing PositionerUserTravelLimitsSet Min Limit\n");
         else cntrl->minlimit = steps;
         break;
 

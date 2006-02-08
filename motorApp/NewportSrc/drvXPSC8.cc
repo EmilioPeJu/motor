@@ -17,6 +17,13 @@
  * The driver is converted to asyn.  The XPS some times returns an accel=zero in 
  * readStatus so I have added a do loop to repeat the command until a non zero
  * value is returned
+ *
+ * 07/12/05
+ * Improve the way SetStatus handles limits & done flags.  The limit errors may
+ * be read by setting drvXPSC8Debug = 1.
+ * Error checking is added to the positionerError API.
+ *
+ * 
  */
 
 #include        <string.h>
@@ -45,7 +52,8 @@
 #else
     #define Debug()
 #endif
-volatile int drvXPSC8Debug = 6;
+volatile int drvXPSC8Debug = 0;
+epicsExportAddress(int, drvXPSC8Debug);
 /* --- Local data. --- */ 
 int XPSC8_num_cards = 0;
 
@@ -107,7 +115,7 @@ struct
 epicsExportAddress(drvet, drvXPSC8);
 
 /* I don't know where the XPSC8_access is set?*/
-STATIC struct thread_args targs = {SCAN_RATE, &XPSC8_access, 0.0};
+STATIC struct thread_args targs = {SCAN_RATE, &XPSC8_access};
 
 /*********************************************************
  * Print out driver status report
@@ -192,6 +200,7 @@ STATIC void readXPSC8Status(int card)
     int axisingroup;
     int loop;	/* Variables used when the XPS returns accel=zero */
     int max_loop = 10;	/* This creates an error when we set the vel/accel */
+    int positionerError; /* Used because the XPS sometimes returns an incorrect value */
     
     msta_field statusflags;
     status = 0;
@@ -200,6 +209,8 @@ STATIC void readXPSC8Status(int card)
 
     Debug(10, "XPSC8:readXPSC8Status card=%d num_axes=%d\n",card,XPSC8_num_axes);
     
+    /* Take a lock so that only 1 thread can be talking to the Neport XPSC8 
+    */
     epicsMutexLock(control->XPSC8Lock);
 	/*epicsThreadSleep(10);*/
     
@@ -316,17 +327,33 @@ STATIC void readXPSC8Status(int card)
 	/* Place the position data into the axis structure */
 	cntrl->setpointposition = position[axisingroup];}
 
-        status = PositionerErrorGet(cntrl->pollsocket,
+	/* The error checking loops bellow are required because the XPS randomly returns 
+	   zero as a positioner error even if it should be <0.  This effect is only
+	   observed when the API is sent by code!
+	 */
+	positionerError = 0;
+	cntrl->positionererror = 0;
+	for (loop = 0; loop < 20; loop++){
+	/*epicsThreadSleep(0.1); Putting in a pause does not solve the problem */
+            status = PositionerErrorGet(cntrl->pollsocket,
                                     cntrl->positionername,
-                                    &cntrl->positionererror);
-        if (status != 0) {
-            printf(" Error performing PositionerErrorGet\n");
-            statuserror =1;
-        }
-
-        /* We probably don't need to poll this because the limits are set to 
-         * the database values on startup*/
-
+                                    &positionerError);
+            if (status != 0) {
+              printf(" Error performing PositionerErrorGet\n");
+              statuserror =1;
+            }
+	    Debug(15, "XPS - %i, Channel - %i, Read_status: positionererror number %i, loop %i\n",
+						card,i,positionerError,loop); 
+	    if (positionerError < 0) { 
+	      cntrl->positionererror = positionerError;
+	      loop = 99; /* EXIT */
+	    }
+	}
+	
+	if (cntrl->positionererror != 0) {
+	  Debug(1, "XPS - %i, Channel - %i, Read_status: positionererror number %i\n",
+							card,i,cntrl->positionererror);} 	
+	
         status = PositionerUserTravelLimitsGet(cntrl->pollsocket,
                                                cntrl->positionername,
                                                &cntrl->minlimit,
@@ -377,7 +404,7 @@ STATIC int set_status(int card, int signal)
 
     /* Lock access to global data structure */
     epicsMutexLock(control->XPSC8Lock);
-    
+	
     Debug(10, "XPSC8:set_status entry: card=%d, signal=%d\n", card, signal);
     
     /* Parse the error and position values read within the readXPSC8Status 
@@ -386,49 +413,60 @@ STATIC int set_status(int card, int signal)
     pos = cntrl->currentposition;
     target = cntrl->targetposition;
     groupstatus = cntrl->groupstatus;
+    Debug(10, "XPSC8:set_status entry: positionererror=%d, pos=%f,"
+          " resolution=%f\n",
+          			positionererror, pos, resolution);
+    Debug(10, "XPSC8:set_status entry: pos0=%f\n",
+          			cntrl->currentposition);
 
-    /*if (cntrl->velocity >= 0)
-        status.Bits.RA_DIRECTION = 1;
-    else
-        status.Bits.RA_DIRECTION=0;*/
-
-    if (groupstatus > 9 && groupstatus < 20) { 
-        /* These states mean ready from move/home/jog etc*/
-        status.Bits.RA_DONE=1; /* 1 means cd ready */
-        Debug(10, "Set_status: Done -->groupstatus=%d\n", groupstatus);
-    } else {
-        status.Bits.RA_DONE=0;
-        Debug(10, "Set_status: Not Done -->groupstatus=%d\n", groupstatus);
-    }
-    status.Bits.RA_PLUS_LS=0;
+    status.Bits.RA_PLUS_LS=0; /* Set to zero but may change further down */
     status.Bits.RA_MINUS_LS=0;
     
     cntrl->moving = 0 ; /* not moving */
+    status.Bits.RA_DONE=1;
     
     if (groupstatus > 42 && groupstatus < 49) {
         /* These states mean it is moving/homeing/jogging etc*/
         cntrl->moving = 1;
+	status.Bits.RA_DONE=0;
+	Debug(10, "Set_status: Not Done -->groupstatus=%d\n", groupstatus);
         
 	if (target >= pos) {
 	    status.Bits.RA_DIRECTION = 1;
-	    Debug(2, "Set_status: Positive Direction\n");
+	    Debug(2, "XPS - %i, Channel - %i, Set_status: Positive Direction\n",
+	    							card,signal);
 	} else {
 	    status.Bits.RA_DIRECTION = 0;
-	    Debug(2, "Set_status: Negative Direction\n");
+	    Debug(2, "XPS - %i, Channel - %i, Set_status: Negative Direction\n",
+   							card,signal);
 	}
-
-    }
- 
-    /* These are hard limits */   
-    if (positionererror & XPSC8_END_OF_RUN_MINUS ) {
- 
-        status.Bits.RA_MINUS_LS=1;   /* defined in drvXPSC8.h */
-        ls_active = true;
     }
 
-    if (positionererror & XPSC8_END_OF_RUN_PLUS ) {
+    /* These are mechanical limits */   
+    if ((positionererror == XPSC8_END_OF_RUN_MINUS1) || 
+    	(positionererror == XPSC8_END_OF_RUN_MINUS2)) { /* defined in drvXPSC8.h */
+ 
+        status.Bits.RA_MINUS_LS=1;   
+        if ( status.Bits.RA_DIRECTION == 0) ls_active = true;
+	Debug(1, "XPS - %i, Channel - %i, Set_status: Minus Limit\n",card,signal);
+    }
+    /* These are mechanical limits */   
+    if ((positionererror == XPSC8_END_OF_RUN_BOTH1)  || 
+	(positionererror == XPSC8_END_OF_RUN_BOTH2)  ||
+	(positionererror == XPSC8_END_OF_RUN_BOTH3)) { /* defined in drvXPSC8.h */
+ 
+        status.Bits.RA_MINUS_LS=1;   
+        if ( status.Bits.RA_DIRECTION == 0) ls_active = true;
+	Debug(1, "XPS - %i, Channel - %i, Set_status: Both Limits\n",card,signal);
+    }
+
+    if ((positionererror == XPSC8_END_OF_RUN_PLUS1) || 
+        (positionererror == XPSC8_END_OF_RUN_PLUS2) ||
+	(positionererror == XPSC8_END_OF_RUN_PLUS3)) {
+	
         status.Bits.RA_PLUS_LS=1;
-        ls_active = true;
+        if ( status.Bits.RA_DIRECTION == 1) ls_active = true;
+	Debug(1, "XPS - %i, Channel - %i, Set_status: Plus Limit\n",card,signal);
     }
 
     status.Bits.RA_HOME=0;
@@ -461,24 +499,35 @@ STATIC int set_status(int card, int signal)
     status.Bits.RA_PROBLEM=0;
 
         /* not initialized, homed or disabled */
-    if ((groupstatus >= 0 && groupstatus < 10) || (groupstatus >= 20 && groupstatus < 43)) { 
+    if ((groupstatus >= 0 && groupstatus < 10) || (groupstatus >= 20 && groupstatus < 43)
+    						|| (groupstatus > 49) ) { 
 
         /* Set the Hard limits To show that it is unable to move. This means when you
 	   home the motor record will only let you home away from the current shown
-	   limit */
+	   limit 
 	   
-        status.Bits.RA_MINUS_LS=1;
-        status.Bits.RA_PLUS_LS=1;
+	   Add groupstatus > 49 so that home errors are included 29/11/05 JHK
+	   */
+	   
+        /*status.Bits.RA_MINUS_LS=1;  I think setting both limits confuses the motor record
+        status.Bits.RA_PLUS_LS=1;*/
         status.Bits.RA_PROBLEM=1;  /*This variable is to do with polling*/
-        Debug(1, "--------Set Status Not initialised state!  \n");    
+	Debug(1, "XPS - %i, Channel - %i, Set_status: positionererror number %i\n",
+								card,signal,positionererror); 
+	Debug(1, "XPS - %i, Channel - %i, Set_status: Not initialised state!\n",card,signal);    
     
     }
 
    motor_info->velocity = (int)cntrl->velocity; 
 
+/*    if (status.Bits.RA_DIRECTION==0)
+        motor_info->velocity *= -1;*/
+
     rtn_state = (!motor_info->no_motion_count || ls_active == true ||
                  (status.Bits.RA_DONE | status.Bits.RA_PROBLEM)) ? 1 : 0;
  
+    Debug(10, "--------set_status rtn_state=%d  \n",rtn_state);   
+
 
     if (cntrl->status == XPSC8_COMM_ERR)
         /* I defined this to be -1! */
@@ -535,7 +584,7 @@ STATIC RTN_STATUS send_mess(int card, char const *com, char *c)
     }
     while ((groupcntrl->cuesize == 0) && (signal < (XPSC8_NUM_CHANNELS-1)));
     
-    Debug(5,"Send_mess After do loop axisingp=%d, groupstatus=%i socket=%i cue=%i flag=%i \n",
+    Debug(5,"After do loop axisingp=%d, groupstatus=%i socket=%i cue=%i flag=%i \n",
              axisingroup,groupstatus,cntrl->socket,groupcntrl->cuesize,groupcntrl->cueflag);
 
     if((signal == (XPSC8_NUM_CHANNELS-1)) && (groupcntrl->cuesize == 0)) 
@@ -547,6 +596,9 @@ STATIC RTN_STATUS send_mess(int card, char const *com, char *c)
     			
     if (status != 0) 
             printf(" SendMess Error performing GroupStatusGet status=%d\n", status);
+	     
+    Debug(5,"After status get axisingp=%d, groupstatus=%i socket=%i cue=%i gp=%i \n",
+             axisingroup,groupstatus,cntrl->socket,groupcntrl->cuesize,groupnumber);
 
     if (groupstatus > 9 && groupstatus < 20){	/* Ready from move */
 
@@ -557,19 +609,25 @@ STATIC RTN_STATUS send_mess(int card, char const *com, char *c)
 		epicsThreadSleep(XPSC8_QUE_PAUSE_READY);	/* Wait for other motors */
 		epicsMutexLock(control->XPSC8Lock);
 		groupcntrl->cuesize = 0;		/* Reset cue */
-		groupcntrl->cueflag = 0;	
+		groupcntrl->cueflag = 0;
+		Debug(5,"Before Move position %f\n",*groupcntrl->positionarray);	
 
 		status = GroupMoveAbsolute(cntrl->socket,
 					cntrl->groupname,
 					groupsize,
 					groupcntrl->positionarray); /*Pointer to array*/
 		
+		Debug(5,"After Move\n");
+		/*epicsMutexLock(control->XPSC8Lock);*/
+		
+		/*epicsThreadSleep(0.1);*/
+		
 		if (status != 0 && status != -27) 
 		    printf(" Error performing GroupMoveAbsolute %i\n",status);
 		/* Error -27 is caused when the motor record changes dir i.e.
 		   when it aborts a move!*/
 
-    Debug(5,"Send_mess After move in Send_mess axisingp=%d, groupstatus=%i socket=%i psocket=%i\n",
+    Debug(5,"After move in Send_mess axisingp=%d, groupstatus=%i socket=%i psocket=%i\n",
               	cntrl->axisingroup,groupstatus,cntrl->socket,cntrl->pollsocket);		
 		goto send_mess_end;
 		}
@@ -577,10 +635,11 @@ STATIC RTN_STATUS send_mess(int card, char const *com, char *c)
 
     if (groupstatus > 42 && groupstatus < 47){	/* Moveing/Homing*/
 	    if (groupcntrl->cuesize > 1)
-	    	Debug(1,"Send_mess**Added move to the cue group busy ie xps moving***\n");
+	    	Debug(1,"**Added move to the cue group busy ie xps moving***\n");
 	    if (groupcntrl->cueflag == 1){		/* First motor called */
 	        groupcntrl->cueflag = 0;	        	
 		waitcount = 0;
+		Debug(5,"Before While motors moving axcue=%i\n",groupcntrl->cuesize);
 		while((groupstatus > 42 && groupstatus < 49) && 
 					(waitcount <= XPSC8_MAX_WAIT)){
 		   epicsMutexUnlock(control->XPSC8Lock);/* Free up for the others*/
@@ -590,14 +649,14 @@ STATIC RTN_STATUS send_mess(int card, char const *com, char *c)
 		   status = GroupStatusGet(cntrl->pollsocket, cntrl->groupname,
                                 &cntrl->groupstatus);
 		   if (status != 0) 
-                       printf("Error performing GroupStatusGet Bottom Send_mess status=%d\n", status); 
+                       printf("Bottom sendMess Error performing GroupStatusGet status=%d\n", status); 
         	   
 		   groupstatus = cntrl->groupstatus;	/* Update groupstatus */
 
 		}
 		   
 		if (waitcount >= XPSC8_MAX_WAIT){
-			printf(" Error Motor Cue timed out \n");
+			printf(" Error Motor Cue timed out\n");
 			groupcntrl->cuesize = 0;		/* Reset cue */
 			groupcntrl->cueflag = 0;
 			/* Re set the cue array to current positions */
@@ -622,14 +681,20 @@ STATIC RTN_STATUS send_mess(int card, char const *com, char *c)
 		   when it aborts a move!*/
 		    if (status != 0 && status != -27 ) 
 		        printf(" Error performing GroupMoveAbsolute %i\n",status);
-		   
+		    /*if (status == -27) 
+		        printf("Just a warning that the last move was aborted.\n");*/
+		    
+
+		    
 		    
 		}
 	    }
 	}
 
 send_mess_end:
-    epicsMutexUnlock(control->XPSC8Lock);	
+    epicsMutexUnlock(control->XPSC8Lock);
+    Debug(5,"End of sendmess axisingp=%d, groupstatus=%i socket=%i cue=%i\n",
+              	cntrl->axisingroup,groupstatus,cntrl->socket,groupcntrl->cuesize);	
     return (OK);
 }
 
@@ -716,7 +781,15 @@ RTN_STATUS XPSC8Config(int card,   /* Controller number */
     control = (struct XPSC8controller *) motor_state[card]->DevicePrivate;
     
     motor_state[card]->total_axis = totalaxes;
-      
+    
+    /* Try using only 1 drive & 1 poll socket */
+    /*socket = TCP_ConnectToServer(ipchar,port,TIMEOUT);*/
+        /* Find a socket number */
+    /*if (socket < 0) {
+        printf(" Error TCP_ConnectToServer for move-socket\n");
+        statuserror =1;
+    }*/
+    
     pollsocket = TCP_ConnectToServer(ipchar,port,TIMEOUT);
     
     if (pollsocket < 0) {
@@ -739,6 +812,13 @@ RTN_STATUS XPSC8Config(int card,   /* Controller number */
             printf(" Error TCP_ConnectToServer for move-socket\n");
             statuserror =1;
         }
+
+        /*pollsocket = TCP_ConnectToServer(ipchar,port,TIMEOUT);*/
+        /* Find a socket number */
+        /*if (pollsocket < 0) {
+            printf(" Error TCP_ConnectToServer for pollsocket\n");
+            statuserror =1;
+        } */
  
         cntrl = (struct XPSC8axis *)&control->axis[axis];
         Debug(11, "XPSC8Config: axis=%d, cntrl=%p\n", axis, cntrl);
@@ -838,7 +918,7 @@ STATIC int motor_init()
         control->XPSC8Lock = epicsMutexCreate();
         errind = false;
 
-        /* Just to test status, 0 means the call worked */
+        /* just to test status, 0 means the call worked*/
         counter = 0;
 	/* wait incase the socket is busy */
 	while (status < 0 && counter < (TIMEOUT*10)) {
@@ -860,6 +940,7 @@ STATIC int motor_init()
 	    groupcntrl = (struct XPSC8group *)&control->group[i];
 	    groupcntrl->cuesize = 0;
 	    groupcntrl->cueflag = 0;
+	
 	}
 	    
 
@@ -879,6 +960,7 @@ STATIC int motor_init()
             start_status(card_index);
             /*Read in all the parameters vel/accel ect */
 
+            Debug(10, "XPSC8:motor_init: called start_status OK\n");
             for (motor_index = 0; motor_index < totalaxes; motor_index++) {
                 struct mess_info *motor_info = &brdptr->motor_info[motor_index];
                 motor_info->status.All = 0;
@@ -886,11 +968,15 @@ STATIC int motor_init()
                 motor_info->encoder_position = 0;
                 motor_info->position = 0;
                 /* Read status of each motor */
+                Debug(5, " XPSC8:motor_init: calling set_status for motor %d\n",
+                      motor_index);
+                set_status(card_index, motor_index);
             }
         }
         else
             motor_state[card_index] = (struct controller *) NULL;
     }
+    Debug(10, "XPSC8:motor_init: done with start_status and set_status\n");
 
     any_motor_in_motion = 0;
 
@@ -899,9 +985,10 @@ STATIC int motor_init()
 
     free_list.head = (struct mess_node *) NULL;
     free_list.tail = (struct mess_node *) NULL;
+
+    Debug(10, "XPSC8:motor_init: spawning XPSC8_motor task\n");
     
-    epicsThreadCreate((char *) "XPSC8_motor", epicsThreadPriorityMedium,
-		      epicsThreadGetStackSize(epicsThreadStackMedium), 
+    epicsThreadCreate((char *) "XPSC8_motor", 64, 5000, 
                       (EPICSTHREADFUNC) motor_task, (void *) &targs);
 
     return (OK);

@@ -4,7 +4,7 @@
 import time
 import thread
 
-UPDATE_FREQUENCY = 10
+UPDATE_FREQUENCY = 100
 
 # Maximum number of axis on pmac
 MAX_AXIS = 32
