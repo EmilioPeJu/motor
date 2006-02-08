@@ -13,8 +13,8 @@ MAX_MVAR = 3300
 
 # I-variables
 I_ACTIVATE = 00
-I_DEMVEL   = 22
-I_DEMACC   = 19
+I_DEMVEL   = 22    # Counts/msec
+I_DEMACC   = 19    # Counts/msec^2
 
 # M-variables
 M_DEMANDPOS = 61
@@ -134,7 +134,7 @@ class pmaccontroller(object):
     def controllerupdate(self):        
         """ Update thread function (Runs at 10Hz) """
         while not self.finish:
-            time.sleep(1/UPDATE_FREQUENCY)            
+            time.sleep(1.0/UPDATE_FREQUENCY)            
             self.updatestat()
             self.updatepos()
 
@@ -155,9 +155,9 @@ class pmaccontroller(object):
                 dempos   = self.motors[axis].getdempos()
                 readback = self.motors[axis].getreadback()
                 idemvel = 'I%d%d' % (axis,int(I_DEMVEL))
-                demvel   = float(self.getivar(idemvel))
+                demvel   = 1000.0 * float(self.getivar(idemvel))
                 idemacc = 'I%d%d' % (axis,int(I_DEMACC))
-                demacc   = float(self.getivar(idemacc))
+                demacc   = 1000000.0 * float(self.getivar(idemacc))
                 curvel   = self.motors[axis].getcurvel()
                 #print dempos, readback, demvel, demacc, curvel
                 
@@ -214,9 +214,11 @@ class pmaccontroller(object):
                     
                     
                 # Check to see if we need to slow down
+                # velocities and distances are in real units,
+                # readbacks in 1/32 units
                 if self.motors[axis].getmotstate() != 'DECEL':
-                    if abs(readback - dempos) <= accdist:
-                        if abs(readback - dempos) <= decdist:
+                    if abs(readback - dempos) <= (accdist * 32.0):
+                        if abs(readback - dempos) <= (decdist * 32.0):
                             #print readback,dempos,accdist,decdist
                             self.motors[axis].setmotstate('DECEL')
                     

@@ -231,7 +231,7 @@ static RTN_STATUS Pmac_build_trans(motor_cmnd command, double *parms, struct mot
 	
 	case SET_ACCEL:
     	    /* Convert input (steps/s^2) to steps/ms^2. */
-	    sprintf(buff, " I%.2d19=%f ", axis, (*parms / 1000.0));
+	    sprintf(buff, " I%.2d19=%f ", axis, (*parms / 1000000.0));
 	    break;
 	
 	case GO:
