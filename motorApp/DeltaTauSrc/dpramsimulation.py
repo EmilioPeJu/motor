@@ -74,7 +74,7 @@ class dpram:
         self.dpramstruct="3740xBBH160sxBxxxx258s"
 
         # List of tokens to be used in regular expression
-        self.tokens = ( ('movecmd','(#[0-9]+\s*I[0-9]+=[0-9.]+\s*I[0-9]+=[0-9.]+\s*J=[0-9-]+)'),
+        self.tokens = ( ('movecmd','(#[0-9]+\s+(?:I[0-9]+=[0-9.]+\s+)*J=[0-9-]+)'),
                         ('type','(TYPE|type)'),
                         ('version','(VERSION|version)'),
                         ('setmvar','(M[0-9]+\s*=\s*[0-9]+)'),
@@ -98,33 +98,28 @@ class dpram:
 
     def movecmd(self,pmac,command):
         """
-        Function to process a move command.
+        Function to process a move command with optional I-variables
         """
         # Split move command tokens
-        cmnd = command.split(' ')
-        # Remove empty strings
-        cmnd.remove('')
+        cmnds = command.split(' ')
 
-        # Extract axis number
-        axis = int(cmnd[0].split('#')[1])
-
-        # Set I variables
-        inum = cmnd[1].split('=')[0]
-        inum = int(inum.split('I')[1])
-        istring = 'I'+str(inum)
-        val = cmnd[1].split('=')[1]
-
-        pmac.setivar(istring,val)
-
-        inum = cmnd[2].split('=')[0]
-        inum = int(inum.split('I')[1])
-        istring = 'I'+str(inum)
-        val = cmnd[2].split('=')[1]
-
-        pmac.setivar(istring,val)
-
-        newpos = command.split('J=')[1]
-        pmac.setpos(axis,float(newpos))
+        # Loop over tokens processing in order
+        for cmnd in cmnds:
+            # There may be empty tokens (due to multiple spaces) Skip these
+            if (len(cmnd) > 0):
+                # check 1st character of command to see what sort it is.
+                if (cmnd[0]=='#'):
+                    # Have found axis number, so set it.
+                    axis = int(cmnd[1:])
+                elif (cmnd[0]=='I'):
+                    # this is an i variable, store variable and value.
+                    strs = cmnd.split('=')
+                    # Note a leading 0 on the motor number has to be stripped.
+                    iVar = 'I'+str(int(strs[0][1:]))
+                    pmac.setivar(iVar,strs[1])
+                elif (cmnd[0]=='J'):
+                    # this is an value string "J=VALUE", send value to the axis
+                    pmac.setpos(axis,float(cmnd[2:]))
         
         return None
         
@@ -254,7 +249,6 @@ class dpram:
                 else:
                     print 'Invalid message (%s)' % command
 
-			
                 # Send reply to client application
                     
             # Sleep before repeating
