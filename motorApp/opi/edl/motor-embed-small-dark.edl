@@ -3,59 +3,26 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 101
-y 205
+x 600
+y 286
 w 190
 h 110
 font "helvetica-medium-r-14.0"
 ctlFont "courier-bold-r-14.0"
 btnFont "helvetica-medium-r-14.0"
 fgColor index 14
-bgColor index 3
+bgColor index 69
 textColor index 14
 ctlFgColor1 index 25
 ctlFgColor2 index 30
-ctlBgColor1 index 3
-ctlBgColor2 index 3
+ctlBgColor1 index 69
+ctlBgColor2 index 69
 topShadowColor index 1
 botShadowColor index 11
 title "Motor box small"
 showGrid
 gridSize 5
 endScreenProperties
-
-# (Related Display)
-object relatedDisplayClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x -1
-y -1
-w 192
-h 112
-fgColor index 0
-bgColor index 0
-topShadowColor index 0
-botShadowColor index 0
-font "helvetica-medium-r-14.0"
-xPosOffset -50
-yPosOffset -50
-button3Popup
-invisible
-buttonLabel "HELP"
-numPvs 4
-numDsps 1
-displayFileName {
-  0 "motor-embed-small-tooltip"
-}
-setPosition {
-  0 "parentWindow"
-}
-symbols {
-  0 "label=$(label)"
-}
-endObjectProperties
 
 # (Rectangle)
 object activeRectangleClass
@@ -83,7 +50,7 @@ w 85
 h 24
 fgColor index 21
 onColor index 4
-offColor index 3
+offColor index 69
 topShadowColor index 1
 botShadowColor index 11
 controlPv "$(motor).STOP"
@@ -91,7 +58,7 @@ pressValue "1"
 onLabel "STOP"
 offLabel "STOP"
 3d
-font "arial-bold-r-18.0"
+font "arial-bold-r-16.0"
 visMin "0"
 visMax "1"
 endObjectProperties
@@ -108,7 +75,7 @@ w 24
 h 25
 fgColor index 25
 onColor index 4
-offColor index 3
+offColor index 69
 topShadowColor index 0
 botShadowColor index 14
 controlPv "$(motor).TWR"
@@ -133,7 +100,7 @@ w 24
 h 25
 fgColor index 25
 onColor index 4
-offColor index 3
+offColor index 69
 topShadowColor index 0
 botShadowColor index 14
 controlPv "$(motor).TWF"
@@ -176,7 +143,7 @@ numPvs 1
 useOriginalSize
 useOriginalColors
 fgColor index 14
-bgColor index 3
+bgColor index 69
 endObjectProperties
 
 # (Symbol)
@@ -205,7 +172,7 @@ numPvs 1
 useOriginalSize
 useOriginalColors
 fgColor index 14
-bgColor index 3
+bgColor index 69
 endObjectProperties
 
 # (Related Display)
@@ -219,16 +186,40 @@ y 80
 w 85
 h 24
 fgColor index 43
-bgColor index 3
+bgColor index 69
 topShadowColor index 1
 botShadowColor index 11
-font "arial-bold-r-16.0"
-buttonLabel "Config"
+font "arial-bold-r-18.0"
+invisible
+buttonLabel "MORE"
 numPvs 4
 numDsps 1
 displayFileName {
   0 "motor.edl"
 }
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 6
+y 80
+w 85
+h 24
+fgColor index 43
+onColor index 4
+offColor index 69
+topShadowColor index 1
+botShadowColor index 11
+onLabel "More"
+offLabel "More"
+3d
+font "arial-medium-r-16.0"
+visMin "0"
+visMax "1"
 endObjectProperties
 
 # (Static Text)
@@ -239,15 +230,42 @@ minor 1
 release 0
 x 6
 y -1
-w 2
-h 0
+w 44
+h 14
 font "arial-medium-r-12.0"
 fgColor index 14
-bgColor index 3
+bgColor index 69
 value {
   "$(label)"
 }
 autoSize
+endObjectProperties
+
+# (Menu Mux PV)
+object menuMuxPVClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 250
+y 55
+w 20
+h 10
+fgColour index 14
+bgColour index 69
+topShadowColour index 1
+botShadowColour index 11
+font "helvetica-medium-r-14.0"
+numItems 1
+symbolTag {
+  0 "."
+}
+symbol0 {
+  0 "label"
+}
+PV0 {
+  0 "$(motor).DESC"
+}
 endObjectProperties
 
 # (Text Monitor)
@@ -286,7 +304,7 @@ h 36
 controlPv "$(motor).VAL"
 precision 4
 fgColor index 25
-bgColor index 3
+bgColor index 69
 colorPv "$(motor):MODE"
 fill
 font "arial-bold-r-14.0"
@@ -310,32 +328,5 @@ lineWidth 2
 visPv "$(motor)$(EMOTOR).SEVR"
 visMin "1"
 visMax "3"
-endObjectProperties
-
-# (Menu Mux PV)
-object menuMuxPVClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 355
-y 49
-w 20
-h 20
-fgColour index 14
-bgColour index 3
-topShadowColour index 1
-botShadowColour index 11
-font "helvetica-medium-r-14.0"
-numItems 1
-symbolTag {
-  0 "."
-}
-symbol0 {
-  0 "label"
-}
-PV0 {
-  0 "$(motor).DESC"
-}
 endObjectProperties
 

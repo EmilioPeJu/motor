@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 369
-y 554
+x 374
+y 576
 w 290
 h 210
 font "helvetica-medium-r-14.0"
@@ -21,23 +21,9 @@ topShadowColor index 1
 botShadowColor index 11
 title "Tooltip"
 showGrid
+snapToGrid
 gridSize 5
 endScreenProperties
-
-# (Rectangle)
-object activeRectangleClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 1
-y 1
-w 288
-h 208
-lineColor index 14
-fillColor index 3
-lineWidth 2
-endObjectProperties
 
 # (Rectangle)
 object activeRectangleClass
@@ -520,9 +506,9 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 92
-y 5
-w 100
+x 95
+y 10
+w 90
 h 25
 font "arial-bold-r-16.0"
 fontAlign "center"
@@ -771,5 +757,20 @@ yPoints {
   0 175
   1 145
 }
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 5
+w 280
+h 200
+lineColor index 14
+fillColor index 3
+lineWidth 3
 endObjectProperties
 
