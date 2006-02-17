@@ -39,7 +39,7 @@ Last Modified:	2004/09/23 16:18:12
 
 typedef enum DONE_STATES {SOFTMOVE = 0, HARDMOVE = 1, DONE = 2} DONE_STATES;
 
-#define MAXMSGS 50
+#define MAXMSGS 200
 
 struct soft_private
 {
