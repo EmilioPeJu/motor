@@ -22,11 +22,12 @@ record(motor, "$(P)$(M)") {
   field(DLLM, "$(DLLM)")
   field(HLSV, "$(HLSV)")
   field(INIT, "$(INIT)")
+  field(RTRY, "0")
   field(TWV, "1")
 }
 
 
-record(mbbo, "$(P)$(M):state") {
+record(mbbo, "$(P)$(M):STATE") {
   field(DTYP, "Soft Channel")
   field(ZRST, "Unknown")
   field(ONST, "Ready")
@@ -39,7 +40,7 @@ record(calcout, "$(P)$(M):calc") {
   field(CALC, "(B=1)?4:((A=1)?2:1)")
   field(INPA, "$(P)$(M).MOVN CP")
   field(INPB, "$(P)$(M).LVIO CP")
-  field(OUT, "$(P)$(M):state PP")
+  field(OUT, "$(P)$(M):STATE PP")
   field(PINI, "YES")
 }
 
@@ -48,8 +49,8 @@ record(calcout, "$(P)$(M):calc") {
 #! Record("$(P)$(M)",20,28,0,0,"$(P)$(M)")
 #! Field("$(P)$(M).MOVN",16777215,1,"$(P)$(M).MOVN")
 #! Field("$(P)$(M).LVIO",16777215,1,"$(P)$(M).LVIO")
-#! Record("$(P)$(M):state",480,100,0,1,"$(P)$(M):state")
-#! Field("$(P)$(M):state.VAL",16777215,1,"$(P)$(M):state.VAL")
+#! Record("$(P)$(M):STATE",480,100,0,1,"$(P)$(M):STATE")
+#! Field("$(P)$(M):STATE.VAL",16777215,1,"$(P)$(M):STATE.VAL")
 #! Record("$(P)$(M):calc",400,314,0,1,"$(P)$(M):calc")
 #! Field("$(P)$(M):calc.INPA",16777215,0,"$(P)$(M):calc.INPA")
 #! Link("$(P)$(M):calc.INPA","$(P)$(M).MOVN")
