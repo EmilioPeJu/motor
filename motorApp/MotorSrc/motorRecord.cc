@@ -2757,7 +2757,12 @@ static long get_units(const DBADDR *paddr, char *units)
 
     case motorRecordACCL:
     case motorRecordBACC:
+    case motorRecordDLY:
 	strcpy(s, "sec");
+	break;
+
+    case motorRecordFRAC:
+	strcpy(s, "");
 	break;
 
     case motorRecordS:
