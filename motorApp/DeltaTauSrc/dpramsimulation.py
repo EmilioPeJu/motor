@@ -71,7 +71,8 @@ class dpram:
         Initialisation function for DPRAM class
         """        
         # Dual port ram structure (matching drvPmac.h)
-        self.dpramstruct="3740xBBH160sxBxxxx258s"
+        self.dpramstruct="3740xBBH160sBxxx256s"
+#        self.dpramstruct="3740xBBH160sxBxxxx258s"
 
         # List of tokens to be used in regular expression
         self.tokens = ( ('movecmd','(#[0-9]+\s+(?:I[0-9]+=[0-9.]+\s+)*J=[0-9-]+)'),

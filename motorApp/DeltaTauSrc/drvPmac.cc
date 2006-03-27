@@ -49,6 +49,7 @@ Last Modified:	2005/05/10 16:32:41
 #ifdef vxWorks
 #include	<vxLib.h>
 #include	<sysLib.h>
+#include	<taskLib.h>
 #include	<rebootLib.h>
 #include	<logLib.h>
 #endif
@@ -90,9 +91,16 @@ volatile int drvPmacdebug = 0;
     #define Debug(l, f, args...)
 #endif
 
+#define SET_BIT(val,mask,set) ((set)? ((val) | (mask)): ((val) & ~(mask)))
+#define BIT_SET( val, bit ) (((val) & (0x1<<(bit)))? 1 : 0 )
+
 /* Global data. */
 int Pmac_num_cards = 0;
+#ifdef BUILD_SIMULATION
+int simulation_mode = 1;
+#else
 int simulation_mode = 0;
+#endif
 extern "C" {epicsExportAddress(int, simulation_mode);}
 extern "C" {epicsExportAddress(int, drvPmacdebug);}
 
@@ -100,7 +108,10 @@ extern "C" {epicsExportAddress(int, drvPmacdebug);}
 #include	"motordrvComCode.h"
 
 /* --- Local data common to all Pmac drivers. --- */
-static char *Pmac_addrs = 0x0;	/* Base address of DPRAM. */
+#ifdef vxWorks
+SEM_ID test_sem;
+#endif
+static char * Pmac_addrs = (char *) 0x700000;	/* Base address of DPRAM. */
 static epicsAddressType Pmac_ADDRS_TYPE;
 static volatile unsigned PmacInterruptVector = 0;
 static volatile epicsUInt8 PmacInterruptLevel = Pmac_INT_LEVEL;
@@ -115,12 +126,17 @@ static double quantum;
 /*----------------functions-----------------*/
 
 /* Common local function declarations. */
-static long report(int);
+long Pmac_report(int);
 static long init();
 static void query_done(int, int, struct mess_node *);
 static int set_status(int, int);
-static RTN_STATUS send_mess(int, char const *, char *);
+#if 0
+static RTN_STATUS send_mess(int card, char const *com, char *name);
 static int recv_mess(int, char *, int);
+#else
+RTN_STATUS send_mess(int card, char const *com, char *name);
+int recv_mess(int, char *, int);
+#endif
 static void motorIsr(int);
 static int motor_init();
 static void Pmac_reset();
@@ -160,7 +176,7 @@ struct
     long number;
     long (*report) (int);
     long (*init) (void);
-} drvPmac = {2, report, init};
+} drvPmac = {2, Pmac_report, init};
 
 extern "C" {epicsExportAddress(drvet, drvPmac);}
 
@@ -168,7 +184,7 @@ static struct thread_args targs = {SCAN_RATE, &Pmac_access, 0.0};
 
 /*----------------functions-----------------*/
 
-static long report(int level)
+long Pmac_report(int level)
 {
     int card;
 
@@ -202,14 +218,17 @@ static int set_status(int card, int signal)
 {
     struct PMACcontroller *cntrl;
     struct mess_node *nodeptr;
-    MOTOR_STATUS motorstat;
     struct mess_info *motor_info;
     /* Message parsing variables */
     char buff[BUFF_SIZE], outbuf[20];
     int rtn_state;
+    int motprogram;
+    int axishomed;
     double motorData;
+    static long int word1debug= 0;
     bool plusdir, ls_active = false, plusLS, minusLS;
     msta_field status;
+    long int status1, status2;
 
     cntrl = (struct PMACcontroller *) motor_state[card]->DevicePrivate;
     motor_info = &(motor_state[card]->motor_info[signal]);
@@ -218,23 +237,266 @@ static int set_status(int card, int signal)
 
     send_mess(card, "?", Pmac_axis[signal]);
     recv_mess(card, buff, 1);
-    rtn_state = sscanf(buff, "%4hx%4hx%4hx", &motorstat.word1.All,
-		       &motorstat.word2.All, &motorstat.word3.All);
+    rtn_state = sscanf(buff, "%6lx%6lx", &status1, &status2 );
 
-    status.Bits.RA_DONE     = (motorstat.word3.Bits.in_position == YES) ? 1 : 0;
-    status.Bits.EA_POSITION = (motorstat.word1.Bits.amp_enabled == YES) ? 1 : 0;
+	/* MN DEBUG */
+	if( word1debug != status1 )
+	{
+            word1debug = status1;
+            printf("Status words = 0x%lx 0x%lx\n", status1, status2 );
+	}
 
-    sprintf(outbuf, "M%.2d61", (signal + 1));	// Get Commanded Position.
+
+        status.Bits.RA_DONE = BIT_SET( status2, w2_in_position );
+
+        status.Bits.EA_POSITION = BIT_SET( status1, w1_open_loop );
+
+	/* PMAC specific error states (MN 4/5/05) */
+	if( BIT_SET( status1, w1_motor_on ) )
+	{
+		status.All |= PM_MOTACTIVATE;
+	}
+	else
+	{
+		status.All &= ~PM_MOTACTIVATE;
+	}
+	
+	if( BIT_SET( status1, w1_amp_enabled ) )
+	{
+		status.All |= PM_AMPENABLE;
+	}
+	else
+	{
+		status.All &= ~PM_AMPENABLE;
+	}
+
+	if( BIT_SET( status1, w1_move_time_on ) )
+	{
+		status.All |= PM_MOTTIMACT;
+	}
+	else
+	{
+		status.All &= ~PM_MOTTIMACT;
+	}
+	
+	if( BIT_SET( status1, w1_dwell ))
+	{
+		status.All |= PM_DWELLACT;
+	}
+	else
+	{
+		status.All &= ~PM_DWELLACT;
+	}
+	
+	if(  BIT_SET( status1, w1_DataBlkErr ) )
+	{
+		status.All |= PM_DATAERR;
+	}
+	else
+	{
+		status.All &= ~PM_DATAERR;
+	}
+	
+	if( BIT_SET( status1, w1_CmndVelZero ) )
+	{
+		status.All |= PM_DESVELZERO;
+	}
+	else
+	{
+		status.All &= ~PM_DESVELZERO;
+	}
+	
+	if( BIT_SET( status1, w1_homing ) )
+	{
+		status.All |= PM_HOMESEARCH;
+	}
+	else
+	{
+		status.All &= ~PM_HOMESEARCH;
+	}
+	
+	if( BIT_SET( status2, w2_pos_limit_stop ) )
+	{
+		status.All |= PM_POSLIMIT;
+	}
+	else
+	{
+		status.All &= ~PM_POSLIMIT;
+	}
+	
+	if( BIT_SET( status2, w2_home_complete ) )
+	{
+		status.All |= PM_HOMCOMPLETE;
+	}
+	else
+	{
+		status.All &= ~PM_HOMCOMPLETE;
+	}
+	
+	if( BIT_SET( status2, w2_trigger_move ) )
+	{
+		status.All |= PM_TRIGGERMOVE;
+	}
+	else
+	{
+		status.All &= ~PM_TRIGGERMOVE;
+	}
+	
+	if(  BIT_SET( status2, w2_i2_follow_err ) )
+	{
+		status.All |= PM_INTFOLERR;
+	}
+	else
+	{
+		status.All &= ~PM_INTFOLERR;
+	}
+		
+	if( (BIT_SET( status2, w2_i2t_amp_fault ) ) || 
+	    (BIT_SET( status2, w2_amp_fault ) )       )
+	{
+		status.All |= PM_AMPFAULT;
+	}
+	else
+	{
+		status.All &= ~PM_AMPFAULT;
+	}
+	
+	if( (BIT_SET( status2, w2_err_follow_err ) ) ||
+	    (BIT_SET( status2, w2_warn_follow_err ) )  )
+	{
+		status.All |= PM_FOLERR;
+	}
+	else
+	{
+		status.All &= ~PM_FOLERR;
+	}
+	
+	if( BIT_SET( status2, w2_in_position )  )
+	{
+		status.All |= PM_INPOSITION;
+	}
+	else
+	{
+		status.All &= ~PM_INPOSITION;
+	}
+	
+    /* Determine if there is a problem */
+    if (BIT_SET( status1, w1_DataBlkErr ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("Data Block Error\n");
+    }   
+    else if (BIT_SET( status1, w1_error_trigger ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("Trigger error\n");
+    }
+    else if (BIT_SET( status2, w2_pos_limit_stop ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("Stopped on position limit\n");
+    }
+    else if (BIT_SET( status2, w2_phase_ref_err ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("Phasing Reference Error\n");
+    }
+    else if (BIT_SET( status2, w2_i2_follow_err ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("Integrated Fatal Following Error\n");
+    }
+    else if (BIT_SET( status2, w2_i2t_amp_fault ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("I^2T Amplifier Fault Error\n");
+    }
+    else if (BIT_SET( status2, w2_amp_fault ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("Amplifier Fault Error\n");
+    }
+    else if (BIT_SET( status2, w2_err_follow_err ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("Fatal Following Error\n");
+    }
+    else if (BIT_SET( status2, w2_warn_follow_err ) )
+    {
+      status.Bits.RA_PROBLEM = 1;
+      errlogPrintf("Warning following error\n");	
+    }
+	    
+    else
+    {
+      /* No problem detected */
+      status.Bits.RA_PROBLEM = 0;
+    }
+
+    #if 0
+    if( motorstat.word1.Bits.move_time_on ) )
+    {
+      status.Bits.RA_MOVING = 1;
+    }
+    else
+    { /* bastard Rok 
+	    if(signal==15) {
+		    status.All |= RA_MOVING;
+		    errlogPrintf("PMAC Phantom Cheating...\n");
+	    }
+            else     */  status.Bits.RA_MOVING = 0;
+    }
+    #endif
+ 
+
+    /* Get PMAC motion program status bits (MN 13/04/05) */
+    sprintf(outbuf, "M%.2d34", (signal + 1)); /* Get Motion program status */
+    send_mess(card, outbuf, (char) NULL);
+    recv_mess(card, buff, 1);
+
+    motprogram = atoi( buff );
+    if( motprogram )
+    {
+      status.All |= PM_MOTPROGRAM;
+    }
+    else
+    {
+      status.All &= ~PM_MOTPROGRAM;
+    }
+
+    sprintf(outbuf, "M%.2d44", (signal + 1)); /* Get homed status bit */
+    send_mess(card, outbuf, (char) NULL);
+    recv_mess(card, buff, 1);
+
+    axishomed = atoi( buff );
+    if( axishomed )
+    {
+      status.All |= PM_AXISHOMED;
+    }
+    else
+    {
+      status.All &= ~PM_AXISHOMED;
+    }
+
+
+
+    sprintf(outbuf, "M%.2d61", (signal + 1));	/* Get Commanded Position. */
     send_mess(card, outbuf, (char) NULL);
     recv_mess(card, buff, 1);
 
     motorData = atof(buff);
-    motorData /= 32.0; /* Shift out fractionial data. */
+    motorData /= cntrl->pos_scaleFac[signal + 1];
+
+    /* Replaced with PMAC scale factor */
+    /* motorData /= 32.0;  Shift out fractionial data. */
+    /* motorData /= 96.0;  Divide by position scale factor (Ixx08) */
 
     if (motorData == motor_info->position)
     {
-	if (nodeptr != 0)	/* Increment counter only if motor is moving. */
-	    motor_info->no_motion_count++;
+	    if (nodeptr != 0)	{ /* Increment counter only if motor is moving. */
+	    	 motor_info->no_motion_count++;
+                 errlogPrintf("PMAC: no_motion_count=%d\n", motor_info->no_motion_count);
+		}
     }
     else
     {
@@ -247,8 +509,8 @@ static int set_status(int card, int signal)
     }
 
     plusdir = (status.Bits.RA_DIRECTION) ? true : false;
-    plusLS  = motorstat.word1.Bits.pos_limit_set;
-    minusLS = motorstat.word1.Bits.neg_limit_set;
+    plusLS  = BIT_SET( status1, w1_pos_limit_set);
+    minusLS = BIT_SET( status1, w1_neg_limit_set);
 
     /* Set limit switch error indicators. */
     if (plusLS == true)
@@ -278,9 +540,16 @@ static int set_status(int card, int signal)
     send_mess(card, outbuf, (char) NULL);	// Get Actual Position.
     recv_mess(card, buff, 1);
     motorData = atof(buff);
+    motorData /= cntrl->pos_scaleFac[signal + 1];
+    
+    printf("MOTOR CODE: motorData = %d\n",(int32_t) motorData);
+    
+    /* Replaced by PMAC scale factor */
+    /* motorData /= 32.0;     Shift out fractional data */
+    /* motorData /= 96.0;     Divide by position scale factor (Ixx08) */
     motor_info->encoder_position = (int32_t) motorData;
 
-    status.Bits.RA_PROBLEM	= 0;
+    /*motor_info->status &= ~RA_PROBLEM;*/
 
     /* Parse motor velocity? */
     /* NEEDS WORK */
@@ -291,7 +560,7 @@ static int set_status(int card, int signal)
 	motor_info->velocity *= -1;
 
     rtn_state = (!motor_info->no_motion_count || ls_active == true ||
-		status.Bits.RA_DONE | status.Bits.RA_PROBLEM) ? 1 : 0;
+		status.Bits.RA_DONE || status.Bits.RA_PROBLEM) ? 1 : 0;
 
     /* Test for post-move string. */
     if ((status.Bits.RA_DONE || ls_active == true) && nodeptr != 0 &&
@@ -311,50 +580,93 @@ static int set_status(int card, int signal)
 /* send a message to the Pmac board		     */
 /*		send_mess()			     */
 /*****************************************************/
+#if 0
 static RTN_STATUS send_mess(int card, char const *com, char *name)
+#else
+RTN_STATUS send_mess(int card, char const *com, char *name)
+#endif
 {
     char outbuf[MAX_MSG_SIZE];
     RTN_STATUS return_code;
 
-    if (strlen(com) > MAX_MSG_SIZE)
-    {
-	errlogMessage("drvPmac.cc:send_mess(); message size violation.\n");
-	return (ERROR);
-    }
+#ifdef vxWorks
+    STATUS sem_ret;
 
-    /* Check that card exists */
-    if (!motor_state[card])
+    sem_ret = semTake( test_sem, 5000);
+    if( sem_ret == OK )
     {
+/*      printf("send_mess: GOT SEMAPHORE\n");*/
+#endif
+      if (strlen(com) > MAX_MSG_SIZE)
+      {
+	  errlogMessage("drvPmac.cc:send_mess(); message size violation.\n");
+	  return (ERROR);
+      }
+
+      /* Check that card exists */
+      if (!motor_state[card])
+      {
 	errlogMessage("drvPmac.cc:send_mess() - invalid card \n");
+
+#ifdef vxWorks
+        sem_ret = semGive( test_sem );
+      	if( sem_ret != OK )
+      	{
+			printf("Error returning semaphore\n");
+        }
+#endif
 	return (ERROR);
-    }
+      }
 
-    /* Flush receive buffer */
-    recv_mess(card, (char *) NULL, -1);
+      /* Flush receive buffer */
+      recv_mess(card, (char *) NULL, -1);
 
-    if (name == NULL)
+      if (name == NULL)
 	strcpy(outbuf, com);
-    else
-    {
+      else
+      {
 	strcpy(outbuf, "#");
 	strcat(outbuf, name);
 	strcat(outbuf, com);
-    }
+      }
 
-    Debug(9, "send_mess: ready to send message.\n");
+      Debug(9, "send_mess: ready to send message.\n");
 
-    return_code = PmacPut(card, outbuf);
+      return_code = PmacPut(card, outbuf);
 
-    if (return_code == OK)
-    {
+      if (return_code == OK)
+      {
 	Debug(4, "sent message: (%s)\n", outbuf);
+      }
+      else
+      {
+	Debug(4, "unable to send message (%s)\n", outbuf);
+#ifdef vxWorks
+		sem_ret = semGive( test_sem );
+      	if( sem_ret != OK )
+      	{
+			printf("Error returning semaphore\n");
+        }
+#endif
+	return (ERROR);
+      }
+
+#ifdef vxWorks
+      sem_ret = semGive( test_sem );
+      if( sem_ret != OK )
+      {
+	printf("Error returning semaphore\n");
+	return_code = ERROR;
+      }
+      
     }
     else
     {
-	Debug(4, "unable to send message (%s)\n", outbuf);
-	return (ERROR);
+       printf("Error taking semaphore\n");
+       return_code = ERROR;
     }
-
+#endif
+    
     return (return_code);
 }
 
@@ -404,17 +716,24 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
  *  NORMAL RETURN.
  */
 
+#if 0
 static int recv_mess(int card, char *com, int amount)
+#else
+int recv_mess(int card, char *com, int amount)
+#endif
 {
     volatile struct controller *pmotorState;
     volatile struct pmac_dpram *pmotor;
-    volatile REPLY_STATUS *stptr;
+    volatile epicsUInt8 *stptr;
     int trys;
     char control;
 
     pmotorState = motor_state[card];
     pmotor = (struct pmac_dpram *) pmotorState->localaddr;
-    stptr = &pmotor->reply_status;
+    stptr = &pmotor->reply_status.Bits.term;
+    Debug(9, "recv_mess() - pmotor = %p, out_cntrl_wd %p, out_ctrl_char %p, cmdbuff %p reply_status %p reply count %p response %p\n",
+          pmotor, &(pmotor->out_cntrl_wd), &(pmotor->out_cntrl_char), &(pmotor->cmndbuff[0]), 
+          &(pmotor->reply_status), &(pmotor->reply_count), &(pmotor->response) );
     
     /* Check that card exists */
     if (card >= total_cards)
@@ -426,7 +745,7 @@ static int recv_mess(int card, char *com, int amount)
     if (amount == -1)
     {
 	bool timeout = false, flushed = false;
-	control = stptr->Bits.cntrl_char;
+	control = *stptr;
 
 	while (timeout == false && flushed == false)
 	{
@@ -436,7 +755,8 @@ static int recv_mess(int card, char *com, int amount)
 	    {
 		Debug(6, "recv_mess() - flush wait on NULL\n");
 		epicsThreadSleep(flush_delay);
-		control = stptr->Bits.cntrl_char;
+                control = *stptr;
+		// control = stptr->Bits.cntrl_char;
 		if (control == (char)NULL)
 		    flushed = true;
 		else
@@ -444,31 +764,37 @@ static int recv_mess(int card, char *com, int amount)
 	    }
 	    else if (control == ACK)
 	    {
-		stptr->All = 0;
+		pmotor->reply_status.All  = 0;
 		Debug(6, "recv_mess() - flush wait on ACK\n");
 		epicsThreadSleep(flush_delay);
-		control = stptr->Bits.cntrl_char;
+		// control = stptr->Bits.cntrl_char;
+                control = *stptr;
 	    }
 	    else if (control == CR)
 	    {
-		stptr->All = 0;
+		pmotor->reply_status.All = 0;
 		Debug(6, "recv_mess() - flush wait on CR\n");
-		for (trys = 0; trys < 10 && stptr->Bits.cntrl_char == (char)NULL; trys++)
+		for (trys = 0; trys < 10 && (*stptr) == 0; trys++)
 		{
 		    epicsThreadSleep(quantum * trys);
 		    Debug(6, "recv_mess() - flush wait #%d\n", trys);
 		}
 		if (trys >= 10)
 		    timeout = true;
-		control = stptr->Bits.cntrl_char;
+
+		// control = stptr->Bits.cntrl_char;
+                control = *stptr;
 	    }
 	    else
 	    {
-		stptr->All = 0;
+		pmotor->reply_status.All = 0;
 		errlogPrintf("%s(%d): ERROR = 0x%X\n", __FILE__, __LINE__,
 			     (epicsUInt32) control);
 		epicsThreadSleep(flush_delay);
-		control = stptr->Bits.cntrl_char;
+                flushed = true;
+
+		// control = stptr->Bits.cntrl_char;
+                control = *stptr;
 	    }
 	}
 
@@ -480,7 +806,7 @@ static int recv_mess(int card, char *com, int amount)
 
     for (trys = 0; trys < 10;)
     {
-	if (stptr->All == 0)
+	if (pmotor->reply_status.All == 0)
 	{
 	    trys++;
 	    epicsThreadSleep(quantum * 2.0);
@@ -495,30 +821,30 @@ static int recv_mess(int card, char *com, int amount)
 	return(-1);
     }
 
-    control = stptr->Bits.cntrl_char;
+    control = *stptr;
 
     if (control == CMNDERR)
     {
-	stptr->All = 0;
+        pmotor->reply_status.All = 0;
 	Debug(1, "recv_mess(): command error.\n");
 	return(-1);
     }
     else if (control == ACK)
     {
 	Debug(4, "recv_mess(): control = ACK\n");
-	stptr->All = 0;
+        pmotor->reply_status.All = 0;
 	return(recv_mess(card, com, amount));
     }
     else if (control == CR)
     {
 	strcpy(com, (char *) &pmotor->response[0]);
-	stptr->All = 0;
-	Debug(4, "recv_mess(): card %d, msg: (%s)\n", card, com);
+        pmotor->reply_status.All = 0;
+	Debug(4, "recv_mess(): card %d, msg: (%s) from address %p\n", card, com, &pmotor->response[0] );
 	return(0);
     }
     else
     {
-	stptr->All = 0;
+        pmotor->reply_status.All = 0;
 	errlogPrintf("%s(%d): ERROR = 0x%X\n", __FILE__, __LINE__,
 		     (unsigned int) control);
 	return(-1);
@@ -534,12 +860,12 @@ static RTN_STATUS PmacPut(int card, char *pmess)
 {
     volatile struct controller *pmotorState;
     volatile struct pmac_dpram *pmotor;
-    volatile REPLY_STATUS *stptr;
+    volatile epicsUInt8 *stptr;
     int itera;
 
     pmotorState = motor_state[card];
     pmotor = (struct pmac_dpram *) pmotorState->localaddr;
-    stptr = &pmotor->reply_status;
+    stptr = &(pmotor->reply_status.Bits.term);
     
     for(itera = 0; itera < 10; itera++)
     {
@@ -554,12 +880,11 @@ static RTN_STATUS PmacPut(int card, char *pmess)
     else
     {
 	strcpy((char *) &pmotor->cmndbuff[0], pmess);
-	Debug(7,"Sent message \"%s\"\n",pmess);
 	pmotor->out_cntrl_wd = 1;
     }
     
     /* Wait for response. */
-    for (itera = 0; itera < 10 && stptr->Bits.cntrl_char == (char)NULL; itera++)
+    for (itera = 0; itera < 10 && (*stptr == 0); itera++)
     {
 	epicsThreadSleep(quantum * itera);
 	Debug(7, "PmacPut() - response wait #%d\n", itera);      
@@ -677,13 +1002,19 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
 	    break;
     }
 
-    // Test MailBox address.
-    Mbox_addrs = (char *) mbox;
 #ifdef vxWorks
+    /* Test MailBox address. */
+    /* I don't want to do this --- Rok Sabjan */
+    Mbox_addrs = (char *) mbox;
+    /*
     status = devNoResponseProbe(Pmac_ADDRS_TYPE, (epicsUInt32)
 				(Mbox_addrs + 0x121), 1);
+    */
     Debug(1,"Bypassing mailbox probe\n");
 #endif
+
+    /* Force this probe to always be successful */
+	  status = S_dev_addressOverlap;
 
     if( !simulation_mode )
     {
@@ -707,16 +1038,17 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
 
 	Mbox_addrs = (char *) localaddr;	/* Convert to physical address.*/
 	Pmac_addrs = (char *) addrs;
-	A19A14 = (char) ((unsigned long) Pmac_addrs >> 14);
-	A19A14 &= 0x3F;
-	*(Mbox_addrs + 0x121) = A19A14;
+	/* A19A14 = (char) ((unsigned long) Pmac_addrs >> 14); */
+        /* A19A14 &= 0x3F; */
+        /* *(Mbox_addrs + 0x121) = A19A14; */
+	*(Mbox_addrs + 0x121) = (char) ((unsigned long) Pmac_addrs >> 14); /* Select VME A19-A14 for DPRAM. */
     }
     else
     {
 	errlogPrintf("%s(%d): Mailbox bus error - 0x%X\n", __FILE__, __LINE__,
 		     (epicsUInt32) (Mbox_addrs + 0x121));
 	Mbox_addrs = (char *) NULL;
-	Pmac_num_cards = 0;
+	/* Pmac_num_cards = 0; */
     }
 
     }/* End of if (!simulation_mode) */
@@ -779,6 +1111,12 @@ static int motor_init()
     quantum = epicsThreadSleepQuantum();
     Debug(5, "motor_init: epicsThreadSleepQuantum = %f\n", quantum);
 
+#ifdef vxWorks
+    test_sem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);    
+    printf("test_sem = 0x%x\n",test_sem);
+    semShow(test_sem,1);
+#endif
+
     /* Check for setup */
     if (Pmac_num_cards <= 0)
     {
@@ -797,7 +1135,7 @@ static int motor_init()
       /* Allocate memory for simulation DPRAM */            
       for(card_index = 0; card_index < Pmac_num_cards; card_index++)
       {
-	psimdpram[card_index]=(struct pmac_dpram *)malloc( sizeof( struct
+          psimdpram[card_index]=(struct pmac_dpram *)calloc( 1, sizeof( struct
 								   pmac_dpram ) );
 	if( psimdpram[card_index] != NULL )
 	{
@@ -805,11 +1143,11 @@ static int motor_init()
 	} 
 	else
 	{
-	  errlogPrintf("%s(%d): Error in DPRAM malloc\n",__FILE__,__LINE__);
+	  errlogPrintf("%s(%d): Error in DPRAM calloc\n",__FILE__,__LINE__);
 	}
 	
 
-	Debug(1,"psimdpram[%d] = 0x%x\n",card_index,psimdpram[card_index]);
+	Debug(1,"psimdpram[%d] = 0x%p\n",card_index,psimdpram[card_index]);
 
       }/* End of for loop */
 	
@@ -829,7 +1167,7 @@ static int motor_init()
 #endif
     
     /* allocate space for total number of motors */
-    motor_state = (struct controller **) malloc(Pmac_num_cards *
+    motor_state = (struct controller **) calloc(Pmac_num_cards,
 						sizeof(struct controller *));
 
     /* allocate structure space for each motor present */
@@ -856,11 +1194,14 @@ static int motor_init()
 	/* Scan memory space to assure card id */
 	do
 	{
-	  /*status = devNoResponseProbe(Pmac_ADDRS_TYPE, (unsigned int) startAddr, 1);*/
+#ifdef vxWorks
+            status = devNoResponseProbe(Pmac_ADDRS_TYPE, (unsigned int) startAddr, 1);
+#endif
 	    startAddr += 0x100;
 	} while (PROBE_SUCCESS(status) && startAddr < endAddr);
 
-	if( simulation_mode )
+	/* Force this probe to always be successful */
+	/* if( simulation_mode ) */
 	  status = S_dev_addressOverlap;
 
 	if (PROBE_SUCCESS(status))
@@ -885,8 +1226,8 @@ static int motor_init()
 
 	    Debug(9, "motor_init: localaddr = %x\n", (int) localaddr);
 
-	    Debug(9, "motor_init: malloc'ing motor_state\n");
-	    motor_state[card_index] = (struct controller *) malloc(sizeof(struct controller));
+	    Debug(9, "motor_init: calloc'ing motor_state\n");
+	    motor_state[card_index] = (struct controller *) calloc(1, sizeof(struct controller));
 	    pmotorState = motor_state[card_index];
 
 #ifdef BUILD_SIMULATION
@@ -907,7 +1248,7 @@ static int motor_init()
 	    pmotorState->motor_in_motion = 0;
 	    pmotorState->cmnd_response = false;
 
-	    cntrl = (struct PMACcontroller *) malloc(sizeof(struct PMACcontroller));
+	    cntrl = (struct PMACcontroller *) calloc(1, sizeof(struct PMACcontroller));
 	    pmotorState->DevicePrivate = cntrl;
 	    cntrl->irqEnable = FALSE;
 
@@ -936,7 +1277,9 @@ static int motor_init()
 		send_mess(card_index, outbuf, (char) NULL);
 		recv_mess(card_index, axis_pos, 1);
 		if (strcmp(axis_pos, "0") == 0)
-		    errind = true;
+                {
+		    // errind = true;
+                }
 		else if (strcmp(axis_pos, "1") == 0)
 		{
 		    pmotorState->motor_info[total_axis].motor_motion = NULL;
@@ -948,12 +1291,13 @@ static int motor_init()
 		    sprintf(outbuf, "I%.2d21=0", (total_axis + 1));
 		    send_mess(card_index, outbuf, (char) NULL);
 
-/* ????? Read and save Position Scale Factor. ??????
+            /* Read and save Position Scale Factor */
 		    sprintf(outbuf, "I%.2d08", (total_axis + 1));
 		    send_mess(card_index, outbuf, (char) NULL);
 		    recv_mess(card_index, axis_pos, 1);
-		    cntrl->pos_scaleFac[total_axis] = atof(axis_pos) * 32.0;
-*/
+		    cntrl->pos_scaleFac[total_axis+1] = atof(axis_pos) * 32.0;
+		    Debug(1, "Pos scale factor %f\n",cntrl->pos_scaleFac[total_axis]);
+
 		}
 		else
 		{
@@ -1002,6 +1346,8 @@ static int motor_init()
 	}
     }
 
+    // motor_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
+
     any_motor_in_motion = 0;
 
     mess_queue.head = (struct mess_node *) NULL;
@@ -1009,7 +1355,7 @@ static int motor_init()
 
     free_list.head = (struct mess_node *) NULL;
     free_list.tail = (struct mess_node *) NULL;
-
+    
     Debug(3, "Motors initialized\n");
 
     epicsThreadCreate((const char *) "Pmac_motor", epicsThreadPriorityMedium,
@@ -1027,6 +1373,7 @@ epicsRegisterFunction(PmacSetup);
 static void Pmac_reset()
 {
 }
+
 
 #ifdef BUILD_SIMULATION
 /*---------------------------------------------------------------------*/

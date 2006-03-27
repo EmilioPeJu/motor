@@ -13,12 +13,15 @@ MAX_MVAR = 3300
 
 # I-variables
 I_ACTIVATE = 00
+I_SCALEFAC = 8
 I_DEMVEL   = 22    # Counts/msec
 I_DEMACC   = 19    # Counts/msec^2
 
 # M-variables
 M_DEMANDPOS = 61
 M_READBACK  = 62
+M_MOTPROGRAM= 34
+M_AXISHOMED = 44
 
 # Status masks
 # Word1
@@ -72,6 +75,11 @@ class pmaccontroller(object):
             istring = 'I'+str(i)+str('%.2d'%I_ACTIVATE)
             self.setivar(istring,1)
             
+        # Set scale factor to 96
+        for i in range(1,MAX_AXIS+1):
+            istring = 'I'+str(i)+str('%.2d'%I_SCALEFAC)
+            self.setivar(istring,1)
+            
     def mvarinit(self):
         #print 'Initialising M-variables'
         self.mvar = {}
@@ -116,6 +124,10 @@ class pmaccontroller(object):
             return self.motors[axis].getreadback()
         elif mnum[-2:] == str(M_DEMANDPOS):
             return self.motors[axis].getreadback()
+        elif mnum[-2:] == str(M_MOTPROGRAM):
+            return 0
+        elif mnum[-2:] == str(M_AXISHOMED):
+            return 1
         else:
             print 'getmvar: Unknown M-variable (',mnum,')'
 

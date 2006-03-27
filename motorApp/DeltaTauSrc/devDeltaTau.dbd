@@ -1,5 +1,8 @@
 # Oregon Micro Systems VME8/44 and VME58 Driver support.
 device(motor,VME_IO,devPmac,"PMAC")
+#device(ao,VME_IO,devAoPmac,"PMAC")
+#device(stringout,VME_IO,devSoPmac,"PMAC")
+#device(stringin,VME_IO,devSiPmac,"PMAC")
 driver(drvPmac)
 function(PmacSetup)
 variable(simulation_mode)

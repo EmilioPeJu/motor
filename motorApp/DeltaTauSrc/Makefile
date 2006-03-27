@@ -5,14 +5,18 @@ include $(TOP)/configure/CONFIG
 #  ADD MACRO DEFINITIONS AFTER THIS LINE
 
 # The following are used for debugging messages.
-USR_CXXFLAGS_linux-x86 += -DDEBUG -DBUILD_SIMULATION
-USR_CXXFLAGS += $(USR_CXXFLAGS_$(T_A))
+USR_CXXFLAGS_linux-x86 += -DBUILD_SIMULATION
+USR_CXXFLAGS += -DDEBUG $(USR_CXXFLAGS_$(T_A))
 
 DBD += devDeltaTau.dbd
 
 LIBRARY = DeltaTau
 
 SRCS += devPmac.cc drvPmac.cc
+SRCS_vxWorks += devAoPmac.c
+#SRCS_vxWorks += devSimPmac.c
+SRCS_vxWorks += devSiPmac.c
+SRCS_vxWorks += devSoPmac.c
 SRCS += PmacRegister.cc
 
 
