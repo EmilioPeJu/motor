@@ -14,7 +14,6 @@ LIBRARY = DeltaTau
 
 SRCS += devPmac.cc drvPmac.cc
 SRCS_vxWorks += devAoPmac.c
-#SRCS_vxWorks += devSimPmac.c
 SRCS_vxWorks += devSiPmac.c
 SRCS_vxWorks += devSoPmac.c
 SRCS += PmacRegister.cc
