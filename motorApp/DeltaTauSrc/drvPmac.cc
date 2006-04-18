@@ -96,11 +96,7 @@ volatile int drvPmacdebug = 0;
 
 /* Global data. */
 int Pmac_num_cards = 0;
-#ifdef BUILD_SIMULATION
-int simulation_mode = 1;
-#else
 int simulation_mode = 0;
-#endif
 extern "C" {epicsExportAddress(int, simulation_mode);}
 extern "C" {epicsExportAddress(int, drvPmacdebug);}
 
@@ -220,7 +216,7 @@ static int set_status(int card, int signal)
     struct mess_node *nodeptr;
     struct mess_info *motor_info;
     /* Message parsing variables */
-    char buff[BUFF_SIZE], outbuf[20];
+    char buff[BUFF_SIZE] = "", outbuf[20];
     int rtn_state;
     int motprogram;
     int axishomed;
@@ -228,7 +224,7 @@ static int set_status(int card, int signal)
     static long int word1debug= 0;
     bool plusdir, ls_active = false, plusLS, minusLS;
     msta_field status;
-    long int status1, status2;
+    long int status1 = 0, status2 = 0;
 
     cntrl = (struct PMACcontroller *) motor_state[card]->DevicePrivate;
     motor_info = &(motor_state[card]->motor_info[signal]);
@@ -485,7 +481,7 @@ static int set_status(int card, int signal)
     recv_mess(card, buff, 1);
 
     motorData = atof(buff);
-    motorData /= cntrl->pos_scaleFac[signal + 1];
+    motorData /= cntrl->pos_scaleFac[signal];
 
     /* Replaced with PMAC scale factor */
     /* motorData /= 32.0;  Shift out fractionial data. */
@@ -540,7 +536,7 @@ static int set_status(int card, int signal)
     send_mess(card, outbuf, (char) NULL);	// Get Actual Position.
     recv_mess(card, buff, 1);
     motorData = atof(buff);
-    motorData /= cntrl->pos_scaleFac[signal + 1];
+    motorData /= cntrl->pos_scaleFac[signal];
     
     printf("MOTOR CODE: motorData = %d\n",(int32_t) motorData);
     
@@ -1094,7 +1090,7 @@ static int motor_init()
     struct PMACcontroller *cntrl;
     long status;
     int card_index, motor_index;
-    char axis_pos[50];
+    char axis_pos[50] = "";
     char *tok_save;
     int total_encoders = 0, total_axis = 0;
     volatile void *localaddr;
@@ -1295,9 +1291,8 @@ static int motor_init()
 		    sprintf(outbuf, "I%.2d08", (total_axis + 1));
 		    send_mess(card_index, outbuf, (char) NULL);
 		    recv_mess(card_index, axis_pos, 1);
-		    cntrl->pos_scaleFac[total_axis+1] = atof(axis_pos) * 32.0;
+		    cntrl->pos_scaleFac[total_axis] = atof(axis_pos) * 32.0;
 		    Debug(1, "Pos scale factor %f\n",cntrl->pos_scaleFac[total_axis]);
-
 		}
 		else
 		{
