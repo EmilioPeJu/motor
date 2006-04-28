@@ -646,6 +646,10 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 	pmotor->outBuffer[putIndex++] = *p;
 	if (putIndex >= BUFFER_SIZE)
 	    putIndex = 0;
+        /*** SJS Addition 24/05/04 to fix MVME5500 processor timing problem ***/        epicsThreadSleep(0);
+        /*** SJS Addition 19/04/05 - double delay to fix timing for Micromech ***/
+        epicsThreadSleep(0);
+        /*** End of SJS Addition ***/
     }
 
     Debug(4, "send_mess: sent card %d message:", card);
