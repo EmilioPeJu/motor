@@ -108,9 +108,7 @@ extern "C" {epicsExportAddress(int, drvPmacdebug);}
 SEM_ID test_sem;
 #endif
 static char * Pmac_addrs = (char *) 0x700000;	/* Base address of DPRAM. */
-static epicsAddressType Pmac_ADDRS_TYPE;
-static volatile unsigned PmacInterruptVector = 0;
-static volatile epicsUInt8 PmacInterruptLevel = Pmac_INT_LEVEL;
+static struct PMACcontroller *cards[Pmac_NUM_CARDS];
 static char *Pmac_axis[] =
     {"1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9", "10",
     "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
@@ -185,12 +183,12 @@ long Pmac_report(int level)
     int card;
 
     if (Pmac_num_cards <= 0)
-	printf("    No VME8/44 controllers configured.\n");
+	printf("    No PMAC controllers configured.\n");
     else
     {
 	for (card = 0; card < Pmac_num_cards; card++)
 	    if (motor_state[card])
-		printf("    Pmac VME8/44 motor card %d @ 0x%X, id: %s \n",
+		printf("    Pmac VME motor card %d @ 0x%X, id: %s \n",
 		       card, (epicsUInt32) motor_state[card]->localaddr,
 		       motor_state[card]->ident);
     }
@@ -911,10 +909,10 @@ static int motorIsrEnable(int card)
     long status;
     
     status = pdevLibVirtualOS->pDevConnectInterruptVME(
-	PmacInterruptVector + card, (void (*)()) motorIsr, (void *) card);
+	cards[card]->interrupt_vector, (void (*)()) motorIsr, (void *) card);
 
     status = devEnableInterruptLevel(Pmac_INTERRUPT_TYPE,
-				     PmacInterruptLevel);
+				     cards[card]->interrupt_level);
 #endif
 
     return (OK);
@@ -926,11 +924,11 @@ static void motorIsrDisable(int card)
     long status;
 
     status = pdevLibVirtualOS->pDevDisconnectInterruptVME(
-	      PmacInterruptVector + card, (void (*)(void *)) motorIsr);
+	      cards[card]->interrupt_vector, (void (*)(void *)) motorIsr);
 
     if (!RTN_SUCCESS(status))
 	errPrintf(status, __FILE__, __LINE__, "Can't disconnect vector %d\n",
-		  PmacInterruptVector + card);
+		  cards[card]->interrupt_vector);
 #endif
 }
 
@@ -939,9 +937,9 @@ static void motorIsrDisable(int card)
  * FUNCTION... PmacSetup()
  *
  * USAGE...Configuration function for PMAC.
+ *         Should be called once for each PMAC controller.
  *                                
  * LOGIC...
- *  Check for valid input on maximum number of cards.
  *  Based on VMEbus address type, check for valid Mailbox and DPRAM addresses.
  *  Bus probe the logical mailbox address.
  *  IF mailbox address valid.
@@ -953,8 +951,7 @@ static void motorIsrDisable(int card)
  *  ENDIF
  *****************************************************/
 
-int PmacSetup(int num_cards,	/* maximum number of cards in rack */
-	     int addrs_type,	/* VME address type; 24 - A24 or 32 - A32. */
+int PmacSetup(int addrs_type,	/* VME address type; 24 - A24 or 32 - A32. */
 	     void *mbox,	/* Mailbox base address. */
 	     void *addrs,	/* DPRAM Base Address */
 	     unsigned vector,	/* noninterrupting(0), valid vectors(64-255) */
@@ -962,48 +959,51 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
 	     int scan_rate)	/* polling rate - in HZ */
 {
     char *Mbox_addrs;		/* Base address of Mailbox. */
+#ifdef vxWorks
     volatile void *localaddr;
-    void *probeAddr, *erraddr = 0;
+    void *probeAddr;
+#endif
+    void *erraddr = 0;
+    struct PMACcontroller *card;
+    epicsAddressType addr_type;
     long status;
 
-    if (num_cards < 1 || num_cards > Pmac_NUM_CARDS)
+    if (++Pmac_num_cards >= Pmac_NUM_CARDS)
     {
-      errlogPrintf("Invalid number of cards(%d) setting to %d",num_cards,Pmac_NUM_CARDS);
-      Pmac_num_cards = Pmac_NUM_CARDS;
-    }
-    else
-    {
-	Pmac_num_cards = num_cards;
+      errlogPrintf("Too many cards (%d) - should be less than %d",
+		   Pmac_num_cards, Pmac_NUM_CARDS);
+      Pmac_num_cards--;
+      return (ERROR);
     }
 
     switch(addrs_type)
     {
 	case 24:
-	    Pmac_ADDRS_TYPE = atVMEA24;
+	    addr_type = atVMEA24;
 
-	    if ((epicsUInt32) mbox & 0xF0000000)
+	    if ((epicsUInt32) mbox & 0xFF000000)
 		erraddr = mbox;
-	    else if ((epicsUInt32) addrs & 0xF)
+	    else if ((epicsUInt32) addrs & 0xFF00000F)
 		erraddr = addrs;
 
 	    if (erraddr != 0)
-		Debug(1, "PmacSetup: invalid A24 address 0x%X\n", (epicsUInt32) mbox);
+		Debug(1, "PmacSetup: invalid A24 address 0x%X\n", (epicsUInt32) erraddr);
 
 	    break;
 	case 32:
-	    Pmac_ADDRS_TYPE = atVMEA32;
+	    addr_type = atVMEA32;
 	    break;
 	default:
 	    Debug(1, "PmacSetup: invalid Address Type %d\n", (epicsUInt32) addrs);
 	    break;
     }
 
+    Mbox_addrs = (char *) mbox;
 #ifdef vxWorks
     /* Test MailBox address. */
     /* I don't want to do this --- Rok Sabjan */
-    Mbox_addrs = (char *) mbox;
     /*
-    status = devNoResponseProbe(Pmac_ADDRS_TYPE, (epicsUInt32)
+    status = devNoResponseProbe(addr_type, (epicsUInt32)
 				(Mbox_addrs + 0x121), 1);
     */
     Debug(1,"Bypassing mailbox probe\n");
@@ -1016,14 +1016,13 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
     {
 
 
+#ifdef vxWorks
     if (PROBE_SUCCESS(status))
     {
 	char A19A14;	 /* Select VME A19-A14 for DPRAM. */
-#ifdef vxWorks
-	status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE, (size_t)
+	status = devRegisterAddress(__FILE__, addr_type, (size_t)
 			    Mbox_addrs, 122, (volatile void **) &localaddr);
 	Debug(9, "motor_init: devRegisterAddress() status = %d\n", (int) status);
-#endif
 
 	if (!RTN_SUCCESS(status))
 	{
@@ -1034,10 +1033,10 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
 
 	Mbox_addrs = (char *) localaddr;	/* Convert to physical address.*/
 	Pmac_addrs = (char *) addrs;
-	/* A19A14 = (char) ((unsigned long) Pmac_addrs >> 14); */
-        /* A19A14 &= 0x3F; */
-        /* *(Mbox_addrs + 0x121) = A19A14; */
-	*(Mbox_addrs + 0x121) = (char) ((unsigned long) Pmac_addrs >> 14); /* Select VME A19-A14 for DPRAM. */
+	/* Select VME A19-A14 for DPRAM */
+	A19A14 = (char) ((unsigned long) Pmac_addrs >> 14);
+        A19A14 &= 0x3F;
+        *(Mbox_addrs + 0x121) = A19A14;
     }
     else
     {
@@ -1046,26 +1045,34 @@ int PmacSetup(int num_cards,	/* maximum number of cards in rack */
 	Mbox_addrs = (char *) NULL;
 	/* Pmac_num_cards = 0; */
     }
+#endif
 
     }/* End of if (!simulation_mode) */
 
-    PmacInterruptVector = vector;
+    card = (struct PMACcontroller *) calloc(1, sizeof(struct PMACcontroller));
+    cards[Pmac_num_cards - 1] = card;
+
+    card->irqEnable = FALSE;
+    card->mbox_addr = Mbox_addrs;
+    card->dpram_addr = Pmac_addrs;
+    card->addr_type = addr_type;
+    
     if (vector < 64 || vector > 255)
     {
 	if (vector != 0)
 	{
 	    Debug(1, "PmacSetup: invalid interrupt vector %d\n", vector);
-	    PmacInterruptVector = (unsigned) Pmac_INT_VECTOR;
+	    vector = (unsigned) Pmac_INT_VECTOR;
 	}
     }
+    card->interrupt_vector = vector;
 
     if (int_level < 1 || int_level > 6)
     {
 	Debug(1, "PmacSetup: invalid interrupt level %d\n", int_level);
-	PmacInterruptLevel = Pmac_INT_LEVEL;
+	int_level = Pmac_INT_LEVEL;
     }
-    else
-	PmacInterruptLevel = int_level;
+    card->interrupt_level = int_level;
 
     /* Set motor polling task rate */
     if (scan_rate >= 1 && scan_rate <= MAX_SCAN_RATE)
@@ -1087,7 +1094,6 @@ static int motor_init()
 {
     volatile struct controller *pmotorState;
     volatile struct pmac_dpram *pmotor;
-    struct PMACcontroller *cntrl;
     long status;
     int card_index, motor_index;
     char axis_pos[50] = "";
@@ -1172,7 +1178,7 @@ static int motor_init()
 
 #ifdef vxWorks
     if (rebootHookAdd((FUNCPTR) Pmac_reset) == ERROR)
-	Debug(1, "vme8/44 motor_init: Pmac_reset disabled\n");
+	Debug(1, "PMAC motor_init: Pmac_reset disabled\n");
 #endif
 
     for (card_index = 0; card_index < Pmac_num_cards; card_index++)
@@ -1182,7 +1188,7 @@ static int motor_init()
 
 	Debug(2, "motor_init: card %d\n", card_index);
 
-	probeAddr = Pmac_addrs + (card_index * Pmac_BRD_SIZE);
+	probeAddr = cards[card_index]->dpram_addr;
 	startAddr = (int8_t *) probeAddr + 1;
 	endAddr = startAddr + Pmac_BRD_SIZE;
 
@@ -1191,7 +1197,8 @@ static int motor_init()
 	do
 	{
 #ifdef vxWorks
-            status = devNoResponseProbe(Pmac_ADDRS_TYPE, (unsigned int) startAddr, 1);
+            status = devNoResponseProbe(cards[card_index]->addr_type, 
+					(unsigned int) startAddr, 1);
 #endif
 	    startAddr += 0x100;
 	} while (PROBE_SUCCESS(status) && startAddr < endAddr);
@@ -1204,7 +1211,7 @@ static int motor_init()
 	{
 
 #ifdef vxWorks
-	    status = devRegisterAddress(__FILE__, Pmac_ADDRS_TYPE,
+	    status = devRegisterAddress(__FILE__, cards[card_index]->addr_type,
 					(size_t) probeAddr, Pmac_BRD_SIZE,
 					(volatile void **) &localaddr);
 	    Debug(9, "motor_init: devRegisterAddress() status = %d\n",
@@ -1244,9 +1251,7 @@ static int motor_init()
 	    pmotorState->motor_in_motion = 0;
 	    pmotorState->cmnd_response = false;
 
-	    cntrl = (struct PMACcontroller *) calloc(1, sizeof(struct PMACcontroller));
-	    pmotorState->DevicePrivate = cntrl;
-	    cntrl->irqEnable = FALSE;
+	    pmotorState->DevicePrivate = cards[card_index];
 
 	    /* Initialize DPRAM communication. */
 	    pmotor = (struct pmac_dpram *) pmotorState->localaddr;
@@ -1291,8 +1296,8 @@ static int motor_init()
 		    sprintf(outbuf, "I%.2d08", (total_axis + 1));
 		    send_mess(card_index, outbuf, (char) NULL);
 		    recv_mess(card_index, axis_pos, 1);
-		    cntrl->pos_scaleFac[total_axis] = atof(axis_pos) * 32.0;
-		    Debug(1, "Pos scale factor %f\n",cntrl->pos_scaleFac[total_axis]);
+		    cards[card_index]->pos_scaleFac[total_axis] = atof(axis_pos) * 32.0;
+		    Debug(1, "Pos scale factor %f\n",cards[card_index]->pos_scaleFac[total_axis]);
 		}
 		else
 		{
@@ -1307,7 +1312,7 @@ static int motor_init()
 	     * Enable interrupt-when-done if selected - driver depends on
 	     * motor_state->total_axis  being set.
 	     */
-	    if (PmacInterruptVector)
+	    if (cards[card_index]->interrupt_vector)
 	    {
 		if (motorIsrEnable(card_index) == ERROR)
 		    errPrintf(0, __FILE__, __LINE__, "Interrupts Disabled!\n");

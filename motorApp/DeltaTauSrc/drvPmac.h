@@ -37,6 +37,7 @@ Last Modified:	2004/09/15 18:48:35
 #ifndef	INCdrvPmach
 #define	INCdrvPmach 1
 
+#include <devLib.h>
 #include "motor.h"
 #include "motordrvCom.h"
 
@@ -62,6 +63,11 @@ struct PMACcontroller
 {
     int	status;
     bool irqEnable;
+    char *mbox_addr;
+    char *dpram_addr;
+    int interrupt_vector;
+    int interrupt_level;
+    epicsAddressType addr_type;
     double pos_scaleFac[Pmac_MAX_AXES];	/* Position scale factor (Ixx08 * 32). */
 };
 
