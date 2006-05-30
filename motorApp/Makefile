@@ -12,23 +12,28 @@ DIRS += MotorSrc
 DIRS += DeltaTauSrc
 DIRS += OmsSrc
 DIRS += SoftMotorSrc
+DIRS += MotorSimSrc
 
 # All the following modules require ASYN.
 ifdef ASYN
 DIRS += NewportSrc
-#!DIRS += ImsSrc
-#!DIRS += AcsSrc
-#!DIRS += MclennanSrc
-#!DIRS += PiSrc
-#!DIRS += MicroMoSrc
-#!DIRS += MicosSrc
+#DIRS += ImsSrc
+#DIRS += AcsSrc
+#DIRS += MclennanSrc
+#DIRS += PiSrc
+#DIRS += MicroMoSrc
+#DIRS += MicosSrc
+#DIRS += FaulhaberSrc
+#DIRS += PC6KSrc
+#DIRS += NewFocusSrc
 endif
 
+# Install the edl files
+#DIRS += opi
 
 ifdef MX
 DIRS += MXmotorSrc
 endif
 
 DIRS += Db
-DIRS+=opi
 include $(TOP)/configure/RULES_DIRS

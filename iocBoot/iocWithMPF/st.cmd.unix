@@ -6,6 +6,7 @@
 dbLoadDatabase("$(TOP)/dbd/WithMPF.dbd")
 WithMPF_registerRecordDeviceDriver(pdbbase)
 dbLoadTemplate("motor.substitutions")
+dbLoadRecords("$(MOTOR)/db/motorUtil.db", "P=IOC:")
 
 
 # The following commands are for a local serial line
@@ -146,3 +147,7 @@ MM4000Config(0, "L0")
 #!var drvMDrivedebug 4
 
 iocInit
+
+# motorUtil (allstop & alldone)
+motorUtilInit("IOC:")
+

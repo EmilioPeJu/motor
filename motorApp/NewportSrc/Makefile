@@ -8,8 +8,6 @@ include $(TOP)/configure/CONFIG
 
 DBD += devNewport.dbd
 
-INC += xps_c8_driver.h
-
 LIBRARY_IOC = Newport
 
 SRCS += NewportRegister.cc
@@ -19,6 +17,9 @@ SRCS += devMM3000.cc drvMM3000.cc
 
 # MM4000/5 (i.e., MM4000) device driver.
 SRCS += devMM4000.cc drvMM4000.cc
+SRCS += drvMM4000Asyn.c
+SRCS += MM4005_trajectoryScan.st
+SRCS_vxWorks += XPS_trajectoryScan.st
 
 # PM500 device driver.
 SRCS += devPM500.cc  drvPM500.cc
@@ -27,8 +28,8 @@ SRCS += devPM500.cc  drvPM500.cc
 SRCS += devESP300.cc drvESP300.cc
 
 # XPS C8 device driver
-#SRCS += Socket.cpp 
-SRCS += asynOctetSocket.cpp xps_c8_driver.cpp devXPSC8.cc  drvXPSC8.cc
+SRCS += asynOctetSocket.cpp 
+SRCS += XPS_C8_drivers.cpp drvXPSAsyn.c drvXPSAsynAux.c
 
 # XPS Gathering Test C script function -> int xpsgathering(void)
 SRCS_vxWorks += XPSGathering.cc
@@ -36,7 +37,7 @@ SRCS_vxWorks += XPSGathering.cc
 # Function which will run a tcl script on an XPS
 SRCS += tclCall.cc
 
-Newport_LIBS += motor asyn
+Newport_LIBS += motor asyn seq pv
 Newport_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

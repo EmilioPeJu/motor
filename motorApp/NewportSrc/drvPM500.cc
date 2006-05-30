@@ -2,9 +2,9 @@
 FILENAME... drvPM500.cc
 USAGE...    Motor record driver level support for Newport PM500.
 
-Version:    1.18
-Modified By:    sluiter
-Last Modified:  2005/05/10 16:36:46
+Version:    $Revision: 1.18 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2005/05/10 16:36:46 $
 */
 
 /* Device Driver Support routines for PM500 motor controller */

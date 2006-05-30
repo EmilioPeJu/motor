@@ -2,9 +2,9 @@
 FILENAME...	devOmsCom.cc
 USAGE... Data and functions common to all OMS device level support.
 
-Version:	1.9
-Modified By:	sluiter
-Last Modified:	2005/04/14 20:16:34
+Version:	$Revision: 1.9 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2005/04/14 20:16:34 $
 */
 
 /*

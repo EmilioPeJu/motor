@@ -2,9 +2,9 @@
 FILENAME...	devMAXV.cc
 USAGE... Device level support for OMS MAXv model.
 
-Version:	1.2
-Modified By:	sluiter
-Last Modified:	2004/12/20 21:11:53
+Version:	$Revision: 1.2 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2004/12/20 21:11:53 $
 */
 
 /*

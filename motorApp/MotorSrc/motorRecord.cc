@@ -2,9 +2,9 @@
 FILENAME...	motorRecord.cc
 USAGE...	Motor Record Support.
 
-Version:	1.26
-Modified By:	sluiter
-Last Modified:	2005/10/11 20:56:13
+Version:	$Revision: 1.30 $
+Modified By:	$Author: rivers $
+Last Modified:	$Date: 2006/03/21 22:45:05 $
 */
 
 /*
@@ -78,10 +78,18 @@ Last Modified:	2005/10/11 20:56:13
  *                  - Avoid STUP errors from devices that do not have "GET_INFO"
  *                    command (e.g. Soft Channel).
  * .25 10-11-05 rls - CDIR not set correctly when jogging with DIR="Neg".
- *
+ * .26 11-23-05 rls - Malcolm Walters bug fixes for;
+ *		      - get_units() returned wrong units for VMAX.
+ *		      - get_graphic_double() and get_control_double() returned
+ *			incorrect values for VELO.
+ * .27 02-14-06 rls - Bug fix for record issuing moves when |DIFF| < |RDBD|.
+ *                  - removed "slop" from do_work.
+ * .28 03-08-06 rls - Moved STUP processing to top of do_work() so that things
+ *                    like LVIO true and SPMG set to PAUSE do not prevent
+ *                    status update.
  */
 
-#define VERSION 5.7
+#define VERSION 5.9
 
 #include	<stdlib.h>
 #include	<string.h>
@@ -131,7 +139,7 @@ static void check_speed_and_resolution(motorRecord *);
 static void set_dial_highlimit(motorRecord *, struct motor_dset *);
 static void set_dial_lowlimit(motorRecord *, struct motor_dset *);
 static void set_userlimits(motorRecord *);
-static void range_check(motorRecord *, float *, double, double);
+static void range_check(motorRecord *, double *, double, double);
 static void clear_buttons(motorRecord *);
 
 /*** Record Support Entry Table (RSET) functions. ***/
@@ -379,7 +387,7 @@ Make RDBD >= MRES.
 ******************************************************************************/
 static void enforceMinRetryDeadband(motorRecord * pmr)
 {
-    float min_rdbd;
+    double min_rdbd;
 
     min_rdbd = fabs(pmr->mres);
 
@@ -480,6 +488,7 @@ static long init_record(dbCommon* arg, int pass)
 	    case (PV_LINK):
 	    case (DB_LINK):
 	    case (CA_LINK):
+	    case (INST_IO):
 		pmr->card = -1;
 		break;
 	    default:
@@ -553,7 +562,7 @@ static long init_record(dbCommon* arg, int pass)
     pmr->lrvl = pmr->rval;
     pmr->lvio = 0;		/* init limit-violation field */
 
-    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == (float) 0.0))
+    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
 	;
     else if ((pmr->drbv > pmr->dhlm + pmr->mres) || (pmr->drbv < pmr->dllm - pmr->mres))
     {
@@ -1188,7 +1197,7 @@ static long process(dbCommon *arg)
 		    pmr->mip |= MIP_DELAY_REQ;
 		    MARK(M_MIP);
 
-                    callbackRequestDelayed(&pcallback->dly_callback, (double) pmr->dly);
+                    callbackRequestDelayed(&pcallback->dly_callback, pmr->dly);
 
 		    pmr->dmov = FALSE;
 		    pmr->pact = 0;
@@ -1201,7 +1210,7 @@ static long process(dbCommon *arg)
 enter_do_work:
 
     /* check for soft-limit violation */
-    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == (float) 0.0))
+    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
 	pmr->lvio = false;
     else
     {
@@ -1283,24 +1292,20 @@ DEFINITIONS:
 LOGIC:
     Initialize.
 
-    IF Stop button activated, AND, NOT processing a STOP request.
-	Set MIP field to indicate processing a STOP request.
-	Mark MIP field as changed.  Set Post process command field TRUE.
-	Clear Jog forward and reverse request.  Clear Stop request.
-	Send STOP_AXIS message to controller.
-    	NORMAL RETURN.
+    IF Status Update request is YES.
+	Send an INFO command.
     ENDIF
 
-    IF Stop/Pause/Move/Go field has changed.
-        Update Last Stop/Pause/Move/Go field.
-	IF SPMG field set to STOP, OR, PAUSE.
-	    IF SPMG field set to STOP.
+    IF Stop/Pause/Move/Go field has changed, OR, STOP field true.
+        Update Last SPMG or clear STOP field.
+	IF SPMG field set to STOP or PAUSE, OR, STOP was true.
+	    IF SPMG field set to STOP, OR, STOP was true.
 		IF MIP state is DONE, STOP or RETRY.
 		    Shouldn't be moving, but send a STOP command without
 			changing to the STOP state.
 		    NORMAL RETURN.
 		ELSE IF Motor is moving (MOVN).
-		    Set Post process command TRUE.
+		    Set Post process command TRUE. Clear Jog and Home requests.
 		ELSE
 		    Set VAL <- RBV and mark as changed.
 		    Set DVAL <- DRBV and mark as changed.
@@ -1423,10 +1428,6 @@ LOGIC:
     	NORMAL RETURN.
     ENDIF
 
-    IF Status Update request is YES.
-	Send an INFO command.
-    ENDIF
-
     IF DVAL field has changed, OR, NOT done moving.
 	Mark DVAL as changed.
 	Calculate new DIFF and RDIF fields and mark as changed.
@@ -1470,11 +1471,11 @@ LOGIC:
 	    ENDIF
 	    
 	    IF the dial DIFF is within the retry deadband.
-		IF the move is in the "preferred direction".
+		IF MIP state is DONE.
 		    Update last target positions.
 		    Terminate move. Set DMOV TRUE.
-		    NORMAL RETURN.
 		ENDIF		    
+		NORMAL RETURN.
 	    ENDIF
 	    ....
 	    ....
@@ -1505,6 +1506,22 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 
     Debug(3, "do_work: begin\n");
     
+    if (pmr->stup == motorSTUP_ON)
+    {
+	RTN_STATUS status;
+
+	pmr->stup = motorSTUP_BUSY;
+	MARK_AUX(M_STUP);
+	INIT_MSG();
+	status = WRITE_MSG(GET_INFO, NULL);
+	/* Avoid errors from devices that do not have "GET_INFO" (e.g. Soft
+	   Channel). */
+	if (status == ERROR)
+	    pmr->stup = motorSTUP_OFF;
+	else
+	    SEND_MSG();
+    }
+
     /*** Process Stop/Pause/Go_Pause/Go switch. ***
     *
     * STOP	means make the motor stop and, when it does, make the drive
@@ -1699,7 +1716,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
     		return(OK);
 	    }
 	    /* check for limit violation */
-	    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == (float) 0.0))
+	    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
 		;
 	    else if ((pmr->homf && (pmr->dval > pmr->dhlm - pmr->velo)) ||
 		     (pmr->homr && (pmr->dval < pmr->dllm + pmr->velo)))
@@ -1761,7 +1778,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 	    (pmr->mip & MIP_JOG_REQ))
 	{
 	    /* check for limit violation */
-	    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == (float) 0.0))
+	    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
 		;
 	    else if ((pmr->jogf && (pmr->dval > pmr->dhlm - pmr->velo)) ||
 		     (pmr->jogr && (pmr->dval < pmr->dllm + pmr->velo)))
@@ -1894,7 +1911,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
     }
 
     /* Record limit violation */
-    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == (float) 0.0))
+    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
 	pmr->lvio = false;
     else
 	pmr->lvio = (pmr->dval > pmr->dhlm) ||
@@ -1923,22 +1940,6 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
     if (stop_or_pause == true)
 	return(OK);
     
-    if (pmr->stup == motorSTUP_ON)
-    {
-	RTN_STATUS status;
-
-	pmr->stup = motorSTUP_BUSY;
-	MARK_AUX(M_STUP);
-	INIT_MSG();
-	status = WRITE_MSG(GET_INFO, NULL);
-	/* Avoid errors from devices that do not have "GET_INFO" (e.g. Soft
-	   Channel). */
-	if (status == ERROR)
-	    pmr->stup = motorSTUP_OFF;
-	else
-	    SEND_MSG();
-    }
-
     /* IF DVAL field has changed, OR, NOT done moving. */
     if (pmr->dval != pmr->ldvl || !pmr->dmov)
     {
@@ -1971,7 +1972,6 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 	    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
 	    double bvel = pmr->bvel / fabs(pmr->mres);	/* backlash speed  */
 	    double bacc = (bvel - vbase) / pmr->bacc;	/* backlash accel. */
-	    double slop = 0.95 * pmr->rdbd;
 	    bool use_rel, preferred_dir;
 	    double relpos = pmr->diff / pmr->mres;
 	    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
@@ -2034,24 +2034,21 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 		preferred_dir = false;
 
 	    /*
-	     * If we're within retry deadband, move only in preferred dir.
+	     * Don't move if we're within retry deadband.
 	     */
-	    if (fabs(pmr->diff) < slop)
-	    {
-		if (preferred_dir == false)
-		{
-		    if (pmr->mip == MIP_DONE)
-		    {
-			pmr->ldvl = pmr->dval;
-			pmr->lval = pmr->val;
-			pmr->lrvl = pmr->rval;
-    
-			pmr->dmov = TRUE;
-			MARK(M_DMOV);
-		    }
-		    return(OK);
-		}
-	    }
+            if (fabs(pmr->diff) <= pmr->rdbd)
+            {
+                if (pmr->mip == MIP_DONE)
+                {
+                    pmr->ldvl = pmr->dval;
+                    pmr->lval = pmr->val;
+                    pmr->lrvl = pmr->rval;
+
+                    pmr->dmov = TRUE;
+                    MARK(M_DMOV);
+                }
+                return(OK);
+            }
 
 	    if (pmr->mip == MIP_DONE || pmr->mip == MIP_RETRY)
 	    {
@@ -2087,9 +2084,10 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 			position = currpos + pmr->frac * (newpos - currpos);
 		}
 		/* Is current position within backlash or retry range? */
-		else if ((fabs(pmr->diff) < slop) ||
+		else if ((fabs(pmr->diff) < pmr->rdbd) ||
 			 (use_rel == true  && ((relbpos < 0) == (relpos > 0))) ||
-			 (use_rel == false && (((currpos + slop) > bpos) == (newpos > currpos))))
+			 (use_rel == false && (((currpos + pmr->rdbd) > bpos) ==
+                                               (newpos > currpos))))
 		{
 /******************************************************************************
  * Backlash correction imposes a much larger penalty on overshoot than on
@@ -2168,7 +2166,7 @@ static long special(DBADDR *paddr, int after)
     RTN_STATUS rtnval;
     motor_cmnd command;
     double temp_dbl;
-    float *temp_flt;
+    double *pcoeff;
     msta_field msta;
 
     msta.All = pmr->msta;
@@ -2579,34 +2577,32 @@ velcheckB:
 	break;
 
     case motorRecordPCOF:
-	temp_flt = &pmr->pcof;
+	pcoeff = &pmr->pcof;
 	command = SET_PGAIN;
 	goto pidcof;
     case motorRecordICOF:
-	temp_flt = &pmr->icof;
+	pcoeff = &pmr->icof;
 	command = SET_IGAIN;
 	goto pidcof;
     case motorRecordDCOF:
-	temp_flt = &pmr->dcof;
+	pcoeff = &pmr->dcof;
 	command = SET_DGAIN;
 pidcof:
 	if (msta.Bits.GAIN_SUPPORT != 0)
 	{
-	    if (*temp_flt < 0.0)	/* Validity check;  0.0 <= gain <= 1.0 */
+	    if (*pcoeff < 0.0)	/* Validity check;  0.0 <= gain <= 1.0 */
 	    {
-		*temp_flt = 0.0;
+		*pcoeff = 0.0;
 		changed = true;
 	    }
-	    else if (*temp_flt > 1.0)
+	    else if (*pcoeff > 1.0)
 	    {
-		*temp_flt = 1.0;
+		*pcoeff = 1.0;
 		changed = true;
 	    }
-
-	    temp_dbl = *temp_flt;
 
 	    INIT_MSG();
-	    rtnval = (*pdset->build_trans)(command, &temp_dbl, pmr);
+	    rtnval = (*pdset->build_trans)(command, pcoeff, pmr);
             /* If an error occured, build_trans() has reset the gain
 	     * parameter to a valid value for this controller. */
 	    if (rtnval != OK)
@@ -2614,21 +2610,19 @@ pidcof:
 
 	    SEND_MSG();
 	    if (changed == 1)
-		db_post_events(pmr, temp_flt, DBE_VAL_LOG);
+		db_post_events(pmr, pcoeff, DBE_VAL_LOG);
 	}
 	break;
 
     case motorRecordCNEN:
 	if (msta.Bits.GAIN_SUPPORT != 0)
 	{
-	    double tempdbl;
-
 	    INIT_MSG();
-	    tempdbl = pmr->cnen;
+	    temp_dbl = pmr->cnen;
 	    if (pmr->cnen != 0)
-		WRITE_MSG(ENABLE_TORQUE, &tempdbl);
+		WRITE_MSG(ENABLE_TORQUE, &temp_dbl);
 	    else
-		WRITE_MSG(DISABL_TORQUE, &tempdbl);
+		WRITE_MSG(DISABL_TORQUE, &temp_dbl);
 	    SEND_MSG();
 	}
 
@@ -3603,14 +3597,14 @@ static void set_userlimits(motorRecord *pmr)
 }
 
 /*
-FUNCTION... void range_check(motorRecord *, float *, double, double)
+FUNCTION... void range_check(motorRecord *, double *, double, double)
 USAGE... Limit parameter to valid range; i.e., min. <= parameter <= max.
 
 INPUT...	parm - pointer to parameter to be range check.
 		min  - minimum value.
 		max  - 0 = max. range check disabled; !0 = maximum value.
 */
-static void range_check(motorRecord *pmr, float *parm_ptr, double min, double max)
+static void range_check(motorRecord *pmr, double *parm_ptr, double min, double max)
 {
     bool changed = false;
     double parm_val = *parm_ptr;

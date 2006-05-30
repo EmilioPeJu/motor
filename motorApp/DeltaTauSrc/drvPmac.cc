@@ -2,9 +2,9 @@
 FILENAME...	drvPmac.cc
 USAGE...	Driver level support for Delta Tau PMAC model.
 
-Version:	1.8
-Modified By:	sluiter
-Last Modified:	2005/05/10 16:32:41
+Version:	$Revision: 1.9 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2006/01/27 23:52:58 $
 */
 
 /*
@@ -44,6 +44,8 @@ Last Modified:	2005/05/10 16:32:41
  *                  - eliminate calls to devConnectInterrupt() due to C++
  *		      problems with devLib.h; i.e. "sorry, not implemented:
  *		      `tree_list' not supported..." compiler error message.
+ * .05 01/18/05 rls - Fix for R3.14.8 devLib.h prototype change for
+ *		      pDevConnectInterruptVME().
  */
 
 #ifdef vxWorks
@@ -909,7 +911,13 @@ static int motorIsrEnable(int card)
     long status;
     
     status = pdevLibVirtualOS->pDevConnectInterruptVME(
-	cards[card]->interrupt_vector, (void (*)()) motorIsr, (void *) card);
+	cards[card]->interrupt_vector,
+#if LT_EPICSBASE(3,14,8)
+        (void (*)()) motorIsr,
+#else
+        (void (*)(void *)) motorIsr,
+#endif
+        (void *) card);
 
     status = devEnableInterruptLevel(Pmac_INTERRUPT_TYPE,
 				     cards[card]->interrupt_level);

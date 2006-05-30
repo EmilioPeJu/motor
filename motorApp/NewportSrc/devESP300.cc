@@ -2,9 +2,9 @@
 FILENAME...	devESP300.cc
 USAGE...	Motor record device level support for Newport ESP300.
 
-Version:	1.3
-Modified By:	sluiter
-Last Modified:	2004/12/20 21:10:53
+Version:	$Revision: 1.3 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2004/12/20 21:10:53 $
 */
 
 /*

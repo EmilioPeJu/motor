@@ -1,8 +1,32 @@
-/**\page Overview Analysis of current motor record interface to device and driver support.
+#ifndef MOTOR_INTERFACE_H
+#define MOTOR_INTERFACE_H
 
-At present, the motor record does not have a clean interface between
-generic record support code and specific implementations for a given
-motor controller because of the 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**\mainpage Proposed EPICS Motor Axis API
+
+For a long time EPICS motor support has either been via the complex,
+and somewhat ill-defined motor record or via primitive record
+support. The two approaches have been mutually incompatible and led to
+much anguish. People who adopt the motor record get a standard
+interface across all controllers, but it is inextensable. Those who
+write their own driver using primitive records cannot port their
+databases to other motor controllers. Neither situation is very satisfactory.
+
+After looking at this for some time, the reason becames clear - the
+the interface between the generic software for the motor record and
+the underlying specific software for a given motor controller is very
+complex, poorly defined and very specific to the motor record. Hence,
+this is an attempt to define a clean, extensible API for motor
+controller drivers to support, and we will be providing an interface
+between this API and both motor records and other primitive
+records. We intend to provide drivers for OMS, Delta Tau and some
+Newport systems and hope others will adopt this approach.
+
+To do this we have had to analyse the requirements needed to support
+the motor record, and the following is the results.
 
 \section control Analysis of commands that control hardware behaviour
 
@@ -10,16 +34,22 @@ All of these commands go through an interface with three routines
 implementing a transaction style interface: start_trans, build_trans
 and end_trans. The implication is that any build_trans commands issued
 between a start_trans and an end_trans happen atomically. Build_trans
-takes a three parameters, the transaction type (an enumerated value) a
-pointer to a double parameter, and a pointer to the motor record
+takes three parameters, the transaction type (an enumerated value), a
+pointer to an array of double parameters, and a pointer to the motor record
 itself.
 
 \subsection sec1 build_trans commands that are only executed alone.
 
-All of the commands in this section are only ever called alone, bracketed by a start_trans and an end_trans call. Hence, they could be re-implemented in a non-transaction based interface.
+All of the commands in this section are only ever called alone,
+bracketed by a start_trans and an end_trans call. Hence, they could be
+re-implemented in a non-transaction based interface.
 
 \subsubsection ss1 Commands that could be removed
-\li \b PRIMITIVE  Called line 316 motordevCom.cc. This command is used just to pass initialisation strings to the controller from the motor OUT link. It could be done as part of controller initialisation.
+\li \b PRIMITIVE Called line 316 motordevCom.cc. This command is used
+just to pass initialisation strings to the controller from the motor
+OUT link. It could be done as part of controller
+initialisation. However, it has been retained in this interface to
+implement the PREM and the POST fields of the motor record.
 
 \subsubsection ss2 Commands for which the return status is consulted.
 
@@ -34,7 +64,7 @@ replaced by the permitted value (but I don't see this being used).
 
 \subsubsection ss3 Other build_trans commands called singly
 
-The return status is never checked when these transactions are build.
+The return status is never checked when these transactions are built.
 
 \li \b DISABL_TORQUE Not called in motordevCom.cc. Called line 2593 motorRecord.cc
 \li \b ENABLE_TORQUE Not called in motordevCom.cc. Called line 2591 motorRecord.cc. These two \b _TORQUE commands are crying out to be implemented as a single command because the parameter is currently ignored. Note that they don't really enable or disable torque, they actually open or close the PID loop.
@@ -55,23 +85,12 @@ HOME_FOR, \b HOME_REV, \b MOVE_REL, \b MOVE_ABS, \b GO and \b JOG. They implemen
 \li \b Move - Starts a relative or absolute move of a fixed distance.
 \li \b Jog - Starts moving at a given velocity and keeps moving until stopped.
 
-The latter is an unfortunate name since I think the work Jog has
+The latter is an unfortunate name since I think the word Jog has
 multiple meanings in motion control context, but here we are dictated
 by the OMS definition where a jog is a constant velocity move. There
 is also two JOG commands, JOG and JOG_VELOCITY, the only difference in
 the OMS driver being that JOG clears the controller DONE flag for this
 axis before starting.
-
-In the API I have implemented these three collections of commands as
-three separate routines, not as multiple single parameter routines
-with a start/end buffering command. I have done this for simplicity to
-highlight the minimum functionality that needs to be provided to
-support the motor record, but this may be the wrong
-decision. Buffering could get complicated if multiple people wrote it
-in different ways. Note that if we did go down the buffering route, I
-see no need for both a GO command or a JOG and JOG_VELOCITY
-command. The former is implicit in the end_trans, and the latter
-should be amalgamated into a single command.
 
 \subsubsection ss4 Homing sequence.
 
@@ -91,7 +110,7 @@ acceleration is specified.
 \li ( \b SET_VEL_BASE )
 \li \b SET_VELOCITY
 \li \b SET_ACCEL
-\li \b MOVE_REL or MOVE_ABS
+\li \b MOVE_REL or \b MOVE_ABS
 \li \b GO
 
 These six transactions are called as a set three times in
@@ -117,7 +136,37 @@ I don't really understand the real difference between these two set -
 as far as I can see the only difference in the OMS driver is that the
 JOG transaction executes a CA to clear the axis done bit before
 running, whilst JOG_VELOCITY doesn't. I suspect that the two could be
-replaced by a single command in a new interface.
+replaced by a single command in a new interface. I suspect one allows
+you to change the velocity whilst the motor is moving and the other
+doesn't, but I'm not sure.
+
+\subsubsection ss7 Notes on the implementation of motion in the API.
+
+In the API I have implemented these three collections of commands as
+three separate routines, not as multiple single parameter routines
+with a start/end buffering command. I have done this for simplicity to
+highlight the minimum functionality that needs to be provided to
+support the motor record, but this may be the wrong
+decision. Buffering could get complicated if multiple people wrote it
+in different ways. Note that if we did go down the buffering route, I
+see no need for either a GO command or a JOG and JOG_VELOCITY
+command. The former is implicit in the end_trans, and the latter
+should be amalgamated into a single command.
+
+A third, compromise, route, which might be the best solution, is to
+implement primitive commands for the move parameters (acceleration,
+velocity etc), but define them such that they have an additional
+parameter which says (for example):
+
+\li If zero, they apply to the next motion command for this AXIS_HDL handle.
+\li If non-zero they apply as default parameters to be used for any motion on this axis.
+
+The latter could be used for the primitive record approach, and the
+former for the motor record.
+
+Finally, in the PREM and the POST fields aren't seen in this
+implementation - I assume they are handled via device support calling
+motorAxisPrimitive.
 
 \section Status Analysis of commands that provide status information
 
@@ -126,96 +175,83 @@ As mentioned above, motor status is handled by issuing GET_INFO commands on a re
 \li Motor step position (motor record rmp field)
 \li Encoder position (motor record rep field), if available.
 \li Motor velocity (motor record vel field) and
-\li Status bits (motor record msta field). The mst field is a bit field of motor status bits, some reflecting the status of the current move, and others representing motor capabilities.
+\li Status bits (motor record msta field). The msta field is a bit field of motor status bits, some reflecting the status of the current move, and others representing motor capabilities.
 
-There is also a certain amount of other updates done in device support, but I suspct these could possibly all be incorporated into a generic piece of code, and 
+There is also a certain amount of other updates done in device support, but I suspect these could possibly all be incorporated into a generic device support module if the driver API is sufficiently complete.
+
+\section Other Other information flow.
+
+There may be other paths of hidden information flow between the records and the controllers, but I haven't uncovered them.
 
 \section Analysis How could this be documented as an acceptable interface.
 
 There are a number of problems with the motor record as it stands.
 
-\li There is no defined (i.e. written down) interface anywhere between the motor record and driver code that implements the specific control of a particular motor controller.
-\li This is further complicated by there being multiple levels of shared code - the motor record itself, motordevCom and motodrvCom. These each have multiple interfaces between themselves and shared code.
-\li The arrangement of shared code makes it difficult to extend the motor controller interface in a generic way to support records other than the motor record.
+\li There is no defined (i.e. written down) interface anywhere between
+the motor record and driver code that implements the specific control
+of a particular motor controller.
+\li This is further complicated by there being multiple levels of
+shared code - the motor record itself, motordevCom and
+motordrvCom. These each have multiple interfaces between themselves
+and shared code.
+\li The arrangement of shared code makes it difficult to extend the
+motor controller interface in a generic way to support records other
+than the motor record.
 
 As a result of this, I feel the first thing to do is to define an API
-that can be implemented by person developing a motor controller, with
+that can be implemented by a person developing a motor controller, with
 the knowledge that if they provide this API, then they will have motor
 record support. We can then extend the API to provide support for
-other records, or the suppportor of a particular motor controller can
+other records, or the supporter of a particular motor controller can
 do it on his own. We will then write device support that links the API
 and the motor record, using the API as, effectively, a driver support
 entry table.
 
 */
 
-/** Forwadr declaration of AXIS_ID, which is a pointer to an internal driver-dependent handle */
-typedef struct motorAxis_str * AXIS_ID;
+/** Forward declaration of AXIS_HDL, which is a pointer to an internal driver-dependent handle */
+typedef struct motorAxisHandle * AXIS_HDL;
 
 #define MOTOR_AXIS_OK (0)
 #define MOTOR_AXIS_ERROR (-1)
 
+/**\struct motorAxisParam_t
 
-/**\union motorAxisStatusBits_union
-
-    This contains all the status bits required by the motor record
+    This is an enumeration of parameters that affect the behaviour of the
+    controller for this axis. The are used by the functions motorAxisSetDouble,
+    motorAxisSetInt and other associated functions.
 */
 
-typedef union motorAxisStatusBits_union
+typedef enum
 {
-    unsigned long All;
-    struct
-    {
-#ifdef MSB_First
-	unsigned int na		    :18;
-	unsigned int RA_MINUS_LS    :1;
-	unsigned int CNTRL_COMM_ERR :1;
-	unsigned int GAIN_SUPPORT   :1;
-	unsigned int RA_MOVING      :1;
-	unsigned int RA_PROBLEM     :1;
-	unsigned int EA_PRESENT     :1;
-	unsigned int EA_HOME        :1;
-	unsigned int EA_SLIP_STALL  :1;
-	unsigned int EA_POSITION    :1;
-	unsigned int EA_SLIP        :1;
-	unsigned int RA_HOME        :1;
-	unsigned int RA_PLUS_LS     :1;
-	unsigned int RA_DONE        :1;
-	unsigned int RA_DIRECTION   :1;
-#else
-	unsigned int RA_DIRECTION   :1;	/**< last motion direction 0=Negative, 1=Positive */
-	unsigned int RA_DONE        :1;	/**< a motion is complete */
-	unsigned int RA_PLUS_LS     :1; /**< plus limit switch has been hit */
-	unsigned int RA_HOME        :1; /**< The home signal is on */
-	unsigned int EA_SLIP        :1; /**< encoder slip enabled (optional - not currently used in software?) */
-	unsigned int EA_POSITION    :1; /**< position maintenence enabled */
-	unsigned int EA_SLIP_STALL  :1; /**< slip/stall detected (optional - not currently used in software?) */
-	unsigned int EA_HOME        :1; /**< encoder home signal on */
-	unsigned int EA_PRESENT     :1; /**< encoder is present */
-	unsigned int RA_PROBLEM     :1; /**< driver stopped polling */
-	unsigned int RA_MOVING      :1;	/**< non-zero velocity present (optional - not currently used in software?) */
-	unsigned int GAIN_SUPPORT   :1;	/**< Motor supports closed-loop position control. */
-	unsigned int CNTRL_COMM_ERR :1;	/**< Controller communication error. */
-	unsigned int RA_MINUS_LS    :1;	/**< minus limit switch has been hit */
-	unsigned int na		    :18;/**< N/A bits  */
-#endif
-    } Bits;                                
-} motorAxisStatusBits_t;
+    motorAxisPosition,         /**< (double) Sets the current motor actual position to a given value in motor units. 
+                                 Returns the current motor actual position in motor units */
+    motorAxisResolution,       /**< (double) Number of motor units per engineering unit */
+    motorAxisEncoderRatio,     /**< (double) Number of encoder counts in one motor count (encoder counts/motor counts) */
+    motorAxisLowLimit,         /**< (double) Low soft limit in motor units */
+    motorAxisHighLimit,        /**< (double) High soft limit in motor units */
+    motorAxisPGain,            /**< (double) The proportional gain term for PID control in controller dependent units */
+    motorAxisIGain,            /**< (double) The integral gain term for PID control in controller dependent units */
+    motorAxisDGain,            /**< (double) The differential gain term for PID control in controller dependent units */
+    motorAxisClosedLoop,       /**< (int)    Enables closed loop in the controller if non-zero */
+    motorAxisEncoderPosn,      /**< (double, r/o) Current encoder position */
+    motorAxisDirection,        /**< (int, r/o) last motion direction 0=Negative, 1=Positive */
+    motorAxisDone,             /**< (int, r/o) a motion is complete */
+    motorAxisHighHardLimit,    /**< (int, r/o) plus limit switch has been hit */
+    motorAxisHomeSignal,       /**< (int, r/o) The home signal is on */
+    motorAxisSlip,             /**< (int, r/o) encoder slip enabled (optional - not currently used in software?) */
+    motorAxisPowerOn,          /**< (int, r/o) position maintenence enabled */
+    motorAxisFollowingError,   /**< (int, r/o) slip/stall detected (optional - not currently used in software?) */
+    motorAxisHomeEncoder,      /**< (int, r/o) encoder home signal on */
+    motorAxisHasEncoder,       /**< encoder is present */
+    motorAxisProblem,          /**< driver stopped polling */
+    motorAxisMoving,           /**< non-zero velocity present (optional - not currently used in software?) */
+    motorAxisHasClosedLoop,    /**< Motor supports closed-loop position control. */
+    motorAxisCommError,        /**< Controller communication error. */
+    motorAxisLowHardLimit      /**< minus limit switch has been hit */
+} motorAxisParam_t;
 
-/**\struct motorAxisStatus_str
-
-    This structure is returned by motorAxisGetStatus and contains all the current information
-    required by the motor record to indicate current motor status
-
-*/
-
-typedef struct motorAxisStatus_str 
-{
-    long position;                   /**< Current motor position in motor steps (if not servoing) or demand position (if servoing) */
-    long encoder_position;           /**< Current motor position in encoder units (only available if a servo system). */
-    motorAxisStatusBits_t status;    /**< bit field of errors and other binary information */
-} motorAxisStatus_t;
-
+#define MOTOR_AXIS_NUM_PARAMS ((int) motorAxisLowHardLimit + 1)
 
 /**\defgroup EPICS EPICS driver support interface routines
 @{
@@ -233,7 +269,7 @@ typedef void (*motorAxisReportFunc)( int level );
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-void motorAxisReport( int level );
+static void motorAxisReport( int level );
 #endif
 
 typedef int (*motorAxisInitFunc)( void );
@@ -250,21 +286,33 @@ typedef int (*motorAxisInitFunc)( void );
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisInit( void );
+static int motorAxisInit( void );
 #endif
 
-typedef enum {motorAxisErrInfo,motorAxisErrMinor,motorAxisErrMajor,motorAxisErrFatal} motorAxisSev_t;
+typedef enum
+  {
+    motorAxisTraceError   =0x0001,
+    motorAxisTraceIODevice=0x0002,
+    motorAxisTraceIOFilter=0x0004,
+    motorAxisTraceIODriver=0x0008,
+    motorAxisTraceFlow    =0x0010
+  } motorAxisLogMask_t;
 
-typedef int (*motorAxisLogFunc)( const motorAxisSev_t severity,const char *pFormat, ...);
+typedef int (*motorAxisLogFunc)( void * userParam,
+                                 const motorAxisLogMask_t logMask,
+                                 const char *pFormat, ...);
 typedef int (*motorAxisSetLogFunc)( motorAxisLogFunc logFunc );
+typedef int (*motorAxisSetLogParamFunc)( AXIS_HDL pAxis, void * param );
 
 /** Provide an external logging routine.
 
     This is an optional function which allows external software to hook
     the driver log routine into an external logging system. The
     external log function is a standard printf style routine with the
-    exception that it has a first parameter which is a message
-    severity indicator. This can have one of four values -
+    exception that it has a first parameter that can be used to set external
+    data on an axis by axis basis and a second parameter which is a message
+    tracing indicator. This is set to be compatible with the asynTrace reasons
+    - enabling tracing of errors, flow, and device filter and driver layers.
     infomational, minor, major or fatal.
 
     \param logFunc [in] Pointer to function of motorAxisLogFunc type.
@@ -273,7 +321,24 @@ typedef int (*motorAxisSetLogFunc)( motorAxisLogFunc logFunc );
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetLog( motorAxisLogFunc logFunc );
+static int motorAxisSetLog( motorAxisLogFunc logFunc );
+#endif
+
+
+/** Provide an external logging routine axis specific user parameter.
+
+    This is an optional function which allows external software to provide
+    axis specific data to the logging function to be used when logging
+    information about this axis. If the logging information is not axis
+    specific a NULL pointer should be supplied to the logging routine.
+
+    \param param [in] Pointer to a user parameter to be used for logging on this axis
+
+    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
+*/
+
+#ifdef DEFINE_MOTOR_PROTOTYPES
+static int motorAxisSetLogParam( AXIS_HDL pAxis, void * param );
 #endif
 
 /**@}*/
@@ -282,12 +347,12 @@ int motorAxisSetLog( motorAxisLogFunc logFunc );
 @{
 */
 
-typedef AXIS_ID (*motorAxisOpenFunc)( char * device, int axis );
+typedef AXIS_HDL (*motorAxisOpenFunc)( int card, int axis, char * param );
 
 /** Initialise connection to a motor axis.
 
-    This routine should open a connection to an motor controller axis previously
-    and return a driver dependent handle that can be uses for subsequent calls to
+    This routine should open a connection to an motor controller axis
+    and return a driver dependent handle that can be used for subsequent calls to
     other axis routines supported by the motor controller. The driver should support
     multiple opens on a single axis and process all calls from separate threads on a
     fifo basis.
@@ -296,18 +361,18 @@ typedef AXIS_ID (*motorAxisOpenFunc)( char * device, int axis );
     \param axis  [in] Axis number - some devices may have conventions on virtual axes.
     \param param [in] Arbitrary, driver defined, parameter string.
 
-    \return AXIS_ID - pointer to handle for using to future calls to motorAxis routines
+    \return AXIS_HDL - pointer to handle for using to future calls to motorAxis routines
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-AXIS_ID motorAxisOpen( int card, int axis, char * param );
+static AXIS_HDL motorAxisOpen( int card, int axis, char * param );
 #endif
 
-typedef int (*motorAxisCloseFunc)( AXIS_ID pAxis );
+typedef int (*motorAxisCloseFunc)( AXIS_HDL pAxis );
 
 /** Close a connection to a motor axis.
 
-    This routine should close the connection to an motor controller previously
+    This routine should close the connection to a motor controller axis previously
     opened with motorOpen, and clean up all space specifically allocated to this 
     axis handle.
 
@@ -317,36 +382,17 @@ typedef int (*motorAxisCloseFunc)( AXIS_ID pAxis );
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisClose( AXIS_ID pAxis );
+static int motorAxisClose( AXIS_HDL pAxis );
 #endif
 
 /**@} - end of Access group*/
 
-/**\defgroup Status Routines to get axis status information
+/**\defgroup Callback Routines to handle callbacks of status information
 @{
 */
 
-typedef int (*motorAxisGetStatusFunc)( AXIS_ID pAxis, motorAxisStatus_t * status );
-
-/** Get status information about a motor axis.
-
-    This routine returns infomation about the current axis stattus in a motorAxisStatus_t
-    structure. Positions are in raw (step or encoder) units. If there is no encoder, 
-    then the encoder position is undefined. If it is a stepper motor controlled by a PID 
-    algorithm, both positions have to be in the same units. Velocity should be in steps/second.
-
-    \param pAxis  [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param status [out]  Structure of motorAxisStatus_t giving current motor status
-
-    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
-*/
-
-#ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisGetStatus( AXIS_ID pAxis, motorAxisStatus_t status );
-#endif
-
-typedef void (*motorAxisCallbackFunc)( void *param );
-typedef int (*motorAxisSetCallbackFunc)( AXIS_ID pAxis, motorAxisCallbackFunc callback, void * param, int period );
+typedef void (*motorAxisCallbackFunc)( void *param, unsigned int numReasons, unsigned int * reasons );
+typedef int (*motorAxisSetCallbackFunc)( AXIS_HDL pAxis, motorAxisCallbackFunc callback, void * param );
 
 /** Set a callback function to be called when motor axis information changes
 
@@ -356,7 +402,7 @@ typedef int (*motorAxisSetCallbackFunc)( AXIS_ID pAxis, motorAxisCallbackFunc ca
     in clock ticks) indicating a lack of interest. Normally 0 should not flood
     a system.
 
-    Only one callback function is allowed per AXIS_ID, and so subsequent calls to
+    Only one callback function is allowed per AXIS_HDL, and so subsequent calls to
     this function using the original axis identifier will replace the original
     callback. Setting the callback function to a NULL pointer will delete the
     callback hook.
@@ -369,7 +415,7 @@ typedef int (*motorAxisSetCallbackFunc)( AXIS_ID pAxis, motorAxisCallbackFunc ca
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetCallback( AXIS_ID pAxis, motorAxisCallbackFunc callback, void * param );
+static int motorAxisSetCallback( AXIS_HDL pAxis, motorAxisCallbackFunc callback, void * param );
 #endif
 
 /**@} - end of Status group*/
@@ -378,160 +424,109 @@ int motorAxisSetCallback( AXIS_ID pAxis, motorAxisCallbackFunc callback, void * 
  @{
 */
 
-typedef int (*motorAxisSetDoubleFunc)( AXIS_ID pAxis, double );
-typedef int (*motorAxisSetIntegerFunc)( AXIS_ID pAxis, int );
+typedef int (*motorAxisStringFunc)( AXIS_HDL pAxis, int, char * );
 
-/** Set the current motor position
+/** Pass a controller specific string to the controller
 
-    Sets the current position of the axis to be a given number in motor (i.e.
-    not encoder) units.
+    This optional routine passes a controller specific string down to the controller.
+    The exact string format depends on the controller. The length parameter allows
+    the string to contain embedded nulls.
 
     \param pAxis    [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param position [in]   Double value indicating motors current position.
+    \param length   [in]   Length of the string to be passed to the controller.
+    \param string   [in]   Character string to be passed to the controller.
 
     \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetPosition( AXIS_ID pAxis, double position );
+static int motorAxisPrimitive( AXIS_HDL pAxis, int length, char * string );
 #endif
 
-typedef int (*motorAxisSetEncoderRatioFunc)( AXIS_ID pAxis, double enc_counts, double mot_counts );
+typedef int (*motorAxisSetDoubleFunc)( AXIS_HDL pAxis, motorAxisParam_t, double );
 
-/** Set the encoder ratio
+/** Sets a double parameter in the controller.
 
-    The encoder ratio is expressed as two double precision numbers, both of which represent
-    the same physical dimension (i.e. angle, distance etc) but in two different units, motor
-    units (i.e. stepper motor steps) and encoder units. For stepper motors without encoders
-    and DC servo motors without a concept of motor steps, both elements should be unity.
-
-    \param pAxis      [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param enc_counts [in]   Number of encoder counts equivalent to mot_counts motor counts.
-    \param mot_counts [in]   Number of motor counts equivalent to enc_counts encoder counts.
-
-    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
-*/
-
-#ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetEncoderRatio( AXIS_ID pAxis, double enc_counts, double mot_counts );
-#endif
-
-/** Set the axis low limit
-
-    Sets the minimum drive position for the axis in motor units. If the value
-    is out of range an error occurs and the limit isn't changed.
+    The parameters are described in the description of the motorAxisParam_t enumeration.
 
     \param pAxis     [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param low_limit [in]   Double value indicating the low limit.
+    \param function  [in]   One of the motorAxisParam_t values indicating which parameter to set.
+    \param value     [in]   Value to be assigned to the parameter.
 
-    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
+    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure or not supported. 
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetLowLimit( AXIS_ID pAxis, double low_limit );
+static int motorAxisSetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double value );
 #endif
 
+typedef int (*motorAxisSetIntegerFunc)( AXIS_HDL pAxis,  motorAxisParam_t, int );
 
-/** Set the axis high limit
+/** Sets an integer parameter in the controller.
 
-    Sets the maximum drive position for the axis in motor units. If the value
-    is out of range an error occurs and the limit isn't changed.
+    The parameters are described in the description of the motorAxisParam_t enumeration.
 
-    \param pAxis      [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param high_limit [in]   Double value indicating the high limit.
+    \param pAxis     [in]   Pointer to axis handle returned by motorAxisOpen.
+    \param function  [in]   One of the motorAxisParam_t values indicating which parameter to set.
+    \param value     [in]   Value to be assigned to the parameter.
 
-    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
-*/
-
-
-#ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetHighLimit( AXIS_ID pAxis, double high_limit );
-#endif
-
-/** Enable or disable closed loop control.
-
-    This call implements the misleadingly names ENABLE_TORQUE and DISABL_TORQUE transactions 
-    which actually open and close PID loop control or any form of stepper closed loop.
-    If the loop is off the PID parameters should be set to zero and any form of stepper 
-    motor closed loop turned off. However, there may still be holding torque due to the 
-    stepper motor power (or gearbox stiction), it is just not supplied by the control loop.
-
-    \param pAxis   [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param loop_on [in]   Integer - zero for loop off, non-zero for loop on.
-
-    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
+    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure or not supported. 
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetClosedLoop( AXIS_ID pAxis, int loop_on );
+static int motorAxisSetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int value );
 #endif
 
-/** Set the proportional gain.
+typedef int (*motorAxisGetDoubleFunc)( AXIS_HDL pAxis, motorAxisParam_t, double * );
 
-    Sets the proportional gain term for PID control. PID control is enabled
-    by the motorAxisSetClosedLoop function. The units are controller dependent,
-    but might be limited to between 0.0 and 1.0 by the motor record. (Which
-    might be debatable).
+/** Gets a double parameter in the controller.
 
-    \param pAxis [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param pgain [in]   Double value containing loop proportional gain.
+    The parameters are described in the description of the motorAxisParam_t enumeration.
 
-    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
+    \param pAxis     [in]   Pointer to axis handle returned by motorAxisOpen.
+    \param function  [in]   One of the motorAxisParam_t values indicating which parameter to get.
+    \param value     [out]  Value of the parameter.
+
+    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure or not supported. 
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetPGain( AXIS_ID pAxis, double pgain );
+static int motorAxisGetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double * value );
 #endif
 
-/** Set the integral gain.
+typedef int (*motorAxisGetIntegerFunc)( AXIS_HDL pAxis,  motorAxisParam_t, int * );
 
-    Sets the integral gain term for PID control. PID control is enabled
-    by the motorAxisSetClosedLoop function. The units are controller dependent,
-    but might be limited to between 0.0 and 1.0 by the motor record. (Which
-    might be debatable).
+/** Gets an integer parameter in the controller.
 
-    \param pAxis [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param igain [in]   Double value containing loop integral gain.
+    The parameters are described in the description of the motorAxisParam_t enumeration.
 
-    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
+    \param pAxis     [in]   Pointer to axis handle returned by motorAxisOpen.
+    \param function  [in]   One of the motorAxisParam_t values indicating which parameter to set.
+    \param value     [in]   Value of the parameter.
+
+    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure or not supported. 
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetIGain( AXIS_ID pAxis, double igain );
+static int motorAxisGetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int * value );
 #endif
 
-/** Set the differential gain.
-
-    Sets the differential gain term for PID control. PID control is enabled
-    by the motorAxisSetClosedLoop function. The units are controller dependent,
-    but might be limited to between 0.0 and 1.0 by the motor record. (Which
-    might be debatable).
-
-    \param pAxis [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param dgain [in]   Double value containing loop differential gain.
-
-    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
-*/
-
-#ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisSetDGain( AXIS_ID pAxis, double dgain );
-#endif
 /**@} - end parameters group*/
 
 /**\defgroup Motion Routines that initiate and stop motion
  @{
 */
 
-typedef int (*motorAxisMoveFunc)( AXIS_ID pAxis, double position, int relative, double min_velocity, double max_velocity, double acceleraton );
+typedef int (*motorAxisMoveFunc)( AXIS_HDL pAxis, double position, int relative, double min_velocity, double max_velocity, double acceleraton );
 /** Moves the axis to a given demand position and then stops.
 
-    This is a normal move command. Moves consist of an acceleration phase, a coast phase and a decelleration phase.
+    This is a normal move command. Moves consist of an acceleration phase, a coast phase and a deceleration phase.
     If min_velocity is greater than zero and the controller supports this function, the system will not demand 
     a non-zero velocity between + and - min_velocity. Move-on-move (i.e. a move command being issue before another
     is completed should not generate an error - the motor should immediately start moving to the latest demanded position.
     The function should return immediately the move has been started successfully.
 
-    NOTE: I aven't done anything about the pre- and post- move strings yet.
+    NOTE: I haven't done anything about the pre- and post- move strings yet.
 
     \param pAxis         [in]   Pointer to axis handle returned by motorAxisOpen.
     \param position      [in]   Position to move to in motor units.
@@ -546,87 +541,171 @@ typedef int (*motorAxisMoveFunc)( AXIS_ID pAxis, double position, int relative, 
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisMove( AXIS_ID pAxis, double position, int relative, double min_velocity, double max_velocity, double acceleration );
+static int motorAxisMove( AXIS_HDL pAxis, double position, int relative, double min_velocity, double max_velocity, double acceleration );
 #endif
 
-typedef int (*motorAxisHomeFunc)( AXIS_ID pAxis, double min_velocity, double max_velocity, int forwards );
+typedef int (*motorAxisHomeFunc)( AXIS_HDL pAxis, double min_velocity, double max_velocity, double acceleration, int forwards );
 /** Homes the axis, starting in a particular direction.
 
     This initiates a homing operation. If the controller supports it the home procedure can be initially in either
     a forward or a reverse direction. min_velocity and max_velocity are the same as for the motorAxisMove function.
-    I don't know why there isn't an acceleration parameter, but I suppose the controller can choose any reasonable value.
     The routine returns as soon as the home has started successfully.
 
     \param pAxis         [in]   Pointer to axis handle returned by motorAxisOpen.
     \param min_velocity  [in]   Minimum startup velocity in motor units/second. If negative, it will be ignored.
     \param max_velocity  [in]   Maximum velocity during move in motor units/second.
-    \param forwards      [in]   If zero, intitial move is in negative direction, otherwise it is positive (possibly ignored).
+    \param acceleration  [in]   Maximum acceleration (or decelleration) during velocity ramp in 
+                                motor units/second squared. Should be positive.
+    \param forwards      [in]   If zero, initial move is in negative direction, otherwise it is positive (possibly ignored).
 
     \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisHome( AXIS_ID pAxis, double min_velocity, double max_velocity, int forwards );
+static int motorAxisHome( AXIS_HDL pAxis, double min_velocity, double max_velocity, double acceleration, int forwards );
 #endif
 
-typedef int (*motorAxisVelocityMoveFunc)( AXIS_ID pAxis, double velocity, int acceleration );
+typedef int (*motorAxisVelocityMoveFunc)( AXIS_HDL pAxis, double min_velocity, double max_velocity, double acceleration );
 /** Starts the axis moving at a constant velocity
 
-    This initiates a constant velocity move (JOG in OMS parlance). homing operation. The axis is moved at the velocity
+    This initiates a constant velocity move (JOG in OMS parlance). The axis is moved at the velocity
     supplied after ramping up at the rate specified by the acceleration parameter. The motion will only stop if a limit is
     hit or a motorAxisStop command is issued.
 
     \param pAxis         [in]   Pointer to axis handle returned by motorAxisOpen.
-    \param velocity      [in]   Velocity to ramp up to and coast at expressed in motor units/second.
-    \param acceleration  [in]   Maximum acceleration (or decelleration) during velocity ramp in motor units/second squared.
+    \param min_velocity  [in]   Minimum startup velocity in motor units/second. If negative, it will be ignored.
+    \param max_velocity  [in]   Maximum velocity during move in motor units/second.
+    \param acceleration  [in]   Maximum acceleration (or decelleration) during velocity ramp in 
+                                motor units/second squared. Should be positive.
 
     \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
 */
 
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisVelocityMove(  AXIS_ID pAxis, double velocity, double acceleration );
+static int motorAxisVelocityMove(  AXIS_HDL pAxis, double min_velocity, double max_velocity, double acceleration );
 #endif
 
-typedef int (*motorAxisStopFunc)( AXIS_ID pAxis );
+typedef int (*motorAxisProfileMoveFunc)( AXIS_HDL pAxis, int npoints, double positions[], double times[], int relative, int trigger );
+/** Starts the axis moving along a tabulated position profile
+
+    This optional command initiates a profiled motion following a
+    table of position, time pairs. The times are expressed as
+    differences in seconds from the first time. Hence, the times
+    should form a monotonically increasing sequence with the first
+    element being zero. If the first element is non-zero, then it is
+    assumed that the velocity array is only one element long and it
+    contains a fixed time increment between all the steps in the
+    position array.
+
+    The exact behaviour of the motion between the points is not
+    precisely defined, but it is assumed that it will be a reasonably
+    smooth motion within the performance of the underlying
+    system. Either linear or spline interpolation would be acceptable,
+    but stopping at every point with accelerations and decelerations
+    would probably not be - unless that was all that the underlying
+    system was capable of. In this case, the velocity acceleration
+    parameters should be adjusted so that the acceleration and
+    stationary phases are minimised. It can be assumed that the motion
+    table is reasonable (i.e. the underlying system can follow it)
+    and, if not, the controller should just make a best efforts
+    attempt or return an on return from this routine.
+
+    The motion along the profile will not start until triggered. If
+    the relative parameter is zero (i.e. the positions indicated are
+    absolute), then the controller should immediately move the the
+    first position and stop awaiting the trigger.
+
+    The trigger parameter defines when to initiate the motion along
+    the profile. A number of special values are defined.
+
+       \li 0 - Start immediately (i.e. no trigger).
+       \li 1 - Start immediately a motorAxisTriggerProfile is called using any AXIS_HDL for this axis.
+       \li 2 - Start immediately a motorAxisTriggerProfile is called using any AXIS_HDL for this controller.
+
+    Any other value is controller dependent, and will probably be used
+    for using hardware signals special to the controller.
+
+    The motion continues to the end of the profile where it should
+    stop. It can be interrupted by any other motion command, including
+    motorAxisStop.
+
+    Controllers may have limitations about how many profiled motions
+    can be available, or different trigger types. They should indicate
+    this by returning an error if the demands are unacceptable.
+
+    \param pAxis         [in]   Pointer to axis handle returned by motorAxisOpen.
+    \param npoints       [in]   Number of points in the position array and time array if the first time element is zero.
+    \param positions     [in]   Double precision array of positions on the profile (motor units).
+    \param times         [in]   Double precision array of times (seconds)
+    \param relative      [in]   Integer which is non-zero for relative positions and zero for absolute
+    \param trigger       [in]   Integer indication which trigger to use to initiate motion.
+
+    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
+*/
+
+
+#ifdef DEFINE_MOTOR_PROTOTYPES
+static int motorAxisProfileMove( AXIS_HDL pAxis, int npoints, double positions[], double times[], int relative, int trigger );
+#endif
+
+typedef int (*motorAxisTriggerProfileFunc)( AXIS_HDL pAxis );
+/** Triggers a previously loaded profile motion.
+
+    This starts a motion previously initialised with motorAxisProfileMove.
+
+    \param pAxis         [in]   Pointer to axis handle returned by motorAxisOpen.
+
+    \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
+*/
+
+#ifdef DEFINE_MOTOR_PROTOTYPES
+static int motorAxisTriggerProfile( AXIS_HDL pAxis );
+#endif
+
+typedef int (*motorAxisStopFunc)( AXIS_HDL pAxis, double acceleration );
 /** Stops the axis from moving.
 
     This aborts any current motion and brings the axis to a halt at
-    the current position. It takes no parameters, so it is not clear
-    what deacceleration to use, but presumably it should chose a
-    reasonable one - such as the one specified in the last move, home
-    or jog command. The command completes as soon as the stop is initiated.
+    the current position. The command completes as soon as the stop is initiated.
+
+    \param pAxis         [in]   Pointer to axis handle returned by motorAxisOpen.
+    \param acceleration  [in]   Maximum acceleration (or decelleration) during velocity ramp in 
+                                motor units/second squared. Should be positive.
 
     \return Integer indicating 0 (MOTOR_AXIS_OK) for success or non-zero for failure. 
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
-int motorAxisStop( AXIS_ID pAxis );
+static int motorAxisStop( AXIS_HDL pAxis, double acceleration );
 #endif
 
 /**@} end motion group*/
 
 /** The driver support entry table */
 
-typedef struct motorAxisDrvSET_str
+typedef struct
 {
     int number;
     motorAxisReportFunc          report;            /**< Standard EPICS driver report function (optional) */
     motorAxisInitFunc            init;              /**< Standard EPICS dirver initialisation function (optional) */
     motorAxisSetLogFunc          setLog;            /**< Defines an external logging function (optional) */
+    motorAxisSetLogParamFunc     setLogParam;       /**< Defines a parameter to be used when calling the logging function for an axis */
     motorAxisOpenFunc            open;              /**< Driver open function */
     motorAxisCloseFunc           close;             /**< Driver close function */
-    motorAxisGetStatusFunc       getStatus;         /**< Returns motor status */
     motorAxisSetCallbackFunc     setCallback;       /**< Provides a callback function the driver can call when the status updates */
-    motorAxisSetDoubleFunc       setPosition;       /**< Defines the current motor position to be a given value */
-    motorAxisSetEncoderRatioFunc setEncoderRatio;   /**< Sets the encoder ratio */
-    motorAxisSetDoubleFunc       setLowLimit;       /**< */
-    motorAxisSetDoubleFunc       setHighLimit;      /**< */
-    motorAxisSetIntegerFunc      setClosedLoop;     /**< */
-    motorAxisSetDoubleFunc       setPGain;          /**< */
-    motorAxisSetDoubleFunc       setIGain;          /**< */
-    motorAxisSetDoubleFunc       setDGain;          /**< */
-    motorAxisMoveFunc            move;              /**< */
-    motorAxisVelocityMoveFunc    velocityMove;      /**< */
-    motorAxisStopFunc            stop;              /**< */
+    motorAxisStringFunc          primitive;         /**< Passes a controller dependedent string */
+    motorAxisSetDoubleFunc       setDouble;         /**< Pointer to function to set a double value */
+    motorAxisSetIntegerFunc      setInteger;        /**< Pointer to function to set an integer value */
+    motorAxisGetDoubleFunc       getDouble;         /**< Pointer to function to get a double value */
+    motorAxisGetIntegerFunc      getInteger;        /**< Pointer to function to get an integer value */
+    motorAxisHomeFunc            home;              /**< Pointer to function to execute a more to reference or home */
+    motorAxisMoveFunc            move;              /**< Pointer to function to execute a position move */
+    motorAxisVelocityMoveFunc    velocityMove;      /**< Pointer to function to execute a velocity mode move */
+    motorAxisStopFunc            stop;              /**< Pointer to function to stop motion */
 } motorAxisDrvSET_t;
+
+#ifdef __cplusplus
+}
+#endif
+#endif

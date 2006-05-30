@@ -2,9 +2,9 @@
 FILENAME...	MXRegister.cc
 USAGE...	Register MX motor device driver shell commands.
 
-Version:	1.3
-Modified By:	sluiter
-Last Modified:	2003/05/28 14:33:57
+Version:	$Revision: 1.3 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2003/05/28 14:33:57 $
 */
 
 /*****************************************************************

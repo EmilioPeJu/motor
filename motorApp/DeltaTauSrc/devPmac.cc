@@ -2,9 +2,9 @@
 FILENAME...	devPmac.cc
 USAGE... Device level support for Delta Tau PMAC.
 
-Version:	1.4
-Modified By:	sluiter
-Last Modified:	2004/12/20 21:05:19
+Version:	$Revision: 1.4 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2004/12/20 21:05:19 $
 */
 
 /*

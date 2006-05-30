@@ -3,9 +3,9 @@ FILENAME...	drvPI.h
 USAGE... This file contains driver "include" information that is specific to
 Physik Instrumente (PI) GmbH & Co. motor controller driver support.
 
-Version:	1.3
-Modified By:	rivers
-Last Modified:	2004/08/17 21:29:52
+Version:	$Revision: 1.3 $
+Modified By:	$Author: rivers $
+Last Modified:	$Date: 2004/08/17 21:29:52 $
 */
 
 /*

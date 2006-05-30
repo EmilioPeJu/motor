@@ -2,9 +2,9 @@
 FILENAME...	devMXmotor.cc
 USAGE...	Motor record device level support for MX device driver.
 
-Version:	1.5
-Modified By:	sluiter
-Last Modified:	2004/12/20 21:07:26
+Version:	$Revision: 1.5 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2004/12/20 21:07:26 $
 */
 
 /*

@@ -4,9 +4,9 @@ FILENAME..	devOmsCom.h
 USAGE... 	This file contains OMS device information that is
 		common to all OMS device support modules.
 
-Version:	1.4
-Modified By:	sluiter
-Last Modified:	2003/02/03 17:15:21
+Version:	$Revision: 1.4 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2003/02/03 17:15:21 $
 */
 
 /*

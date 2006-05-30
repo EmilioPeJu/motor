@@ -2,9 +2,9 @@
 FILENAME... MicosRegister.cc
 USAGE...    Register Micos MoCo dc motor controller device driver shell commands.
 
-Version:	1.2
-Modified By:	sluiter
-Last Modified:	2004/07/16 19:22:58
+Version:	$Revision: 1.2 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2004/07/16 19:22:58 $
 */
 
 /*****************************************************************

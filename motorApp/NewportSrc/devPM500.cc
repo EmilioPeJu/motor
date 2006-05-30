@@ -3,9 +3,9 @@ FILENAME...	devPM500.cc
 USAGE...	Motor record device level support for the Newport PM500 motor
 		controller.
 
-Version:	1.2
-Modified By:	sluiter
-Last Modified:	2004/12/20 21:10:53
+Version:	$Revision: 1.2 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2004/12/20 21:10:53 $
 */
 
 /*

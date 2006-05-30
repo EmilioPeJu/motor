@@ -2,9 +2,9 @@
 FILENAME...	devSoft.cc
 USAGE...	Motor record device level support for Soft channel.
 
-Version:	1.10
-Modified By:	sluiter
-Last Modified:	2005/08/03 15:02:13
+Version:	$Revision: 1.10 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2005/08/03 15:02:13 $
 */
 
 /*

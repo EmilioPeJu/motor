@@ -3,9 +3,9 @@ FILENAME...	devMVP2001.cc
 USAGE...	Motor record device level support for MicroMo
 		MVP 2001 B02 (Linear, RS-485).
 
-Version:	1.2
-Modified By:	sluiter
-Last Modified:	2004/12/20 21:09:09
+Version:	$Revision: 1.2 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2004/12/20 21:09:09 $
 */
 
 /*

@@ -2,9 +2,9 @@
 FILENAME...	devSoftAux.cc
 USAGE...	Motor record device level support for Soft channel.
 
-Version:	1.9
-Modified By:	sluiter
-Last Modified:	2005/03/30 19:18:16
+Version:	$Revision: 1.10 $
+Modified By:	$Author: peterd $
+Last Modified:	$Date: 2006/04/11 10:11:24 $
 */
 
 /*

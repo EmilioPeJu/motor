@@ -2,9 +2,9 @@
 FILENAME...	drvMAXv.cc
 USAGE...	Motor record driver level support for OMS model MAXv.
 
-Version:	1.7
-Modified By:	sluiter
-Last Modified:	2005/05/10 18:19:06
+Version:	$Revision: 1.9 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2006/01/27 23:53:53 $
 */
 
 /*
@@ -853,7 +853,13 @@ static int motorIsrSetup(int card)
 #ifdef vxWorks
 
     status = pdevLibVirtualOS->pDevConnectInterruptVME(
-	MAXvInterruptVector + card, (void (*)()) motorIsr, (void *) card);
+	MAXvInterruptVector + card,
+#if LT_EPICSBASE(3,14,8)
+        (void (*)()) motorIsr,
+#else
+        (void (*)(void *)) motorIsr,
+#endif
+        (void *) card);
 
     if (!RTN_SUCCESS(status))
     {

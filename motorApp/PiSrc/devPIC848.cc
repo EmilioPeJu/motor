@@ -3,9 +3,9 @@ FILENAME...	devPIC848.cc
 USAGE...	Motor record device level support for Physik Instrumente (PI)
 		GmbH & Co. C-848 motor controller.
 
-Version:	1.1
-Modified By:	sluiter
-Last Modified:	2005/10/04 19:45:52
+Version:	$Revision: 1.1 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2005/10/04 19:45:52 $
 */
 
 /*

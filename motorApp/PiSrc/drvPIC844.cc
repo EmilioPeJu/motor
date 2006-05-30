@@ -3,9 +3,9 @@ FILENAME...	drvPIC844.cc
 USAGE...	Motor record driver level support for Physik Instrumente (PI)
 		GmbH & Co. C-844 motor controller.
 
-Version:	1.13
-Modified By:	sluiter
-Last Modified:	2005/10/04 19:52:02
+Version:	$Revision: 1.15 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2006/01/31 22:10:04 $
 */
 
 /*
@@ -367,7 +367,7 @@ static int set_status(int card, int signal)
     send_mess(card, "AXIS:POS?", (char) NULL);
     recv_mess(card, buff, 1);
     motorData = atof(buff);
-    motor_info->encoder_position = (int32_t) motorData;
+    motor_info->encoder_position = (epicsInt32) motorData;
 
     status.Bits.RA_PROBLEM	= 0;
 

@@ -10,15 +10,20 @@
 # Add your declarations here
 
 #!GATEWAY=
-SUPPORT=/home/diamond/R3.14.7/prod/support
+SUPPORT=/home/diamond/R3.14.8.2/prod/support
+WORK=/home/diamond/R3.14.8.2/work/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-# Recommended ASYN release: R4-3
-ASYN=$(SUPPORT)/asyn/4-3
+# Recommended ASYN release: R4-5
+#ASYN=$(SUPPORT)/asyn/4-5
+ASYN=$(WORK)/asyn
 
-# Recommended EPICS release: R3.14.7
-EPICS_BASE=/home/epics/R3.14.7/base
+# Need the sequencer for the MM4005 and XPS trajectory scanning
+SNCSEQ=$(WORK)/seq
+
+# Recommended EPICS release: R3.14.8.2
+EPICS_BASE=/home/epics/R3.14.8.2/base
 
 # The following must be defined if the "WithMPF" example in motorExApp is to
 # be built.

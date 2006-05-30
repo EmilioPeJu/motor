@@ -2,9 +2,9 @@
 FILENAME...	AcsRegister.cc
 USAGE...	Register ACS motor device driver shell commands.
 
-Version:	1.4
-Modified By:	sluiter
-Last Modified:	2004/07/16 19:06:58
+Version:	$Revision: 1.4 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2004/07/16 19:06:58 $
 */
 
 /*****************************************************************

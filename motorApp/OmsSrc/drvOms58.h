@@ -3,9 +3,9 @@ FILENAME...	drvOms58.h
 USAGE...	OMS driver level "include" information that is specific to OMS
 		model VME58.
 
-Version:	1.4
-Modified By:	sluiter
-Last Modified:	2005/03/21 18:14:12
+Version:	$Revision: 1.4 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2005/03/21 18:14:12 $
 */
 
 /*

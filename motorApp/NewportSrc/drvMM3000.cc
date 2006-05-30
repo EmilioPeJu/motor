@@ -2,9 +2,9 @@
 FILENAME... drvMM3000.cc
 USAGE...    Motor record driver level support for Newport MM3000.
 
-Version:    1.19
-Modified By:    sluiter
-Last Modified:  2005/05/10 16:36:45
+Version:    $Revision: 1.21 $
+Modified By:    $Author: rivers $
+Last Modified:  $Date: 2005/12/15 20:19:02 $
 */
 
 /*
@@ -63,7 +63,9 @@ Last Modified:  2005/05/10 16:36:45
  */
 
 #include <string.h>
+#include <stdio.h>
 #include <epicsThread.h>
+#include <epicsString.h>
 #include <drvSup.h>
 #include "motor.h"
 #include "NewportRegister.h"
@@ -330,7 +332,7 @@ STATIC int set_status(int card, int signal)
     }
 
     tok_save = NULL;
-    cptr = strtok_r(inbuff, " ", &tok_save);
+    cptr = epicsStrtok_r(inbuff, " ", &tok_save);
     motorData = atof(cptr);
 
     if (motorData == motor_info->position)
@@ -639,8 +641,8 @@ STATIC int motor_init()
 
         send_mess(card_index, "RC", (char) NULL);
         recv_mess(card_index, buff, 1);
-        bufptr = strtok_r(buff, "=", &tok_save);
-        bufptr = strtok_r(NULL, " ", &tok_save);
+        bufptr = epicsStrtok_r(buff, "=", &tok_save);
+        bufptr = epicsStrtok_r(NULL, " ", &tok_save);
 
         /* The return string will tell us how many axes this controller has */
         for (total_axis = 0; bufptr != NULL; total_axis++)
@@ -660,8 +662,8 @@ STATIC int motor_init()
             errlogPrintf("drvMM3000:motor_init() - invalid RC response = %s\n",
                    bufptr);
 
-            bufptr = strtok_r(NULL, "=", &tok_save);
-            bufptr = strtok_r(NULL, " ", &tok_save);
+            bufptr = epicsStrtok_r(NULL, "=", &tok_save);
+            bufptr = epicsStrtok_r(NULL, " ", &tok_save);
         }
 
             /* Initialize. */
