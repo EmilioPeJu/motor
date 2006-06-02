@@ -588,8 +588,9 @@ static int motorSimCreateAxis( motorSim_t * pDrv, int card, int axis, double low
   return MOTOR_AXIS_OK;
 }
 
-
-void motorSimCreate( int card, int axis, double lowLimit, double hiLimit, double home, int nCards, int nAxes )
+/* lowLimit, hiLimit, home should all be doubles, but you can't pass a double
+   on the vxWorks command shell on PPC. Grrr. */
+void motorSimCreate( int card, int axis, int lowLimit, int hiLimit, int home, int nCards, int nAxes )
 {
   int i;
   int j;
@@ -598,7 +599,7 @@ void motorSimCreate( int card, int axis, double lowLimit, double hiLimit, double
   if (nAxes < 1 ) nAxes = 1;
 
   PRINT( NULL, FLOW,
-	 "Creating motor simulator: card: %d, axis: %d, hi: %f, low %f, home: %f, ncards: %d, naxis: %d",
+	 "Creating motor simulator: card: %d, axis: %d, hi: %d, low %d, home: %d, ncards: %d, naxis: %d",
 	 card, axis, hiLimit, lowLimit, home, nCards, nAxes );
 
   if (drv.motorThread==NULL)
@@ -619,7 +620,8 @@ void motorSimCreate( int card, int axis, double lowLimit, double hiLimit, double
     {
       for (j = axis; j < axis+nAxes; j++ )
 	{
-	  motorSimCreateAxis( &drv, i, j, lowLimit, hiLimit, home );
+	  motorSimCreateAxis( &drv, i, j, (double)lowLimit, (double)hiLimit,
+			      (double)home );
 	}
     }
 }
