@@ -272,8 +272,7 @@ int drvAsynMotorConfigure(const char *portName, const char *driverName, int card
             return -1;
         }
 	(*pPvt->drvset->setCallback)(pAxis->axis, intCallback, (void *)pAxis);
-	(*pPvt->drvset->setLogParam)(pAxis->axis, pAxis->pasynUser);
-	(*pPvt->drvset->setLog)(logFunc);
+	(*pPvt->drvset->setLog)(pAxis->axis, logFunc, pAxis->pasynUser);
 	setDefaults(pAxis);
     }
 
