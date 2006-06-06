@@ -659,6 +659,6 @@ static int motorSimLogMsg( void * param, const motorAxisLogMask_t mask, const ch
     va_start(pvar, pFormat);
     nchar = vfprintf(stdout,pFormat,pvar);
     va_end (pvar);
-    printf("\n");
+    fprintf(stdout,"\n");
     return(nchar);
 }
