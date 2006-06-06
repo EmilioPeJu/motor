@@ -584,7 +584,7 @@ typedef int (*motorAxisProfileMoveFunc)( AXIS_HDL pAxis, int npoints, double pos
 
     The motion along the profile will not start until triggered. If
     the relative parameter is zero (i.e. the positions indicated are
-    absolute), then the controller should immediately move the the
+    absolute), then the controller should immediately move to the
     first position and stop awaiting the trigger.
 
     The trigger parameter defines when to initiate the motion along
@@ -671,6 +671,8 @@ typedef struct
     motorAxisHomeFunc            home;              /**< Pointer to function to execute a more to reference or home */
     motorAxisMoveFunc            move;              /**< Pointer to function to execute a position move */
     motorAxisVelocityMoveFunc    velocityMove;      /**< Pointer to function to execute a velocity mode move */
+    motorAxisProfileMoveFunc     profileMove;       /**< Pointer to function to initiate a profiled move */
+    motorAxisTriggerProfileFunc  triggerProfile;    /**< Pointer to function to trigger a profiled move */
     motorAxisStopFunc            stop;              /**< Pointer to function to stop motion */
 } motorAxisDrvSET_t;
 
