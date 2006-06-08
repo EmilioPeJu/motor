@@ -671,8 +671,6 @@ typedef struct
     motorAxisHomeFunc            home;              /**< Pointer to function to execute a more to reference or home */
     motorAxisMoveFunc            move;              /**< Pointer to function to execute a position move */
     motorAxisVelocityMoveFunc    velocityMove;      /**< Pointer to function to execute a velocity mode move */
-    motorAxisProfileMoveFunc     profileMove;       /**< Pointer to function to initiate a profiled move */
-    motorAxisTriggerProfileFunc  triggerProfile;    /**< Pointer to function to trigger a profiled move */
     motorAxisStopFunc            stop;              /**< Pointer to function to stop motion */
 } motorAxisDrvSET_t;
 
