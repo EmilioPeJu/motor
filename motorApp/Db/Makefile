@@ -18,6 +18,7 @@ include $(TOP)/configure/CONFIG
 DB += motor.template
 DB += basic_motor.template
 DB += basic_asyn_motor.template
+DB += XPS_extra.db
 DB += TransPos.template
 DB += motorUtil.template
 

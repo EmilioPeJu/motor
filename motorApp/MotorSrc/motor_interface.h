@@ -445,6 +445,7 @@ typedef int (*motorAxisSetIntegerFunc)( AXIS_HDL pAxis,  motorAxisParam_t, int )
 */
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
+    /* XXXX Change the motorAxisParam_t to int */
 static int motorAxisSetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int value );
 #endif
 
