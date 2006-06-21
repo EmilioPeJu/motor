@@ -15,9 +15,8 @@ WORK=/home/diamond/R3.14.8.2/work/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-# Recommended ASYN release: R4-5
-#ASYN=$(SUPPORT)/asyn/4-5
-ASYN=$(WORK)/asyn
+# Required ASYN release: R4-6
+ASYN=$(SUPPORT)/asyn/4-6
 
 # Need the sequencer for the MM4005 and XPS trajectory scanning
 SNCSEQ=$(WORK)/seq
