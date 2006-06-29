@@ -3519,11 +3519,17 @@ static void set_dial_highlimit(motorRecord *pmr, struct motor_dset *pdset)
 {
     int dir_positive = (pmr->dir == motorDIR_Pos);
     double offset, tmp_raw;
+    motor_cmnd command;
     RTN_STATUS rtnval;
 
     tmp_raw = pmr->dhlm / pmr->mres;
     INIT_MSG();
-    rtnval = (*pdset->build_trans)(SET_HIGH_LIMIT, &tmp_raw, pmr);
+    if (pmr->mres < 0) {
+	command = SET_LOW_LIMIT;
+    } else {
+	command = SET_HIGH_LIMIT;
+    }
+    rtnval = (*pdset->build_trans)(command, &tmp_raw, pmr);
     offset = pmr->off;
     if (rtnval == OK)
 	SEND_MSG();
@@ -3553,12 +3559,18 @@ static void set_dial_lowlimit(motorRecord *pmr, struct motor_dset *pdset)
 {
     int dir_positive = (pmr->dir == motorDIR_Pos);
     double offset, tmp_raw;
+    motor_cmnd command;
     RTN_STATUS rtnval;
 
     tmp_raw = pmr->dllm / pmr->mres;
 
     INIT_MSG();
-    rtnval = (*pdset->build_trans)(SET_LOW_LIMIT, &tmp_raw, pmr);
+    if (pmr->mres < 0) {
+	command = SET_HIGH_LIMIT;
+    } else {
+	command = SET_LOW_LIMIT;
+    }
+    rtnval = (*pdset->build_trans)(command, &tmp_raw, pmr);
     offset = pmr->off;
     if (rtnval == OK)
 	SEND_MSG();
