@@ -737,10 +737,13 @@ static void intCallback(void *axisPvt, unsigned int nChanged,
     pnode = (interruptNode *)ellFirst(pclientList);
     while (pnode) {
 	asynMotorStatusInterrupt *pmotorStatusInterrupt = pnode->drvPvt;
+	addr = pmotorStatusInterrupt->addr;
 	reason = pmotorStatusInterrupt->pasynUser->reason;
-	pmotorStatusInterrupt->callback(pmotorStatusInterrupt->userPvt, 
-		    pmotorStatusInterrupt->pasynUser,
-		    &pAxis->status );
+	if (addr == pAxis->num) {
+	    pmotorStatusInterrupt->callback(pmotorStatusInterrupt->userPvt, 
+					    pmotorStatusInterrupt->pasynUser,
+					    &pAxis->status );
+	}
 	pnode = (interruptNode *)ellNext(&pnode->node);
     }
     pasynManager->interruptEnd(pPvt->motorStatusInterruptPvt);
