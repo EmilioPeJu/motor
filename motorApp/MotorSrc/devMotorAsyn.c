@@ -78,6 +78,7 @@ typedef struct {
 typedef struct
 {
     struct motorRecord * pmr;
+    int moveRequestPending;
     epicsUInt32 status;  /**< bit mask of errors and other binary information. The
 			 bit positions are in motor.h */
     epicsInt32 position; /**< Current motor position in motor steps (if not
@@ -326,6 +327,7 @@ static RTN_STATUS build_trans( motor_cmnd command,
 	pmsg->command = pPvt->move_cmd;
 	pmsg->dvalue = pPvt->param;
 	pPvt->move_cmd = -1;
+	pPvt->moveRequestPending++;
 	/* Do we need to set needUpdate and schedule a process here? */
 	/* or can we always guarantee to get at least one callback? */
 	/* Do we really need the callback? I assume so */
@@ -425,6 +427,7 @@ static void asynCallback(asynUser *pasynUser)
     motorRecord *pmr = pPvt->pmr;
     motorAsynMessage *pmsg = pasynUser->userData;
     int status;
+    int commandIsMove = 0;
 
     asynPrint(pasynUser, ASYN_TRACE_FLOW,
               "devMotorAsyn::asynCallback: %s command=%d, ivalue=%d, dvalue=%f\n",
@@ -442,9 +445,13 @@ static void asynCallback(asynUser *pasynUser)
 	pasynUser->reason = motorEncoderPosition;
 	pPvt->pasynInt32->read(pPvt->asynInt32Pvt, pasynUser,
 			       &pPvt->encoder_position);
-	scanOnce(pmr);
 	break;
 
+    case motorMoveAbs:
+    case motorMoveRel:
+    case motorHome:
+	commandIsMove = 1;
+	/* Intentional fall-through */
     default:
         if (pmsg->interface == int32Type) {
             pPvt->pasynInt32->write(pPvt->asynInt32Pvt, pasynUser,
@@ -455,6 +462,18 @@ static void asynCallback(asynUser *pasynUser)
         }
         break;
     }
+
+    if (interruptAccept) { /* effectively if iocInit has completed */
+	dbScanLock((dbCommon *)pmr);
+	if (commandIsMove) {
+	    pPvt->moveRequestPending--;
+	    if (!pPvt->moveRequestPending) {
+		pmr->rset->process((dbCommon*)pmr);
+	    }
+	}
+	dbScanUnlock((dbCommon *)pmr);
+    }
+
     pasynManager->memFree(pmsg, sizeof(*pmsg));
     status = pasynManager->freeAsynUser(pasynUser);
     if (status != asynSuccess) {
@@ -482,12 +501,12 @@ static void statusCallback(void *drvPvt, asynUser *pasynUser,
         pPvt->status = value->status;
         pPvt->position = (epicsInt32)floor(value->position+0.5);
         pPvt->encoder_position = (epicsInt32)floor(value->encoder_posn+0.5);
-	/*	pPvt->veolcity = (epicsInt32)floor(value->velocity+0.5);*/
-        dbScanUnlock((dbCommon*)pmr);
-        if (!pPvt->needUpdate) {
+	/*	pPvt->velocity = (epicsInt32)floor(value->velocity+0.5);*/
+        if (!pPvt->needUpdate && !pPvt->moveRequestPending) {
 	    pPvt->needUpdate = 1;
-	    scanOnce(pmr);
+	    pmr->rset->process((dbCommon*)pmr);
         }
+        dbScanUnlock((dbCommon*)pmr);
     } else {
         pPvt->status = value->status;
         pPvt->position = (epicsInt32)floor(value->position+0.5);
