@@ -46,6 +46,7 @@
 #include "motor_interface.h"
 
 /*Create the dset for devMotor */
+static long init( int after );
 static long init_record(struct motorRecord *);
 static CALLBACK_VALUE update_values(struct motorRecord *);
 static long start_trans(struct motorRecord *);
@@ -58,7 +59,7 @@ typedef enum {int32Type, float64Type, float64ArrayType} interfaceType;
 
 struct motor_dset devMotorAsyn={ { 8,
 				NULL,
-				NULL,
+				(DEVSUPFUN) init,
 				(DEVSUPFUN) init_record,
                                   NULL },
 				update_values,
@@ -101,6 +102,14 @@ typedef struct
 } motorAsynPvt;
 
 
+
+/* The init routine is used to set a flag to indicate that it is OK to call dbScanLock */
+static int dbScanLockOK = 0;
+static long init( int after )
+{
+    dbScanLockOK = (after!=0);
+    return 0;
+}
 
 static long init_record(struct motorRecord * pmr )
 {
@@ -463,7 +472,7 @@ static void asynCallback(asynUser *pasynUser)
         break;
     }
 
-    if (interruptAccept) { /* effectively if iocInit has completed */
+    if (dbScanLockOK) { /* effectively if iocInit has completed */
 	dbScanLock((dbCommon *)pmr);
 	if (commandIsMove) {
 	    pPvt->moveRequestPending--;
@@ -496,7 +505,7 @@ static void statusCallback(void *drvPvt, asynUser *pasynUser,
         "%s devMotorAsyn::statusCallback new value=0x%x\n",
         pmr->name, value);
 
-    if (interruptAccept) {
+    if (dbScanLockOK) {
         dbScanLock((dbCommon *)pmr);
         pPvt->status = value->status;
         pPvt->position = (epicsInt32)floor(value->position+0.5);
