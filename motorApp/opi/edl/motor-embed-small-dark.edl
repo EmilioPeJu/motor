@@ -54,7 +54,7 @@ setPosition {
   0 "button"
 }
 symbols {
-  0 "label#<N>#=$(label#<N>#),motor=$(motor)"
+  0 "auto-label=$(auto-label),motor=$(motor)"
 }
 endObjectProperties
 
@@ -185,7 +185,7 @@ font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 8
 value {
-  "  $(label#<N>#)  "
+  "  $(auto-label)  "
 }
 autoSize
 border
@@ -236,7 +236,7 @@ symbolTag {
   0 "."
 }
 symbol0 {
-  0 "label#<N>#"
+  0 "auto-label"
 }
 PV0 {
   0 "$(motor).DESC"
