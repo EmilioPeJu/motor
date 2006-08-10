@@ -19,7 +19,7 @@ WORK=/home/diamond/R3.14.8.2/work/support
 ASYN=$(SUPPORT)/asyn/4-6
 
 # Need the sequencer for the MM4005 and XPS trajectory scanning
-SNCSEQ=$(WORK)/seq
+SNCSEQ=$(SUPPORT)/seq/2-0-11dls1
 
 # Recommended EPICS release: R3.14.8.2
 EPICS_BASE=/home/epics/R3.14.8.2/base

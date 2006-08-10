@@ -400,7 +400,8 @@ static asynStatus readInt32(void *drvPvt, asynUser *pasynUser,
 	break;
     }
     asynPrint(pasynUser, ASYN_TRACEIO_DRIVER,
-              "drvMotorAsyn::readInt32, value=%d\n", *value);
+              "drvMotorAsyn::readInt32, reason=%d, value=%d\n", 
+	      command, *value);
     return(asynSuccess);
 }
 
@@ -450,7 +451,8 @@ static asynStatus readFloat64(void *drvPvt, asynUser *pasynUser,
 	break;
     }
     asynPrint(pasynUser, ASYN_TRACEIO_DRIVER,
-              "drvMotorAsyn::readFloat64, value=%f\n", *value);
+              "drvMotorAsyn::readFloat64, reason=%d, value=%f\n", 
+	      command, *value);
     return(status);
 }
 
@@ -510,7 +512,8 @@ static asynStatus writeInt32(void *drvPvt, asynUser *pasynUser,
 	break;
     }
     asynPrint(pasynUser, ASYN_TRACEIO_DRIVER,
-	      "drvMotorAsyn::writeInt32, value=%d\n", value);
+	      "drvMotorAsyn::writeInt32, reason=%d, value=%d\n",
+	      command, value);
     return(status);
 }
 
