@@ -29,7 +29,7 @@ DIRS += NewportSrc
 endif
 
 # Install the edl files
-#DIRS += opi
+DIRS += opi
 
 ifdef MX
 DIRS += MXmotorSrc
