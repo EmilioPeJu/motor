@@ -235,8 +235,8 @@ CALLBACK_VALUE update_values(struct motorRecord * pmr)
     rc = NOTHING_DONE;
 
     if ( pPvt->needUpdate ) {
-	pmr->rmp = (epicsInt32)round(pPvt->status.position);
-	pmr->rep = (epicsInt32)round(pPvt->status.encoder_posn);
+	pmr->rmp = (epicsInt32)floor(pPvt->status.position + 0.5);
+	pmr->rep = (epicsInt32)floor(pPvt->status.encoder_posn + 0.5);
 	/* pmr->rvel = (epicsInt32)round(pPvt->status.velocity); */
 	pmr->msta = pPvt->status.status;
 	rc = CALLBACK_DATA;
