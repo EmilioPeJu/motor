@@ -1,6 +1,6 @@
 /*
-FILENAME...	ParkerRegister.h
-USAGE... This file contains function prototypes for Parker IOC shell commands.
+FILENAME...	NewportRegister.h
+USAGE... This file contains function prototypes for Newport IOC shell commands.
 
 Version:	1.4
 Modified By:	rivers
@@ -40,8 +40,7 @@ Last Modified:	2004/07/28 18:45:16
 #include "motordrvCom.h"
 
 /* Function prototypes. */
-extern RTN_STATUS PC6KSetup(int, int);
-extern RTN_STATUS PC6KConfig(int, const char *);
-extern RTN_STATUS PC6KUpLoad(int, const char *, const char *);
+extern RTN_STATUS SPiiPlusSetup(int, int);
+extern RTN_STATUS SPiiPlusConfig(int, const char *);
 
 

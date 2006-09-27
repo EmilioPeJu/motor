@@ -3,20 +3,20 @@ TOP = ../..
 include $(TOP)/configure/CONFIG
 
 # The following are used for debugging messages.
-#USR_CXXFLAGS += -DDEBUG
+USR_CXXFLAGS += -DDEBUG
 
 OPT_CXXFLAGS = -g -O0
 
-DBD += devPC6K.dbd
+DBD += devOriel.dbd
 
-LIBRARY_IOC = Parker
+LIBRARY_IOC = Oriel
 
 # Intelligent Motion Systems driver support.
-SRCS += ParkerRegister.cc
-SRCS += devPC6K.cc drvPC6K.cc
+SRCS += OrielRegister.cc
+SRCS += devEMC18011.cc drvEMC18011.cc
 
-Parker_LIBS += motor asyn
-Parker_LIBS += $(EPICS_BASE_IOC_LIBS)
+Oriel_LIBS += motor asyn
+Oriel_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES
 
