@@ -787,8 +787,8 @@ minor 1
 release 0
 x 10
 y 320
-w 66
-h 19
+w 68
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -827,8 +827,8 @@ minor 1
 release 0
 x 210
 y 320
-w 57
-h 19
+w 61
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -867,8 +867,8 @@ minor 1
 release 0
 x 210
 y 350
-w 95
-h 19
+w 101
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -907,8 +907,8 @@ minor 1
 release 0
 x 10
 y 187
-w 42
-h 19
+w 46
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -927,8 +927,8 @@ minor 1
 release 0
 x 10
 y 217
-w 27
-h 19
+w 28
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -947,8 +947,8 @@ minor 1
 release 0
 x 10
 y 247
-w 46
-h 19
+w 49
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -967,8 +967,8 @@ minor 1
 release 0
 x 10
 y 125
-w 58
-h 19
+w 61
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1042,8 +1042,8 @@ minor 1
 release 0
 x 10
 y 283
-w 84
-h 19
+w 88
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1090,8 +1090,8 @@ minor 1
 release 0
 x 10
 y 350
-w 43
-h 19
+w 44
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1112,13 +1112,12 @@ x 380
 y 241
 w 20
 h 20
-controlPv "$(motor).MSTA"
+controlPv "$(motor).HLS"
 lineColor index 14
 onColor index 35
 offColor index 39
 lineWidth 2
 numBits 1
-shift 2
 endObjectProperties
 
 # (Static Text)
@@ -1169,13 +1168,12 @@ x 380
 y 264
 w 20
 h 20
-controlPv "$(motor).MSTA"
+controlPv "$(motor).LLS"
 lineColor index 14
 onColor index 35
 offColor index 39
 lineWidth 2
 numBits 1
-shift 13
 endObjectProperties
 
 # (Static Text)

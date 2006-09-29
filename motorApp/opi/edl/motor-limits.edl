@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 102
-y 347
+x 189
+y 497
 w 663
 h 231
 font "arial-medium-r-16.0"
@@ -67,8 +67,8 @@ minor 1
 release 0
 x 10
 y 67
-w 165
-h 19
+w 174
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -87,8 +87,8 @@ minor 1
 release 0
 x 330
 y 67
-w 171
-h 19
+w 179
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -125,8 +125,8 @@ minor 1
 release 0
 x 10
 y 105
-w 159
-h 19
+w 167
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -145,8 +145,8 @@ minor 1
 release 0
 x 330
 y 105
-w 159
-h 19
+w 167
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -183,8 +183,8 @@ minor 1
 release 0
 x 330
 y 135
-w 224
-h 19
+w 234
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -203,8 +203,8 @@ minor 1
 release 0
 x 10
 y 135
-w 159
-h 19
+w 166
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -259,8 +259,8 @@ minor 1
 release 0
 x 10
 y 160
-w 197
-h 19
+w 203
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -279,8 +279,8 @@ minor 1
 release 0
 x 10
 y 185
-w 191
-h 19
+w 196
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -299,8 +299,8 @@ minor 1
 release 0
 x 330
 y 160
-w 218
-h 19
+w 227
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -321,7 +321,7 @@ x 230
 y 185
 w 20
 h 20
-controlPv "$(motor).LVIO"
+controlPv "$(motor).LLS"
 lineColor index 14
 onColor index 35
 offColor index 39
@@ -357,7 +357,7 @@ x 580
 y 135
 w 20
 h 20
-controlPv "$(motor).LVIO"
+controlPv "$(motor).RHLS"
 lineColor index 14
 onColor index 35
 offColor index 39
@@ -375,7 +375,7 @@ x 580
 y 160
 w 20
 h 20
-controlPv "$(motor).LVIO"
+controlPv "$(motor).RLLS"
 lineColor index 14
 onColor index 35
 offColor index 39
@@ -393,7 +393,7 @@ x 230
 y 160
 w 20
 h 20
-controlPv "$(motor).LVIO"
+controlPv "$(motor).HLS"
 lineColor index 14
 onColor index 35
 offColor index 39
