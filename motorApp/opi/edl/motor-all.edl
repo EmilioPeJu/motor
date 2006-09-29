@@ -63,7 +63,7 @@ minor 0
 release 0
 x 24
 y 0
-w 532
+w 500
 h 32
 
 beginGroup
@@ -76,7 +76,7 @@ minor 0
 release 0
 x 24
 y 0
-w 525
+w 493
 h 30
 lineColor index 3
 fill
@@ -91,7 +91,7 @@ minor 0
 release 0
 x 24
 y 3
-w 525
+w 493
 h 24
 controlPv "$(P)$(M).DESC"
 fgColor index 14
@@ -110,15 +110,15 @@ minor 0
 release 1
 x 24
 y 3
-w 525
+w 493
 h 24
 lineColor index 11
 fillColor index 0
 numPoints 3
 xPoints {
   0 24
-  1 549
-  2 549
+  1 517
+  2 517
 }
 yPoints {
   0 27
@@ -135,7 +135,7 @@ minor 0
 release 1
 x 24
 y 3
-w 525
+w 493
 h 24
 lineColor index 1
 fillColor index 0
@@ -143,7 +143,7 @@ numPoints 3
 xPoints {
   0 24
   1 24
-  2 549
+  2 517
 }
 yPoints {
   0 27
@@ -779,7 +779,7 @@ minor 0
 release 0
 x 316
 y 436
-w 72
+w 144
 h 20
 fgColor index 20
 onColor index 4
@@ -1600,35 +1600,6 @@ value3 {
   1 "0"
   2 "0"
   3 "0"
-}
-endObjectProperties
-
-# (Related Display)
-object relatedDisplayClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 396
-y 436
-w 68
-h 20
-fgColor index 44
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "helvetica-bold-r-12.0"
-buttonLabel "Other"
-numPvs 4
-numDsps 1
-displayFileName {
-  0 "motor.edl"
-}
-setPosition {
-  0 "button"
-}
-symbols {
-  0 "motor=$(P)$(M)"
 }
 endObjectProperties
 
@@ -3068,5 +3039,196 @@ useDisplayBg
 value {
   "Retry Count"
 }
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 500
+y 0
+w 50
+h 30
+
+beginGroup
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 504
+y 4
+w 42
+h 23
+fgColor index 14
+bgColor index 0
+topShadowColor index 0
+botShadowColor index 14
+font "arial-medium-r-18.0"
+invisible
+buttonLabel "small screen"
+numPvs 4
+numDsps 1
+displayFileName {
+  0 "motor.edl"
+}
+closeAction {
+  0 1
+}
+symbols {
+  0 "motor=$(P)$(M)"
+}
+closeDisplay {
+  0 1
+}
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 502
+y 2
+w 48
+h 29
+lineColor index 11
+fillColor index 63
+lineWidth 2
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 500
+y 0
+w 48
+h 29
+lineColor index 1
+fillColor index 63
+lineWidth 2
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 502
+y 2
+w 47
+h 27
+lineColor index 49
+fill
+fillColor index 48
+lineWidth 3
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 512
+y 6
+w 4
+h 3
+lineColor index 1
+fill
+fillColor index 0
+lineWidth 2
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 520
+y 8
+w 15
+h 9
+lineColor index 14
+fillColor index 48
+lineWidth 2
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 520
+y 8
+w 15
+h 2
+lineColor index 14
+fill
+fillColor index 14
+lineWidth 2
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 518
+y 10
+w 15
+h 9
+lineColor index 48
+fill
+fillColor index 48
+lineWidth 2
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 517
+y 11
+w 15
+h 9
+lineColor index 14
+fill
+fillColor index 48
+lineWidth 2
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 517
+y 11
+w 15
+h 2
+lineColor index 14
+fill
+fillColor index 14
+lineWidth 2
+endObjectProperties
+
+endGroup
+
 endObjectProperties
 
