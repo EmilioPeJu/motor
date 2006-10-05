@@ -482,8 +482,8 @@ static void statusCallback(void *drvPvt, asynUser *pasynUser,
     motorRecord *pmr = pPvt->pmr;
 
     asynPrint(pasynUser, ASYN_TRACEIO_DEVICE,
-	      "%s devMotorAsyn::statusCallback new value=[p:%f,s:%x] %c%c\n",
-	      pmr->name, value->position, value->status,
+	      "%s devMotorAsyn::statusCallback new value=[p:%f,e:%f,s:%x] %c%c\n",
+	      pmr->name, value->position, value->encoder_posn, value->status,
 	      pPvt->needUpdate?'N':' ', pPvt->moveRequestPending?'P':' ');
 
     if (dbScanLockOK) {
