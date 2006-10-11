@@ -21,6 +21,7 @@ DB += basic_asyn_motor.template
 DB += XPS_extra.db
 DB += TransPos.template
 DB += motorUtil.template
+DB += motorReadback.template
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB
