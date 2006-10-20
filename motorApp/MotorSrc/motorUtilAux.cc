@@ -49,7 +49,7 @@ char ** getMotorList()
 {
     DBENTRY dbentry, *pdbentry = &dbentry;
     long    status;
-    char    **paprecords = 0, temp[29];
+    char    **paprecords = 0, temp[PVNAME_STRINGSZ];
     int     num_entries = 0, length = 0, index = 0;
 
     dbInitEntry(pdbbase,pdbentry);
