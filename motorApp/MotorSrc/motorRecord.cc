@@ -2758,8 +2758,15 @@ static long get_units(const DBADDR *paddr, char *units)
     case motorRecordVMAX:
     case motorRecordBVEL:
     case motorRecordVBAS:
+    case motorRecordJVEL:
+    case motorRecordHVEL:
 	strncpy(s, pmr->egu, DB_UNITS_SIZE);
 	strcat(s, "/sec");
+	break;
+
+    case motorRecordJAR:
+	strncpy(s, pmr->egu, DB_UNITS_SIZE);
+	strcat(s, "/s/s");
 	break;
 
     case motorRecordACCL:
