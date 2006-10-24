@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 112
-y 409
+x 126
+y 206
 w 552
 h 464
 font "helvetica-medium-r-10.0"
@@ -2513,7 +2513,7 @@ x 320
 y 96
 w 16
 h 16
-controlPv "$(P)$(M).RHLS"
+controlPv "$(P)$(M).RLLS"
 lineColor index 14
 onColor index 20
 offColor index 24
@@ -2568,7 +2568,7 @@ x 320
 y 112
 w 16
 h 16
-controlPv "$(P)$(M).RHLS"
+controlPv "$(P)$(M).LVIO"
 lineColor index 14
 onColor index 35
 offColor index 39
