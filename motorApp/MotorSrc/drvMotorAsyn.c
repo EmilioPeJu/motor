@@ -344,7 +344,7 @@ int drvAsynMotorConfigure(const char *portName, const char *driverName,
 	    (*pPvt->drvset->setCallback)(pAxis->axis, intCallback, (void *)pAxis);
             (*pPvt->drvset->setLog)(pAxis->axis, logFunc, pAxis->pasynUser);
 	}
-	setDefaults(pAxis);
+	/* All other axis parameters are initialised to zero at allocation */
     }
     /* Create a fallback asynUser for logging, but only the first time */
     if (!defaultAsynUser) {
@@ -632,13 +632,6 @@ static asynStatus readMotorStatus(void *drvPvt, asynUser *pasynUser,
     return(asynSuccess);
 }
 
-static void setDefaults(drvmotorAxisPvt *pAxis)
-{
-    pAxis->max_velocity = 200.0;
-    pAxis->min_velocity = 0.0;
-    pAxis->accel = 100.0;
-}
-
 static int logFunc(void *userParam,
                    const motorAxisLogMask_t logMask,
                    const char *pFormat, ...)
