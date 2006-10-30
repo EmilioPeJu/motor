@@ -26,7 +26,9 @@
 #include "XPSAsynInterpose.h"
 #include "tclCall.h"
 
+#ifdef TEST_GATHERING
 extern int xpsgathering(int);
+#endif
 
 motorAxisDrvSET_t motorXPS = 
   {
@@ -872,6 +874,7 @@ int XPSConfigAxis(int card,                   /* specify which controller 0-up*/
 
 /* Code for iocsh registration */
 
+#ifdef TEST_GATHERING
 /* Newport XPS Gathering Test */
 static const iocshArg XPSGatheringArg0 = {"Element Period*10^4", iocshArgInt};
 static const iocshArg * const XPSGatheringArgs[1] = {&XPSGatheringArg0};
@@ -880,6 +883,7 @@ static void XPSC8GatheringTestCallFunc(const iocshArgBuf *args)
 {
     xpsgathering(args[0].ival);
 }
+#endif
 
 /* XPS tcl execute function */
 static const iocshArg tclcallArg0 = {"tcl name", iocshArgString};
@@ -951,7 +955,9 @@ static void XPSRegister(void)
     iocshRegister(&configXPSAxis, configXPSAxisCallFunc);
     iocshRegister(&TCLRun,        TCLRunCallFunc);
 #ifdef vxWorks
+#ifdef TEST_GATHERING
     iocshRegister(&XPSC8GatheringTest, XPSC8GatheringTestCallFunc);
+#endif
 #endif
 }
 
