@@ -1,3 +1,6 @@
+# AUTOSAVE: level 0 = before record init, level 1 = before AND after record init
+#% autosave 0 DVAL OFF 
+#% autosave 1 DIR DHLM DLLM TWV SREV MRES ERES RRES VBAS VELO ACCL BDST BVEL BACC RDBD DESC EGU RTRY UEIP URIP DLY PREC DISA DISP FOFF OFF FRAC OMSL JVEL JAR
 record(motor,"$(P)$(M)")
 {
 	field(DESC,"$(DESC)")
@@ -18,11 +21,12 @@ record(motor,"$(P)$(M)")
 	field(HLSV,"$(HLSV)")
 	field(INIT,"$(INIT)")
 	field(RTRY,"0")
+	field(HVEL,"0")
 	field(SREV, "$(SREV)")
 	field(RRES, "$(RRES)")
 	field(TWV, "$(TWV)")
 	field(ERES, "$(ERES)")
-	field(JVEL, "$(JVEL)")
+	field(JVEL, "$(VELO)")
 	field(JAR, "$(JAR)")
 	field(UEIP, "$(UEIP)")
 	field(VMAX, "$(VMAX)")
