@@ -26,6 +26,10 @@ DB += motorReadback.template
 #----------------------------------------------------
 # Declare template files which do not show up in DB
 #USES_TEMPLATE += motor.template
+DATA += basic_motor_settings.req
+DATA += motor_positions.req
+DATA += motor_settings.req
+DATA += pseudoMotor_settings.req
 
 include $(TOP)/configure/RULES
 #----------------------------------------
