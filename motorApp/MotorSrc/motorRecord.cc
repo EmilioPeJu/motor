@@ -1693,7 +1693,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 	/** If we're in CLOSED_LOOP mode, get value from input link. **/
 	long status;
 
-	status = dbGetLink(&(pmr->dol), DBR_DOUBLE, &(pmr->val), NULL, NULL);
+	status = dbGetLink(&(pmr->dol), DBR_DOUBLE, &(pmr->val), 0, 0);
 	if (!RTN_SUCCESS(status))
 	{
 	    pmr->udf = TRUE;
@@ -2963,21 +2963,22 @@ static long get_alarm_double(const DBADDR  *paddr, struct dbr_alDouble * pad)
 static void alarm_sub(motorRecord * pmr)
 {
     msta_field msta;
+    int status;
 
     if (pmr->udf == TRUE)
     {
-	recGblSetSevr((dbCommon *) pmr, UDF_ALARM, INVALID_ALARM);
+	status = recGblSetSevr((dbCommon *) pmr, UDF_ALARM, INVALID_ALARM);
 	return;
     }
     /* limit-switch and soft-limit violations */
     if (pmr->hlsv && (pmr->hls || (pmr->dval > pmr->dhlm)))
     {
-	recGblSetSevr((dbCommon *) pmr, HIGH_ALARM, pmr->hlsv);
+	status = recGblSetSevr((dbCommon *) pmr, HIGH_ALARM, pmr->hlsv);
 	return;
     }
     if (pmr->hlsv && (pmr->lls || (pmr->dval < pmr->dllm)))
     {
-	recGblSetSevr((dbCommon *) pmr, LOW_ALARM, pmr->hlsv);
+	status = recGblSetSevr((dbCommon *) pmr, LOW_ALARM, pmr->hlsv);
 	return;
     }
     
@@ -2988,7 +2989,7 @@ static void alarm_sub(motorRecord * pmr)
 	msta.Bits.CNTRL_COMM_ERR =  0;
 	pmr->msta = msta.All;
 	MARK(M_MSTA);
-	recGblSetSevr((dbCommon *) pmr, COMM_ALARM, INVALID_ALARM);
+	status = recGblSetSevr((dbCommon *) pmr, COMM_ALARM, INVALID_ALARM);
     }
     return;
 }
@@ -3283,7 +3284,7 @@ static void
 	long rtnstat;
 
 	old_drbv = pmr->drbv;
-	rtnstat = dbGetLink(&(pmr->rdbl), DBR_DOUBLE, &(pmr->drbv), NULL, NULL);
+	rtnstat = dbGetLink(&(pmr->rdbl), DBR_DOUBLE, &(pmr->drbv), 0, 0 );
 	if (!RTN_SUCCESS(rtnstat))
 	    pmr->drbv = old_drbv;
 	else
