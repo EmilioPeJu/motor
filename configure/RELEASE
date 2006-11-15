@@ -10,8 +10,8 @@
 # Add your declarations here
 
 #!GATEWAY=
-SUPPORT=/home/diamond/R3.14.8.2/prod/support
-WORK=/home/diamond/R3.14.8.2/work/support
+SUPPORT=/dls_sw/prod/R3.14.8.2/support
+WORK=/dls_sw/work/R3.14.8.2/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
@@ -22,7 +22,7 @@ ASYN=$(SUPPORT)/asyn/4-6
 SNCSEQ=$(SUPPORT)/seq/2-0-11dls1
 
 # Recommended EPICS release: R3.14.8.2
-EPICS_BASE=/home/epics/R3.14.8.2/base
+EPICS_BASE=/dls_sw/epics/R3.14.8.2/base
 
 # The following must be defined if the "WithMPF" example in motorExApp is to
 # be built.
