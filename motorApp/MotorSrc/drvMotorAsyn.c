@@ -216,13 +216,12 @@ static asynUser *defaultAsynUser;
 
 
 int drvAsynMotorConfigure(const char *portName, const char *driverName,
-			  int card, int num_axes, int can_block)
+			  int card, int num_axes)
 {
     drvmotorPvt *pPvt;
     drvmotorAxisPvt *pAxis;
     asynStatus status;
     int i;
-    int attributes;
 
     pPvt = callocMustSucceed(1, sizeof(*pPvt), "drvAsynMotorConfigure");
     pPvt->portName = epicsStrDup(portName);
@@ -252,10 +251,8 @@ int drvAsynMotorConfigure(const char *portName, const char *driverName,
     pPvt->drvUser.pinterface  = (void *)&drvMotorDrvUser;
     pPvt->drvUser.drvPvt = pPvt;
 
-    attributes = ASYN_MULTIDEVICE | ASYN_CANBLOCK; 
-
     status = pasynManager->registerPort(portName,
-                                        attributes,
+                                        ASYN_MULTIDEVICE | ASYN_CANBLOCK,
                                         1,  /*  autoconnect */
                                         0,  /* medium priority */
                                         0); /* default stack size */
@@ -919,17 +916,15 @@ static const iocshArg initArg0 = { "portName",iocshArgString};
 static const iocshArg initArg1 = { "driverName",iocshArgString};
 static const iocshArg initArg2 = { "cardNum",iocshArgInt};
 static const iocshArg initArg3 = { "numAxes",iocshArgInt};
-static const iocshArg initArg4 = { "canBlock",iocshArgInt};
-static const iocshArg * const initArgs[5] = {&initArg0,
+static const iocshArg * const initArgs[4] = {&initArg0,
                                              &initArg1,
 					     &initArg2,
-					     &initArg3,
-					     &initArg4};
-static const iocshFuncDef initFuncDef = {"drvAsynMotorConfigure",5,initArgs};
+					     &initArg3};
+static const iocshFuncDef initFuncDef = {"drvAsynMotorConfigure",4,initArgs};
 static void initCallFunc(const iocshArgBuf *args)
 {
     drvAsynMotorConfigure(args[0].sval, args[1].sval, args[2].ival,
-			  args[3].ival, args[4].ival);
+			  args[3].ival);
 }
 
 void motorRegister(void)
