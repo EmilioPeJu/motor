@@ -252,10 +252,8 @@ int drvAsynMotorConfigure(const char *portName, const char *driverName,
     pPvt->drvUser.pinterface  = (void *)&drvMotorDrvUser;
     pPvt->drvUser.drvPvt = pPvt;
 
-    attributes = ASYN_MULTIDEVICE;
-    if (can_block) {
-	attributes |= ASYN_CANBLOCK;
-    }
+    attributes = ASYN_MULTIDEVICE | ASYN_CANBLOCK; 
+
     status = pasynManager->registerPort(portName,
                                         attributes,
                                         1,  /*  autoconnect */
