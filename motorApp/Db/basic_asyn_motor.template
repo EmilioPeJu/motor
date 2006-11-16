@@ -30,5 +30,6 @@ record(motor,"$(P)$(M)")
 	field(JAR, "$(JAR)")
 	field(UEIP, "$(UEIP)")
 	field(VMAX, "$(VMAX)")
+	field(OFF, "$(OFF)")
 }
 
