@@ -530,7 +530,7 @@ endObjectProperties
 object menuMuxClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 172
 y 52
@@ -1533,7 +1533,7 @@ endObjectProperties
 object menuMuxClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 200
 y 376
@@ -2769,6 +2769,7 @@ controlPv "$(P)$(M).MSTA"
 lineColor index 14
 onColor index 15
 offColor index 19
+endian "little"
 numBits 14
 endObjectProperties
 
@@ -3058,7 +3059,7 @@ beginGroup
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 504
 y 4
