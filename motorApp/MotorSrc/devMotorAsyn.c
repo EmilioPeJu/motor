@@ -115,9 +115,10 @@ static void init_controller(struct motorRecord *pmr )
        which is one reason why I have separated it into another routine */
     motorAsynPvt *pPvt = (motorAsynPvt *)pmr->dpvt;
     double position = pPvt->status.position;
+    double rdbd = (fabs(pmr->rdbd) < fabs(pmr->mres) ? fabs(pmr->mres) : fabs(pmr->rdbd) );
 
-    if ((fabs(pmr->dval) > pmr->rdbd && pmr->mres != 0) &&
-        ((position * pmr->mres) < pmr->rdbd))
+    if ((fabs(pmr->dval) > rdbd && pmr->mres != 0) &&
+        (fabs(position * pmr->mres) < rdbd))
     {
         double setPos = pmr->dval / pmr->mres;
         epicsEventId initEvent = epicsEventCreate( epicsEventEmpty );
@@ -128,12 +129,21 @@ static void init_controller(struct motorRecord *pmr )
         build_trans(LOAD_POS, &setPos, pmr);
         end_trans(pmr);
 
+        asynPrint(pPvt->pasynUser, ASYN_TRACE_FLOW,
+                  "devMotorAsyn::init_controller, %s set position to %f\n",
+                  pmr->name, setPos );
+
         if ( initEvent )
         {
             epicsEventMustWait(initEvent);
             epicsEventDestroy(initEvent);
         }
     }
+    else
+        asynPrint(pPvt->pasynUser, ASYN_TRACE_FLOW,
+                  "devMotorAsyn::init_controller, %s setting of position not required, position=%f, mres=%f, dval=%f, rdbd=%f",
+                  pmr->name, position, pmr->mres, pmr->dval, rdbd );
+
 }
 
 static long init_record(struct motorRecord * pmr )
