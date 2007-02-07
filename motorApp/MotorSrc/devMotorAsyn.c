@@ -499,7 +499,8 @@ static void asynCallback(asynUser *pasynUser)
 	if (commandIsMove) {
 	    pPvt->moveRequestPending--;
 	    if (!pPvt->moveRequestPending) {
-		pmr->rset->process((dbCommon*)pmr);
+                /* pmr->rset->process((dbCommon*)pmr); */
+                dbProcess((dbCommon*)pmr);
 	    }
 	}
 	dbScanUnlock((dbCommon *)pmr);
@@ -535,7 +536,8 @@ static void statusCallback(void *drvPvt, asynUser *pasynUser,
         memcpy(&pPvt->status, value, sizeof(struct MotorStatus));
         if (!pPvt->needUpdate && !pPvt->moveRequestPending) {
 	    pPvt->needUpdate = 1;
-	    pmr->rset->process((dbCommon*)pmr);
+	    /* pmr->rset->process((dbCommon*)pmr); */
+            dbProcess((dbCommon*)pmr);
         }
         dbScanUnlock((dbCommon*)pmr);
     } else {
