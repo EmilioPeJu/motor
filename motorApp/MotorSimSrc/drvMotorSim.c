@@ -105,7 +105,7 @@ static motorSim_t drv={ NULL, NULL, motorSimLogMsg, NULL, { 0, 0 } };
 
 static void motorAxisReportAxis( AXIS_HDL pAxis, int level )
 {
-    printf( "Found driver for motorSim card %d, axis %d\n", pAxis->card, pAxis->axis );
+    printf( "Found driver for motorSim card %d, axis %d, mutex %p\n", pAxis->card, pAxis->axis, pAxis->axisMutex );
 
     if (level > 0)
     {
