@@ -1,0 +1,50 @@
+# MACROS
+# ------
+#$(P)		- Record name prefix; e.g., P=1bmb:trans1:
+#$(SOFT) 	- Name of motor record with Soft Channel device support.
+#$(HARD) 	- Name of an existing hard motor record.
+#$(FCALC)	- Forward transformation calculation (from soft to hard motor).
+#$(RCALC)	- Reverse transformation calculation (from hard to soft motor).
+
+record(motor,"$(P)$(SOFT)")
+{
+	field(DESC,"$(DESC)")
+	field(DTYP,"Soft Channel")
+	field(DIR,"$(DIR)")
+	field(VELO,"$(VELO)")
+	field(VBAS,"$(VBAS)")
+	field(ACCL,"$(ACCL)")
+	field(BDST,"$(BDST)")
+	field(BVEL,"$(BVEL)")
+	field(BACC,"$(BACC)")
+	field(PREC,"$(PREC)")
+	field(EGU,"$(EGU)")
+	field(DHLM,"$(DHLM)")
+	field(DLLM,"$(DLLM)")
+	field(INIT,"$(INIT)")
+	field(TWV,"1")
+	field(OUT,"$(P)frwdcalc.A  PP MS")
+	field(RDBL,"$(P)revscalc.VAL  NPP MS")
+	field(URIP,"Yes")
+	field(RRES,"$(RRES)")
+	field(RTRY,"0")
+	field(MRES,"$(MRES)")
+	field(PREC,"$(PREC)")
+	field(STOO,"$(P)$(HARD).STOP  PP MS")
+	field(DINP,"$(P)$(HARD).DMOV  NPP MS")
+}
+
+record(calcout,"$(P)frwdcalc")
+{
+	field(DESC,"Forward calc")
+	field(CALC,"$(FCALC)")
+	field(OUT,"$(P)$(HARD).DVAL  PP MS")
+}
+
+record(calcout,"$(P)revscalc")
+{
+	field(DESC,"Reverse calc")
+	field(CALC,"$(RCALC)")
+	field(INPA,"$(P)$(HARD).DRBV  CP MS")
+}
+
