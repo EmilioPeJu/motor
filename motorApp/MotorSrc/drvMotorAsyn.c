@@ -171,7 +171,6 @@ static asynStatus disconnect        (void *drvPvt, asynUser *pasynUser);
 
 /* These are private functions, not used in any interfaces */
 static void intCallback(void *drvPvt, unsigned int num, unsigned int *changed);
-static void setDefaults(drvmotorAxisPvt *pAxis);
 static int config      (drvmotorPvt *pPvt);
 static int logFunc     (void *userParam,
                         const motorAxisLogMask_t logMask,
