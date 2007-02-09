@@ -22,6 +22,7 @@ DB += XPS_extra.db
 DB += TransPos.template
 DB += motorUtil.template
 DB += motorReadback.template
+DB += motorTranslate.template
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB
