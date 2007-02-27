@@ -541,7 +541,7 @@ bgColor index 3
 topShadowColor index 1
 botShadowColor index 11
 font "helvetica-bold-r-10.0"
-initialState "1"
+initialState "0"
 numItems 2
 symbolTag {
   0 "Dial Co-ords"
