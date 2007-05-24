@@ -322,7 +322,6 @@ displayMode "decimal"
 precision 4
 fgColor index 25
 bgColor index 3
-colorPv "$(motor):MODE"
 font "arial-bold-r-14.0"
 fontAlign "center"
 lineWidth -2
