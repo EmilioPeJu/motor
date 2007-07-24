@@ -1,71 +1,35 @@
-program XPS_trajectoryScan("P=13BMC:,R=traj1,M1=m33,M2=m34,M3=m35,M4=m36,M5=m37,M6=m38,M7=m39,M8=m40")
+program XPS_trajectoryScan("P=13BMC:,R=traj1,IPADDR=164.54.160.34,PORT=5001,"
+                           "USERNAME=Administrator,PASSWORD=Administrator,"
+                           "M1=m1,M2=m2,M3=m3,M4=m4,M5=m5,M6=m6,M7=m7,M8=m8,"
+                           "GROUP=g1,"
+                           "P1=p1,P2=p2,P3=p3,P4=p4,P5=p5,P6=p6,P7=p7,P8=p8")
 
 /*  
- *  This was adapted from trajectoryScan.st written by Mark Rivers!
- *
  *  This sequencer program works with trajectoryScan.db.  It implements
  *  coordinated trajectory motion with the Newport XPS-C8 motor controller.
  *  It can be used with the Newport General Purpose Diffractometer or with any
  *  other set of motors connected to that controller.
  *  
- *  This inforces a minimum trajectory element period of 0.1s because the SNL
- *  must be processed during each element period for the gathering to perform
- *  correctly
- *
- *  This has been converted to use the Asyn XPS driver. 
- *
- *  Jon Kelly
- *  24th May 2005
+ *  Original author: Jon Kelly, based on Mark Rivers' version for the MM4000.
+ *  Current author:  Mark Rivers
  *
  * Modifications:
 */
 
 %% #include <string.h>
 %% #include <stdio.h>
+%% #include <math.h>
 %% #include "XPS_C8_drivers.h"
 %% #include "Socket.h"
-%% #include <hostLib.h>
-%% #include <remLib.h>
-%% #include <netDrv.h>
+%% #include "xps_ftp.h"
 
 
 /* This program must be compiled with the recursive option */
 option +r;
 
-/* State codes for Build, Read and Execute. Careful, these must match the
- * corresponding MBBI records, but there is no way to check this */
-#define BUILD_STATE_DONE            0
-#define BUILD_STATE_BUSY            1
-#define READ_STATE_DONE             0
-#define READ_STATE_BUSY             1
-#define EXECUTE_STATE_DONE          0
-#define EXECUTE_STATE_MOVE_START    1
-#define EXECUTE_STATE_EXECUTING     2
-#define EXECUTE_STATE_FLYBACK       3
-
-/* Status codes for Build, Execute and Read */
-#define STATUS_UNDEFINED 0
-#define STATUS_SUCCESS   1
-#define STATUS_FAILURE   2
-#define STATUS_ABORT     3
-#define STATUS_TIMEOUT   4
-
-/* Time modes */
-#define TIME_MODE_TOTAL         0
-#define TIME_MODE_PER_ELEMENT   1
-
-/* Move modes */
-#define MOVE_MODE_RELATIVE   0
-#define MOVE_MODE_ABSOLUTE   1
-#define MOVE_MODE_HYBRID     2
-
-
-/* Maximum number of motors on MM4005 */
-#define MAX_AXES 8
-
 /* Maximum # of trajectory elements.  The number of points XPS can accept
- * is almost unlimited because the data is stored in a file but  the channel 
- * access limit with a double data type is 2000.
+ * is almost unlimited because the data is stored in a file but the channel 
+ * access limit with a double data type is 2000 on R3.13 clients.
  */
 #define MAX_ELEMENTS 2000
 
@@ -75,11 +39,20 @@ option +r;
  */
 #define MAX_PULSES 2000
 
+/* Note that MAX_ELEMENTS, and MAX_PULSES must be defined before
+ * including the trajectoryScan.h */
+#include "trajectoryScan.h"
+
+/* Buffer sizes */
+#define NAME_LEN 100
+
 /* Polling interval for waiting for motors to reach their targets */
 #define POLL_INTERVAL 0.1
 
-/* getSocket timeout*/
-#define SOCKET_TIMEOUT 	1
+/* Socket timeouts */
+#define POLL_TIMEOUT 1.0
+#define DRIVE_TIMEOUT 100000.  /* Forever */
+#define ABORT_TIMEOUT 10.
 
 /* Used within the exec state as a timeout within the while loops which wait for
  * the ss xpsTrajectoryRun to catch up.  The delays are 0.1 second, so 100 loops
@@ -93,203 +66,11 @@ option +r;
 /* Total length of gathering string */
 #define MAX_GATHERING_STRING MAX_GATHERING_AXIS_STRING * NUM_GATHERING_ITEMS * MAX_AXES
 
-/* XPS specific PVs */
-string groupName;  assign groupName 	to "{P}{R}GroupName.VAL";
-string ipAddress;  assign ipAddress 	to "{P}{R}IP.VAL";
-string asynPort;   assign asynPort      to "{P}{R}AsynPort.VAL";
-int    xpsPort;	   assign xpsPort	to "{P}{R}XPSPort.VAL";
-string axisName[8];	    
-		   assign axisName 	to 
-						{"{P}{R}Axis1.VAL",
-					 	 "{P}{R}Axis2.VAL",
-					 	 "{P}{R}Axis3.VAL",
-					 	 "{P}{R}Axis4.VAL",
-					 	 "{P}{R}Axis5.VAL",
-					 	 "{P}{R}Axis6.VAL",
-					 	 "{P}{R}Axis7.VAL",
-					 	 "{P}{R}Axis8.VAL"};
-
-
-/* Define PVs */
-int    numAxes;     assign numAxes      to "{P}{R}NumAxes.VAL"; 
-                                                        monitor numAxes;
-int    nelements;   assign nelements    to "{P}{R}Nelements.VAL"; 
-                                                        monitor nelements;
-int    npulses;     assign npulses      to "{P}{R}Npulses.VAL"; 
-                                                        monitor npulses;
-
-int    moveMode;    assign moveMode     to "{P}{R}MoveMode.VAL";    
-                                                        monitor moveMode;
-double time;        assign time         to "{P}{R}Time.VAL";      
-                                                        monitor time;
-double timeScale;   assign timeScale    to "{P}{R}TimeScale.VAL"; 
-                                                        monitor timeScale;
-int    timeMode;    assign timeMode     to "{P}{R}TimeMode.VAL";    
-                                                        monitor timeMode;
-double accel;       assign accel        to "{P}{R}Accel.VAL";     
-                                                        monitor accel;
-
-int    build;       assign build        to "{P}{R}Build.VAL";     
-                                                        monitor build;
-int    buildState;  assign buildState   to "{P}{R}BuildState.VAL"; 
-int    buildStatus; assign buildStatus  to "{P}{R}BuildStatus.VAL"; 
-string buildMessage;assign buildMessage to "{P}{R}BuildMessage.VAL";
-
-int    simMode;     assign simMode      to "{P}{R}SimMode.VAL";   
-                                                        monitor simMode;
-int    execute;     assign execute      to "{P}{R}Execute.VAL";   
-                                                        monitor execute;
-int    execState;   assign execState    to "{P}{R}ExecState.VAL";
-							monitor execState;   
-int    execStatus;  assign execStatus   to "{P}{R}ExecStatus.VAL";   
-string execMessage; assign execMessage  to "{P}{R}ExecMessage.VAL";
-int    abort;       assign abort        to "{P}{R}Abort.VAL";   
-                                                        monitor abort;
-
-int    detOn;       assign detOn        to "{P}{R}DetOn.PROC";
-int    detOff;      assign detOff       to "{P}{R}DetOff.PROC";
-
-int    readback;    assign readback     to "{P}{R}Readback.VAL";   
-                                                        monitor readback;
-int    readState;   assign readState    to "{P}{R}ReadState.VAL";   
-int    readStatus;  assign readStatus   to "{P}{R}ReadStatus.VAL";   
-string readMessage; assign readMessage  to "{P}{R}ReadMessage.VAL";
-
-double timeTrajectory[MAX_ELEMENTS];
-                    assign timeTrajectory to  "{P}{R}TimeTraj.VAL"; 
-                                                        monitor timeTrajectory;
-
-int    moveAxis[MAX_AXES]; 
-                    assign moveAxis     to
-                                           {"{P}{R}M1Move.VAL",
-                                            "{P}{R}M2Move.VAL",
-                                            "{P}{R}M3Move.VAL",
-                                            "{P}{R}M4Move.VAL",
-                                            "{P}{R}M5Move.VAL",
-                                            "{P}{R}M6Move.VAL",
-                                            "{P}{R}M7Move.VAL",
-                                            "{P}{R}M8Move.VAL"};
-                                                        monitor moveAxis;
-
-double  motorTrajectory[MAX_AXES][MAX_ELEMENTS]; 
-                    assign motorTrajectory to
-                                           {"{P}{R}M1Traj.VAL",
-                                            "{P}{R}M2Traj.VAL",
-                                            "{P}{R}M3Traj.VAL",
-                                            "{P}{R}M4Traj.VAL",
-                                            "{P}{R}M5Traj.VAL",
-                                            "{P}{R}M6Traj.VAL",
-                                            "{P}{R}M7Traj.VAL",
-                                            "{P}{R}M8Traj.VAL"};
-                                                        monitor motorTrajectory;
-
-double  motorReadbacks[MAX_AXES][MAX_PULSES]; 
-                    assign  motorReadbacks to
-                                           {"{P}{R}M1Actual.VAL",
-                                            "{P}{R}M2Actual.VAL",
-                                            "{P}{R}M3Actual.VAL",
-                                            "{P}{R}M4Actual.VAL",
-                                            "{P}{R}M5Actual.VAL",
-                                            "{P}{R}M6Actual.VAL",
-                                            "{P}{R}M7Actual.VAL",
-                                            "{P}{R}M8Actual.VAL"};
-
-double  motorError[MAX_AXES][MAX_PULSES]; 
-                    assign  motorError  to
-                                           {"{P}{R}M1Error.VAL",
-                                            "{P}{R}M2Error.VAL",
-                                            "{P}{R}M3Error.VAL",
-                                            "{P}{R}M4Error.VAL",
-                                            "{P}{R}M5Error.VAL",
-                                            "{P}{R}M6Error.VAL",
-                                            "{P}{R}M7Error.VAL",
-                                            "{P}{R}M8Error.VAL"};
-
-double  motorCurrent[MAX_AXES]; 
-                    assign  motorCurrent to
-                                           {"{P}{R}M1Current.VAL",
-                                            "{P}{R}M2Current.VAL",
-                                            "{P}{R}M3Current.VAL",
-                                            "{P}{R}M4Current.VAL",
-                                            "{P}{R}M5Current.VAL",
-                                            "{P}{R}M6Current.VAL",
-                                            "{P}{R}M7Current.VAL",
-                                            "{P}{R}M8Current.VAL"};
-
-double  motorMVA[MAX_AXES]; 
-                    assign  motorMVA    to
-                                           {"{P}{R}M1MVA.VAL",
-                                            "{P}{R}M2MVA.VAL",
-                                            "{P}{R}M3MVA.VAL",
-                                            "{P}{R}M4MVA.VAL",
-                                            "{P}{R}M5MVA.VAL",
-                                            "{P}{R}M6MVA.VAL",
-                                            "{P}{R}M7MVA.VAL",
-                                            "{P}{R}M8MVA.VAL"};
-
-double  motorMAA[MAX_AXES]; 
-                    assign  motorMAA    to
-                                           {"{P}{R}M1MAA.VAL",
-                                            "{P}{R}M2MAA.VAL",
-                                            "{P}{R}M3MAA.VAL",
-                                            "{P}{R}M4MAA.VAL",
-                                            "{P}{R}M5MAA.VAL",
-                                            "{P}{R}M6MAA.VAL",
-                                            "{P}{R}M7MAA.VAL",
-                                            "{P}{R}M8MAA.VAL"};
-
-double  epicsMotorPos[MAX_AXES]; 
-                    assign  epicsMotorPos  to
-                                           {"{P}{M1}.VAL",
-                                            "{P}{M2}.VAL",
-                                            "{P}{M3}.VAL",
-                                            "{P}{M4}.VAL",
-                                            "{P}{M5}.VAL",
-                                            "{P}{M6}.VAL",
-                                            "{P}{M7}.VAL",
-                                            "{P}{M8}.VAL"};
-                                                        monitor epicsMotorPos;
-
-double  epicsMotorDir[MAX_AXES]; 
-                    assign  epicsMotorDir  to
-                                           {"{P}{M1}.DIR",
-                                            "{P}{M2}.DIR",
-                                            "{P}{M3}.DIR",
-                                            "{P}{M4}.DIR",
-                                            "{P}{M5}.DIR",
-                                            "{P}{M6}.DIR",
-                                            "{P}{M7}.DIR",
-                                            "{P}{M8}.DIR"};
-                                                        monitor epicsMotorDir;
-double  epicsMotorOff[MAX_AXES]; 
-                    assign  epicsMotorOff  to
-                                           {"{P}{M1}.OFF",
-                                            "{P}{M2}.OFF",
-                                            "{P}{M3}.OFF",
-                                            "{P}{M4}.OFF",
-                                            "{P}{M5}.OFF",
-                                            "{P}{M6}.OFF",
-                                            "{P}{M7}.OFF",
-                                            "{P}{M8}.OFF"};
-                                                        monitor epicsMotorOff;
-double  epicsMotorDone[MAX_AXES]; 
-                    assign  epicsMotorDone  to
-                                           {"{P}{M1}.DMOV",
-                                            "{P}{M2}.DMOV",
-                                            "{P}{M3}.DMOV",
-                                            "{P}{M4}.DMOV",
-                                            "{P}{M5}.DMOV",
-                                            "{P}{M6}.DMOV",
-                                            "{P}{M7}.DMOV",
-                                            "{P}{M8}.DMOV"};
-                                                        monitor epicsMotorDone;
-
-evflag buildMon;        sync build      buildMon;
-evflag executeMon;      sync execute    executeMon;
-evflag abortMon;        sync abort      abortMon;
-evflag readbackMon;     sync readback   readbackMon;
-evflag nelementsMon;    sync nelements  nelementsMon;
-evflag execStateMon;    sync execState  execStateMon;
+/* Constants used for FTP to the XPS */
+#define TRAJECTORY_DIRECTORY "/Admin/public/Trajectories"
+#define TRAJECTORY_FILE "TrajectoryScan.trj"
+#define GATHERING_DIRECTORY "/Admin/public/"
+#define GATHERING_FILE "Gathering.dat"
 
 int status;
 int i;
@@ -297,17 +78,15 @@ int j;
 int k;
 int anyMoving;
 int ncomplete;
-int nextElement;
 int nextra;
 int dir;
-int    pollSocket;
-int    abortSocket;
-int    socket;
-int    positionSocket;
-int    xpsStatus;
-int    count;
+int pollSocket;
+int driveSocket;
+int abortSocket;
+int positionSocket;
+int xpsStatus;
+int count;
 double dtime;
-double minPeriod;
 double posActual;
 double posTheory;
 double expectedTime;
@@ -330,12 +109,7 @@ char userName[NAME_LEN];
 char password[NAME_LEN];
 int  xpsPort;
 
-%%char divisor[] = "1";	/* gather/pulse every # traj elements */
-%%char GPIOname[] = "GPIO4.DO";	/* DB15 Connector */
-%%char pulsemask[] = "63"; /* Defines which pins are pulsed, 63 in base 2 ->00011111 */
-%%char strNpulses[10];
-%%char strElementNumber[10];
-%%char nullchar[] = " ";
+/* Define PVs */
 
 /* All PVs which will be accessed in local C functions need to have their index
  * extracted with pvIndex() */
@@ -353,15 +127,15 @@ unsigned long startTime;
 %% static int getEpicsMotorMoving(SS_ID ssId, struct UserVar *pVar);
 %% static int waitEpicsMotors(SS_ID ssId, struct UserVar *pVar);
 
-%% static int getSocket(SS_ID ssId, struct UserVar *pVar);
-%% static int trajectoryExecute(SS_ID ssId, struct UserVar *pVar);
-%% static int buildAndVerify(SS_ID ssId, struct UserVar *pVar);
+%% static int getSocket(SS_ID ssId, struct UserVar *pVar, double timeout);
+%% static void trajectoryExecute(SS_ID ssId, struct UserVar *pVar);
+%% static void buildAndVerify(SS_ID ssId, struct UserVar *pVar);
 %% static int currentElement(SS_ID ssId, struct UserVar *pVar);
 %% static int getGroupStatus(SS_ID ssId, struct UserVar *pVar);
 %% static void readGathering(SS_ID ssId, struct UserVar *pVar);
 %% static int trajectoryAbort(SS_ID ssId, struct UserVar *pVar);
 
-
+
 ss xpsTrajectoryScan {
 
     /* Initialize things when first starting */
@@ -402,42 +176,14 @@ ss xpsTrajectoryScan {
                 }
             }
 
-	    /* setup a simple 10pt traj for test 
-	    for (i=2; i<=8; i++) {
-	    motorTrajectory[0][i] = 2;
-	    }
-	    motorTrajectory[1][0] = 0.1;
-	    motorTrajectory[1][1] = 0.2;
-	    motorTrajectory[1][2] = 0.5;
-	    motorTrajectory[1][3] = 1;
-	    motorTrajectory[1][4] = 1.8;
-	    motorTrajectory[1][5] = 3;
-	    motorTrajectory[1][6] = 2;
-	    motorTrajectory[1][7] = 1;
-	    motorTrajectory[1][8] = 0;
-	    
-	    motorTrajectory[2][1] = 0.5;
-	    motorTrajectory[2][2] = 1;
-	    motorTrajectory[2][3] = 0.5;
-	    motorTrajectory[2][4] = 0;
-	    motorTrajectory[2][5] = 0.5;
-	    motorTrajectory[2][6] = 1;
-	    motorTrajectory[2][7] = 0.5;
-	    motorTrajectory[2][8] = 0;*/
-	    
-	   
-	    /* Define the file name used within the XPS */
-	    strcpy (trajFileName,"TrajectoryScan.trj"); 
-	    
-	    /* Force numAxes to be <= MAX_AXES */
+            /* Force numAxes to be <= MAX_AXES */
             if (numAxes > MAX_AXES) numAxes = MAX_AXES;
             
-	    /* Ask XPS for a socket 1 to drive 1 to poll*/
-	    %%pVar->socket = getSocket(ssId, pVar);
-	    %%pVar->pollSocket = getSocket(ssId, pVar);
-	    %%pVar->abortSocket = getSocket(ssId, pVar);
-	    %%pVar->positionSocket = getSocket(ssId, pVar);
-	    
+            /* Get sockets for communicating with XPS */
+            %%pVar->pollSocket = getSocket(ssId, pVar, POLL_TIMEOUT);
+            %%pVar->driveSocket = getSocket(ssId, pVar, DRIVE_TIMEOUT);
+            %%pVar->abortSocket = getSocket(ssId, pVar, ABORT_TIMEOUT);
+        
             for (j=0; j<numAxes; j++) {
                 motorCurrentIndex[j]   =  pvIndex(motorCurrent[j]);
                 epicsMotorDoneIndex[j] =  pvIndex(epicsMotorDone[j]);
@@ -452,6 +198,7 @@ ss xpsTrajectoryScan {
         } state monitor_inputs
     }
 
+
     /* Monitor inputs which control what to do (Build, Execute, Read) */
     state monitor_inputs {
         entry {
@@ -463,17 +210,25 @@ ss xpsTrajectoryScan {
         when(efTestAndClear(buildMon) && (build==1)) {
         } state build
 
-        when(efTest(executeMon) && (execute==1) 
-				&& (buildStatus == STATUS_SUCCESS)){
+        when(efTestAndClear(executeMon) && (execute==1) 
+                && (buildStatus == STATUS_SUCCESS)){
         } state execute
 
         when(efTestAndClear(readbackMon) && (readback==1)
-				&& (execStatus == STATUS_SUCCESS)) {
+                && (execStatus == STATUS_SUCCESS)) {
         } state readback
+
+        when(efTestAndClear(nelementsMon) && (nelements>=1)) {
+            /* If nelements changes, then change endPulses to this value,
+             * since this is what the user normally wants.  endPulses can be
+             * changed again after changing nelements if this is desired. */
+            endPulses = nelements;
+            pvPut(endPulses);
+        } state monitor_inputs
 
     }
 
-
+
     /* Build and verify trajectory */
     state build {
         entry {
@@ -483,42 +238,34 @@ ss xpsTrajectoryScan {
             }
         }
         when() {
-	    /* Set busy flag while building */
+            /* Set busy flag while building */
             buildState = BUILD_STATE_BUSY;
             pvPut(buildState);
             buildStatus=STATUS_UNDEFINED;
             pvPut(buildStatus);
-            /* SPEC adds up the total time  */
             
-	    /* If total time mode, calc time per element and write,
-	       else use the array timeTraj as written by SPEC */
-	    if (timeMode == TIME_MODE_TOTAL) {
+            /* If total time mode, calc time per element and write,
+               else use the array timeTraj  */
+            if (timeMode == TIME_MODE_TOTAL) {
                 dtime = time/nelements;
-		for (i=0; i<nelements; i++) timeTrajectory[i] = dtime;
+                for (i=0; i<nelements; i++) timeTrajectory[i] = dtime;
                 pvPut(timeTrajectory);
-	    }
-	    
+            }
+        
             /* Compute expected time for trajectory & check element period */
             expectedTime=0;
-            minPeriod = 100000;
-	    for (i=0; i<nelements; i++) {
+            for (i=0; i<nelements; i++) {
                 expectedTime += timeTrajectory[i];
-		
-		if (minPeriod > timeTrajectory[i]) /* Used in build function */
-		    minPeriod = timeTrajectory[i];
-	    }
-	    
-	    time = expectedTime;
-	    pvPut(time);
-	    
-	    %%buildAndVerify(ssId, pVar);
-	     
-	    /* Export values to PVs */
-	    for (j=0; j<numAxes; j++) {       
-                    pvPut(motorMVA[j]);
-		    pvPut(motorMAA[j]);
-	    } 
-           /* Clear busy flag, post status */
+            }
+        
+            %%buildAndVerify(ssId, pVar);
+         
+            /* Export values to PVs */
+            for (j=0; j<numAxes; j++) {       
+                pvPut(motorMVA[j]);
+                pvPut(motorMAA[j]);
+            } 
+            /* Clear busy flag, post status */
             buildState = BUILD_STATE_DONE;
             pvPut(buildState);
             pvPut(buildStatus);
@@ -535,32 +282,37 @@ ss xpsTrajectoryScan {
         } state monitor_inputs
     }
 
-
+
     state execute {
         entry {
             if (debugLevel > 0) {
                 printf("XPS_trajectoryScan: ss xpsTrajectoryScan: state execute:"
                        " entry\n");
             }
-	    
-	    %%waitMotors(ssId, pVar);
-	    
+            %%waitMotors(ssId, pVar);
+        
             /* Get the initial positions of the motors */
             for (j=0; j<numAxes; j++) initialPos[j] = epicsMotorPos[j];
-            /* Move to start position if required */
+            /* Move to start position if required.
+             * Subtract distance of initial acceleration element */
             if (moveMode == MOVE_MODE_ABSOLUTE) {
                 for (j=0; j<numAxes; j++) {
-                    if (!moveAxis[j]) continue;
-                    epicsMotorPos[j] = motorTrajectory[j][0];
-                    pvPut(epicsMotorPos[j]);
+                    if (moveAxis[j]) {
+                        epicsMotorPos[j] = motorTrajectory[j][0] - preDistance[j];
+                        pvPut(epicsMotorPos[j]);
+                    }
                 }
-                %%waitEpicsMotors(ssId, pVar);
+            } else {
+                /* Backup by distance of initial acceleration element */
+                for (j=0; j<numAxes; j++) {
+                    if (moveAxis[j]) {
+                        epicsMotorPos[j] = epicsMotorPos[j] - preDistance[j];
+                        pvPut(epicsMotorPos[j]);
+                    }
+                }
             }
-	    
-	    %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
-	    /* Set busy flag */
-            execState = EXECUTE_STATE_MOVE_START;
-            pvPut(execState);
+            %%waitEpicsMotors(ssId, pVar);
+        
            /* Define pulse output for trajectory */
             if (npulses > 0) {
                 /* Check validity, modify values if necessary */
@@ -660,30 +412,10 @@ ss xpsTrajectoryScan {
             }
             readStatus=STATUS_UNDEFINED;
             pvPut(readStatus);
-	    /* Start the detector */
-	    detOn = 1;
-            pvPut(detOn);
-	    
-	    /* Get start time of execute */	    
-	    startTime = time(0);
-	    
-	    /* Add Event for 2nd element because the first element has started so it would
-	       not be added by the execState=EXEC code */
-	    %%pVar->status = EventAdd(pVar->pollSocket,\
-				     pVar->axisName[0],\
-			      "PVT.ElementNumberStart",\
-					  	   "2",\
-				 	     "DOPulse",\
-					      GPIOname,\
-					     pulsemask,\
-					      nullchar);
-	    if (status != 0) 
-                printf("Error EventAdd ElementNumberStart %i element 1\n",status);
-	    
         } state wait_execute
     }
 
-
+
     /* Wait for trajectory to complete */
     state wait_execute {
         entry {
@@ -706,7 +438,6 @@ ss xpsTrajectoryScan {
              * want to do this until execution is complete. */
             execute=0;
             pvPut(execute);
-	    efClear(executeMon);
         } state monitor_inputs
 
         when (delay(0.1) && execState==EXECUTE_STATE_EXECUTING) {
@@ -715,37 +446,23 @@ ss xpsTrajectoryScan {
             for (j=0; j<numAxes; j++) pvPut(motorCurrent[j]);
 
             %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
-	    
-	    nextElement = ncomplete + 1;            
-	    %%pVar->ncomplete = currentElement(ssId, pVar);
-	    
-	    /* Define the Pulse event once the previous one has been called */
-	    if(ncomplete == nextElement && xpsStatus == 45) { /* Just started next element */
-	    
-	        sprintf(strElementNumber,"%i",(ncomplete + 1));	/* Convert to a string */
-	    
-		%%pVar->status = EventAdd(pVar->pollSocket,\
-					 pVar->axisName[0],\
-				  "PVT.ElementNumberStart",\
-					  strElementNumber,\
-						 "DOPulse",\
-						  GPIOname,\
-						 pulsemask,\
-						  nullchar);
-	        if (status != 0) 
-                    printf("Error EventAdd ElementNumberStart %i element %i\n",status,i);
-		
-	    }
-            if(xpsStatus == 45)
-	        sprintf(execMessage, "Executing element %d/%d", 
-                                        ncomplete, nelements);
-            pvPut(execMessage);
-            %%pVar->xpsStatus = getGroupStatus(ssId, pVar); 
-            /* 12 = ready from move */
-	    if (xpsStatus == 12) {
+            if (xpsStatus == 45) {
+                %%pVar->ncomplete = currentElement(ssId, pVar);
+                sprintf(execMessage, "Executing element %d/%d", 
+                        ncomplete, nelements);
+                pvPut(execMessage);
+            }
+            else if (xpsStatus == 12) {
+                /* 12 = ready from move */
                 execState = EXECUTE_STATE_FLYBACK;
                 execStatus = STATUS_SUCCESS;
                 strcpy(execMessage, " ");
+            }
+            else if (xpsStatus < 10) {
+                /* The xps group status reflects an error. */
+                execState = EXECUTE_STATE_FLYBACK;
+                execStatus = STATUS_FAILURE;
+                sprintf(execMessage,"XPS Status Error=%d", xpsStatus);
             }
             /* See if the elapsed time is more than expected, time out */
             if (difftime(time(0), startTime) > (expectedTime+10)) {
@@ -753,16 +470,9 @@ ss xpsTrajectoryScan {
                 execStatus = STATUS_TIMEOUT;
                 strcpy(execMessage, "Timeout");
             }
-            /* see if the xps group status reflects an error. */
-	    /* 45 = performing a trajectory, <10 = notinitialised due to major error */
-	    if (xpsStatus < 10) {
-                execState = EXECUTE_STATE_FLYBACK;
-                execStatus = STATUS_FAILURE;
-                strcpy(execMessage,"XPS Status Error");
-            }
         } state wait_execute
 
-        when(execState==EXECUTE_STATE_FLYBACK) {
+        when (execState==EXECUTE_STATE_FLYBACK) {
             if (debugLevel > 0) {
                 printf("XPS_trajectoryScan: ss xpsTrajectoryScan: state wait_execute:"
                        " execStatus = EXECUTE_STATE_FLYBACK\n");
@@ -790,16 +500,16 @@ ss xpsTrajectoryScan {
                 %%waitEpicsMotors(ssId, pVar);
             }
             
-	    execState = EXECUTE_STATE_DONE;
+            execState = EXECUTE_STATE_DONE;
             pvPut(execState);
             /* Clear execute command, post.  This is a "busy" record, don't
              * want to do this until execution is complete. */
             execute=0;
-	    pvPut(execute);
-	    efClear(executeMon);
-           
+            pvPut(execute);
         } state monitor_inputs
     }
+
+
     /* Read back actual positions */
     state readback {
         entry {
@@ -819,7 +529,6 @@ ss xpsTrajectoryScan {
                 for (i=0; i<MAX_PULSES; i++) {
                     motorReadbacks[j][i] = 0.;
                     motorError[j][i] = 0.;
-		    
                 }
             }
             
@@ -828,11 +537,10 @@ ss xpsTrajectoryScan {
             /* readGathering has set the actual number of positions read back */
             pvPut(nactual);
  
-	    /* Post the readback and error arrays */
+            /* Post the readback and error arrays */
             for (j=0; j<numAxes; j++) {
                 pvPut(motorReadbacks[j]);
                 pvPut(motorError[j]);
-		pvPut(motorTrajectory[j]);
             }
             /* Clear busy flag */
             readState = READ_STATE_DONE;
@@ -851,13 +559,14 @@ ss xpsTrajectoryScan {
 }
 
 
+
 /* This state set simply monitors the abort input.  It is a separate state set
  * so that it is always active, no matter what the state of the trajectoryScan
- * state set. It also uses a separate socket. */
+ * state set. */
 ss xpsTrajectoryAbort {
     state monitorAbort {
-        when (efTestAndClear(abortMon) && (abort==1) &&
-					(execState==EXECUTE_STATE_EXECUTING)) {
+        when ((efTestAndClear(abortMon)) && (abort==1) &&
+              (execState==EXECUTE_STATE_EXECUTING)) {
 
             execStatus = STATUS_ABORT;
             if (debugLevel > 0) {
@@ -867,21 +576,20 @@ ss xpsTrajectoryAbort {
             pvPut(execStatus);
             strcpy(execMessage, "Motion aborted");
             pvPut(execMessage);
-	    
-	    %%trajectoryAbort(ssId, pVar);
-	    
+        
+            %%trajectoryAbort(ssId, pVar);
+        
             /* Clear abort command, post.  This is a "busy" record, don't
              * want to do this until abort command has been sent. */
             abort=0;
             pvPut(abort);
-	    efClear(abortMon);
         } state monitorAbort
     }
 }
-/* This state was required because the trajectory execute call did not return
+
+/* This state was required because the trajectory execute call does not return
  * until the end of the trajectory. So to poll during the scan we call the 
- * scan from a separate state set.  Now the driver has been converted to Asyn the
- * socket no longer hangs so this SS could be recombined. */
+ * scan from a separate state set. */
 ss xpsTrajectoryRun {
     state asyncExecute {
         when (efTestAndClear(execStateMon) && (execState == EXECUTE_STATE_MOVE_START)) {
@@ -909,17 +617,20 @@ ss xpsTrajectoryRun {
         } state asyncExecute
     }
 }
+
 /* This state set polls every second to keep the motor current position medm 
  * screen up to date when a scan is not running */
 ss xpsTrajectoryPosition {
     state positionUpdate {
-    	when (delay (1) && (execState == EXECUTE_STATE_DONE)){
-	%%getMotorPositions(ssId, pVar, pVar->motorCurrent);
-        for (j=0; j<numAxes; j++) pvPut(motorCurrent[j]);
-	} state positionUpdate
+        when (delay (1) && (execState == EXECUTE_STATE_DONE)) {
+            %%getMotorPositions(ssId, pVar, pVar->motorCurrent);
+            for (j=0; j<numAxes; j++) pvPut(motorCurrent[j]);
+        } state positionUpdate
     }
 }
 
+
+/*  C functions  */
 %{
 
 /* getMotorPositions returns the positions of each motor */
@@ -930,10 +641,11 @@ static int getMotorPositions(SS_ID ssId, struct UserVar *pVar, double *pos)
     /* Read the current positions of all the axes */
     
     status = GroupPositionCurrentGet(pVar->positionSocket,
-    			pVar->groupName,pVar->numAxes,pos);
+                                     pVar->groupName,pVar->numAxes,pos);
     if (status != 0)
-        	printf(" Error performing GroupPositionCurrentGet%i\n",status);
-    return(0);
+        printf("Error performing GroupPositionCurrentGet%i\n", status);
+  
+    return(status);
 }
 
 
@@ -948,8 +660,8 @@ static int getMotorMoving(SS_ID ssId, struct UserVar *pVar)
 
     status = GroupStatusGet(pVar->pollSocket,pVar->groupName,&groupStatus);
     if (status != 0)
-        printf(" Error performing GroupStatusGet %i\n",status);
-	
+        printf("Error performing GroupStatusGet %i\n",status);
+    
     if (groupStatus > 42)
         moving = 1;
 
@@ -1013,20 +725,21 @@ static int waitEpicsMotors(SS_ID ssId, struct UserVar *pVar)
     }
     return(0);
 }
+
 /* Function to ask the XPS for a socket this requires Socket.h */
-static int getSocket(SS_ID ssId, struct UserVar *pVar)
+static int getSocket(SS_ID ssId, struct UserVar *pVar, double timeout)
 {
     int sock = 0;
     
-	/* With the asyn driver we pass the asyn port name not the ip */
-	
-	sock = TCP_ConnectToServer(pVar->asynPort,0,SOCKET_TIMEOUT);
-	if (sock < 0) 
-            printf(" Error TCP_ConnectToServer %i\n",sock);
-	return (sock);
+    sock = TCP_ConnectToServer(pVar->xpsAddress, pVar->xpsPort, timeout);
+    if (sock < 0) 
+            printf("Error TCP_ConnectToServer, status=%d\n",sock);
+    return (sock);
 }
+
+
 /* Function to setup the gathering, events and start the trajectory */
-static int trajectoryExecute(SS_ID ssId, struct UserVar *pVar)
+static void trajectoryExecute(SS_ID ssId, struct UserVar *pVar)
 {
     int status;
     int j;
@@ -1173,8 +886,10 @@ static int trajectoryExecute(SS_ID ssId, struct UserVar *pVar)
     
     return;
 }
-/* Function to build install and verify trajectory */ 
-static int buildAndVerify(SS_ID ssId, struct UserVar *pVar)
+
+
+/* Function to build, install and verify trajectory */ 
+static void buildAndVerify(SS_ID ssId, struct UserVar *pVar)
 {
     FILE *trajFile;
     int i, j, status;
@@ -1372,18 +1087,20 @@ static int buildAndVerify(SS_ID ssId, struct UserVar *pVar)
     return; 
 }
 
+
 /* Function returns the current trajectory element*/ 
 static int currentElement(SS_ID ssId, struct UserVar *pVar)
 {
-	int status;
-	int number;
-	char fileName[100];
-	strcpy (fileName,pVar->trajFileName); 
-	
-	status = MultipleAxesPVTParametersGet(pVar->pollSocket,
-		pVar->groupName,fileName,&number);
-
-	return (number);
+    int status;
+    int number;
+    char fileName[100];
+    
+    status = MultipleAxesPVTParametersGet(pVar->pollSocket,
+                 pVar->groupName, fileName, &number);
+    if (status != 0)
+        printf("Error performing MultipleAxesPVTParametersGet, status=%d\n", 
+               status);
+    return (number);
 }
 
 static int getGroupStatus(SS_ID ssId, struct UserVar *pVar)
@@ -1395,18 +1112,17 @@ static int getGroupStatus(SS_ID ssId, struct UserVar *pVar)
 
     status = GroupStatusGet(pVar->pollSocket,pVar->groupName,&groupStatus);
     if (status != 0)
-        printf(" Error performing GroupStatusGet %i\n",status);
+        printf("Error performing GroupStatusGet, status=%d\n", status);
     return(groupStatus);
 }
 
+
 /* Function to load the GatheringExternal.dat file which was written
  * by the XPS after the trajectory was performed and read back the
  * actual motor positions and calculate the position errors */ 
 static void readGathering(SS_ID ssId, struct UserVar *pVar)
 {
-    char vxWorksString[100];
-    char buffer[100];
-    FILE *trajFile;
+    char buffer[MAX_GATHERING_STRING];
     FILE *gatheringFile;
     int i,j;
     int nitems;
@@ -1443,10 +1159,9 @@ static void readGathering(SS_ID ssId, struct UserVar *pVar)
     gatheringFile = fopen(GATHERING_FILE, "r");
     
     /* Read 1st 2 lines which only contain the axis names */
-    for(i=0; i<2; ++i){
-        fgets (buffer, 1000, gatheringFile);
-	    /*printf("Line %i of GatheringEx = %s\n",i,buffer);*/
-	}
+    for (i=0; i<2; i++) {
+        fgets (buffer, MAX_GATHERING_STRING, gatheringFile);
+    }
     /* The next line is the motor positions at the start of the trajectory element
      * where pulses began to be output.  Skip this line because this pulse just
      * started the MCS counting, there are no data yet. */
@@ -1478,34 +1193,19 @@ static void readGathering(SS_ID ssId, struct UserVar *pVar)
     fclose (gatheringFile);
     pVar->nactual = i; 
 
-    return (0);
+    return;
 }
+
 /* Function aborts the trajectory/motion */ 
 static int trajectoryAbort(SS_ID ssId, struct UserVar *pVar)
 {
-	int status;
-	
-	status = GroupMoveAbort(pVar->abortSocket,pVar->groupName);
-	if (status != 0)
-           printf(" Error performing GroupMoveAbort %i\n",status);
-	   
-	return (0);
+    int status;
+    
+    status = GroupMoveAbort(pVar->abortSocket,pVar->groupName);
+    if (status != 0)
+        printf("Error performing GroupMoveAbort, status=%d\n", status);
+       
+    return (0);
 }
 
-
 }%
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

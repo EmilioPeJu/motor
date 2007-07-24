@@ -960,7 +960,9 @@ static void XPSRegister(void)
     iocshRegister(&configXPS,     configXPSCallFunc);
     iocshRegister(&configXPSAxis, configXPSAxisCallFunc);
     iocshRegister(&TCLRun,        TCLRunCallFunc);
+#ifdef vxWorks
     iocshRegister(&XPSC8GatheringTest, XPSC8GatheringTestCallFunc);
+#endif
 }
 
 epicsExportRegistrar(XPSRegister);

@@ -70,6 +70,51 @@
   <H1><B><U>Motor Record Version 6.1 Release Notice</U></B></H1>
 </CENTER>
 
+<BR>
+<B><U>Requirements</U></B><BR>
+<BR>
+EPICS base R3.14.8.2 or greater.&nbsp; See the "Required Modules" section of the 
+Motor Record web page for details.<BR>
+
+
+<center>
+  <h4><u>Modifications to Existing Features</u></h4>
+</CENTER>
+
+<DIV align="left">
+  <P>
+  <U><B>PI C-862 communiation errors</B></U>
+  </P>
+  <P>
+  A 17ms "status update delay" was added to the driver to prevent the controller 
+  from dropping communication characters.  This problem resulted in erroneous 
+  error responses from the controller.
+  </P>
+  <P>
+  <U><B>motorStatus[xx].adl displays</B></U>
+  </P>
+  <P>
+  All motorStatus[xx].adl displays were modified to show motor position with text 
+  rather than with bar graphs.
+  </P>
+</DIV>
+
+
+<CENTER>
+  <H4><U>New Features</U></H4>
+</CENTER>
+
+<DIV align="left">
+  <P>
+  <U><B>Physik Instrumente GmbH & Co. Model E-710</B></U>
+  </P>
+  <P>
+  Joe Sullivan added support for the Physik Instrumente (PI) GmbH & Co. Model E-710 
+  motor controller.
+  </P>
+</DIV>
+
+
 <CENTER>
   <H1><B><U>Motor Record Version 6.0 Release Notice</U></B></H1>
 </CENTER>
@@ -90,7 +135,7 @@ Motor Record web page for details.<BR>
   <U><B>OMS MAXv Polling Rate</B></U>
   </P>
   <P>
-  The OMS MAXv polling rate, which set is from the MAXvSetup() st.cmd command, is 
+  The OMS MAXv polling rate, which is set from the MAXvSetup() st.cmd command, is 
   allowed to be as high as the OS clock rate; i.e., (1/epicsThreadSleepQuantum()).
   </P>
   <P>
@@ -98,7 +143,7 @@ Motor Record web page for details.<BR>
   </P>
   <P>
   The New Focus Model 8750 Network Controller device support ("PMNC8750") has been 
-  changed "PMNC87xx".  It now supports both the 8750 and 8752 models.
+  changed to "PMNC87xx".  It now supports both the 8750 and 8752 models.
   </P>
 </DIV>
 
