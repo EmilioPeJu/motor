@@ -25,7 +25,10 @@ DIRS += NewportSrc
 #DIRS += MicosSrc
 #DIRS += FaulhaberSrc
 #DIRS += PC6KSrc
-#DIRS += NewFocusSrc
+DIRS += NewFocusSrc
+#DIRS += AcsTech80Src
+#DIRS += OrielSrc
+#DIRS += ThorLabsSrc
 endif
 
 # Install the edl files

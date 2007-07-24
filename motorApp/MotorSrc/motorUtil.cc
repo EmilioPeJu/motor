@@ -2,9 +2,9 @@
 FILENAME...     motorUtil.cc
 USAGE...        Motor Record Utility Support.
 
-Version:        $Revision: 1.1 $
-Modified By:    $Author: sluiter $
-Last Modified:  $Date: 2006/02/23 19:51:50 $
+Version:        $Revision: 1.2 $
+Modified By:    $Author: peterd $
+Last Modified:  $Date: 2007/02/02 13:58:58 $
 */
 
 

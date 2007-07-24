@@ -19,9 +19,9 @@
  *     of this distribution.
  *     ************************************************************************
  *
- * Version: $Revision: 1.13 $
- * Modified by: $Author: rivers $
- * Last Modified: $Date: 2006/09/06 15:44:35 $
+ * Version: $Revision: 1.14 $
+ * Modified by: $Author: peterd $
+ * Last Modified: $Date: 2007/02/02 16:21:05 $
  *
  * Original Author: Peter Denison
  * Current Author: Peter Denison

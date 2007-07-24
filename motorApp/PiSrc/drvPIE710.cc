@@ -1,26 +1,47 @@
 /*
-FILENAME...	drvPIC862.cc
+FILENAME...	drvPIE710.cc
 USAGE...	Motor record driver level support for Physik Instrumente (PI)
-	GmbH & Co. C-862 motor controller.
+	        GmbH & Co. E-710 motor controller.
+
+Version:	$Revision: 1.1 $
+Modified By:	$Author: sullivan $
+Last Modified:	$Date: 2006/10/06 18:18:22 $
 */
+
 /*
  *      Original Author: Ron Sluiter
- *      Current Author: Mohan Ramanathan
- *      Date: 09/04/2006
+ *      Date: 10/18/05
+ *      Current Author: Joe Sullivan
+ *
+ *      Experimental Physics and Industrial Control System (EPICS)
+ *
+ *      Copyright 1991, the Regents of the University of California,
+ *      and the University of Chicago Board of Governors.
+ *
+ *      This software was produced under  U.S. Government contracts:
+ *      (W-7405-ENG-36) at the Los Alamos National Laboratory,
+ *      and (W-31-109-ENG-38) at Argonne National Laboratory.
+ *
+ *      Initial development by:
+ *	      The Controls and Automation Group (AT-8)
+ *	      Ground Test Accelerator
+ *	      Accelerator Technology Division
+ *	      Los Alamos National Laboratory
+ *
+ *      Co-developed with
+ *	      The Controls and Computing Group
+ *	      Accelerator Systems Division
+ *	      Advanced Photon Source
+ *	      Argonne National Laboratory
  *
  * Modification Log:
  * -----------------
- * .00  09/05/2006  mr  copied from drvPIC848.cc
- * .01  09/25/2006 rls  Set LS error indicator based on LS active high/low
- *                      configuration indicator and the state of the LS.
- * .02  09/28/2006 rls  C-862 drops transmitted characters on move command;
- *                      need "status update delay".
+ * .01 09/13/06 jps - copied from drvPIC848.cc
  */
-
 
 /*
 DESIGN LIMITATIONS...
-    1 - Like all controllers, the PIC862 must be powered-on when EPICS is first
+    1 - Like all controllers, the PIE710 must be powered-on when EPICS is first
     booted up.
 */
 
@@ -29,30 +50,31 @@ DESIGN LIMITATIONS...
 #include <drvSup.h>
 #include "motorRecord.h"
 #include "motor.h"
-#include "drvPIC862.h"
+#include "drvPIE710.h"
 #include "epicsExport.h"
 
-#define GET_IDENT 0x01
+#define GET_IDENT "GI"
 
-#define PIC862_NUM_CARDS	8
-#define MAX_AXES		1
-#define BUFF_SIZE 100		/* Maximum length of string to/from PIC862 */
+#define PIE710_NUM_CARDS	8
+#define MAX_AXES		6
+#define BUFF_SIZE 100		/* Maximum length of string to/from PIE710 */
 
 /*----------------debugging-----------------*/
 #ifdef __GNUG__
     #ifdef	DEBUG
-	#define Debug(l, f, args...) { if(l<=drvPIC862debug) printf(f,## args); }
+	#define Debug(l, f, args...) { if(l<=drvPIE710debug) printf(f,## args); }
     #else
 	#define Debug(l, f, args...)
     #endif
 #else
     #define Debug()
 #endif
-volatile int drvPIC862debug = 0;
-extern "C" {epicsExportAddress(int, drvPIC862debug);}
+volatile int drvPIE710debug = 0;
+extern "C" {epicsExportAddress(int, drvPIE710debug);}
 
 /* --- Local data. --- */
-int PIC862_num_cards = 0;
+int PIE710_num_cards = 0;
+static char *PIE710_axis[] = {"1", "2", "3", "4", "5", "6"};
 
 /* Local data required for every driver; see "motordrvComCode.h" */
 #include	"motordrvComCode.h"
@@ -69,7 +91,7 @@ static void query_done(int, int, struct mess_node *);
 
 /*----------------functions-----------------*/
 
-struct driver_table PIC862_access =
+struct driver_table PIE710_access =
 {
     motor_init,
     motor_send,
@@ -90,7 +112,7 @@ struct driver_table PIC862_access =
     query_done,
     NULL,
     &initialized,
-    NULL
+    PIE710_axis
 };
 
 struct
@@ -98,11 +120,11 @@ struct
     long number;
     long (*report) (int);
     long (*init) (void);
-} drvPIC862 = {2, report, init};
+} drvPIE710 = {2, report, init};
 
-extern "C" {epicsExportAddress(drvet, drvPIC862);}
+extern "C" {epicsExportAddress(drvet, drvPIE710);}
 
-static struct thread_args targs = {SCAN_RATE, &PIC862_access, 0.017};
+static struct thread_args targs = {SCAN_RATE, &PIE710_access, 0.0};
 
 /*********************************************************
  * Print out driver status report
@@ -111,22 +133,22 @@ static long report(int level)
 {
     int card;
 
-    if (PIC862_num_cards <=0)
-	printf("    No PIC862 controllers configured.\n");
+    if (PIE710_num_cards <=0)
+	printf("    No PIE710 controllers configured.\n");
     else
     {
-	for (card = 0; card < PIC862_num_cards; card++)
+	for (card = 0; card < PIE710_num_cards; card++)
 	{
 	    struct controller *brdptr = motor_state[card];
 
 	    if (brdptr == NULL)
-		printf("    PIC862 controller %d connection failed.\n", card);
+		printf("    PIE710 controller %d connection failed.\n", card);
 	    else
 	    {
-		struct PIC862controller *cntrl;
+		struct PIE710controller *cntrl;
 
-		cntrl = (struct PIC862controller *) brdptr->DevicePrivate;
-		printf("    PIC862 controller #%d, port=%s, id: %s \n", card,
+		cntrl = (struct PIE710controller *) brdptr->DevicePrivate;
+		printf("    PIE710 controller #%d, port=%s, id: %s \n", card,
 		       cntrl->asyn_port, brdptr->ident);
 	    }
 	}
@@ -144,9 +166,9 @@ static long init()
      * support
      */
     /* Check for setup */
-    if (PIC862_num_cards <= 0)
+    if (PIE710_num_cards <= 0)
     {
-	Debug(1, "init(): PIC862 driver disabled. PIC862Setup() missing from startup script.\n");
+	Debug(1, "init(): PIE710 driver disabled. PIE710Setup() missing from startup script.\n");
     }
     return((long) 0);
 }
@@ -188,25 +210,21 @@ static void query_done(int card, int axis, struct mess_node *nodeptr)
 
 static int set_status(int card, int signal)
 {
-    struct PIC862controller *cntrl;
+    struct PIE710controller *cntrl;
     struct mess_node *nodeptr;
     struct mess_info *motor_info;
     struct motorRecord *mr;
     /* Message parsing variables */
     char buff[BUFF_SIZE];
-    C862_Status_Reg1 mstat1;
-    C862_Status_Reg2 mstat2;
-    C862_Status_Reg3 mstat3;
-    C862_Status_Reg4 mstat4;
-    C862_Status_Reg5 mstat5;
-    epicsUInt16 dev_sts1, dev_sts2, dev_sts3, dev_sts4, dev_sts5, dev_sts6;
-    
-    int rtn_state, convert_cnt, charcnt;
+    char rtnBuff[BUFF_SIZE];
+    E710_Status_Reg mstat;
+    int rtn_state;
+    unsigned int convert_cnt, charcnt, statusInt;
     epicsInt32 motorData;
-    bool plusdir, ls_active = false, plusLS, minusLS, LSactiveH;
+    bool plusdir, ls_active, plusLS, minusLS;
     msta_field status;
 
-    cntrl = (struct PIC862controller *) motor_state[card]->DevicePrivate;
+    cntrl = (struct PIE710controller *) motor_state[card]->DevicePrivate;
     motor_info = &(motor_state[card]->motor_info[signal]);
     nodeptr = motor_info->motor_motion;
     if (nodeptr != NULL)
@@ -218,13 +236,14 @@ static int set_status(int card, int signal)
     if (cntrl->status != NORMAL)
 	charcnt = recv_mess(card, buff, FLUSH);
 
-    send_mess(card, "TS", (char) NULL);		/*  Tell Status */
+    send_mess(card, "#GI8", PIE710_axis[signal]);
     charcnt = recv_mess(card, buff, 1);
-    if (charcnt > 18)
-	convert_cnt = sscanf(buff, "S:%2hx %2hx %2hx %2hx %2hx %2hx\n", 
-		            &dev_sts1,&dev_sts2,&dev_sts3,&dev_sts4,&dev_sts5,&dev_sts6);
+    if (charcnt > 2)
+      convert_cnt = sscanf(buff, "%s %s %d\n", rtnBuff, rtnBuff, &statusInt);
+    else
+      convert_cnt = 0;
 
-    if (charcnt > 18 && convert_cnt == 6)
+    if (charcnt > 2 && convert_cnt == 3)
     {
 	cntrl->status = NORMAL;
 	status.Bits.CNTRL_COMM_ERR = 0;
@@ -247,37 +266,34 @@ static int set_status(int card, int signal)
 	}
     }
 
-    mstat1.All = dev_sts1;
-    mstat2.All = dev_sts2;
-    mstat3.All = dev_sts3;
-    mstat4.All = dev_sts4;
-    mstat5.All = dev_sts5;
-   
-    status.Bits.RA_DONE = (mstat1.Bits.trty_done) ? 1 : 0;
-    status.Bits.EA_POSITION = (mstat1.Bits.motor_off) ? 0 : 1;
-    status.Bits.RA_DIRECTION = (mstat3.Bits.mvdir_pol) ? 1 : 0;
 
-    /* Set +/- LS indicator based on limit switch active high/low
-       configuration and the state of the limits switch. */
-
-    LSactiveH = (mstat4.Bits.lmt_high) ? true : false;
-    if (LSactiveH == true)
-    {
-        plusLS  = mstat5.Bits.plus_ls;
-        minusLS = mstat5.Bits.minus_ls;
-    }
+    /* Check for 1 byte status of earlier E710 revisions 
+     *  and shift into high byte */
+    if (cntrl->statusShift)
+      mstat.All = statusInt * (2^8);
     else
-    {
-        plusLS  = !mstat5.Bits.plus_ls;
-        minusLS = !mstat5.Bits.minus_ls;
-    }
+      mstat.All = statusInt;
 
+    /* Always DONE if torque disabled */
+    status.Bits.RA_DONE = (mstat.Bits.moving && !mstat.Bits.torque) ? 0 : 1;
+    status.Bits.RA_HOME = status.Bits.RA_DONE;
 
-   /* Parse motor position */
-    send_mess(card, "TP", (char) NULL);  /*  Tell Position */
+    status.Bits.EA_POSITION = (mstat.Bits.torque) ? 0 : 1;  /* Torgue disabled flag */
+
+    ls_active = plusLS = minusLS = false;
+
+    /* LS status may be true but servo is not within position error - keep updating */
+    if (status.Bits.RA_DONE)
+      {
+	plusLS  = mstat.Bits.plus_ls ? true : false;
+	minusLS = mstat.Bits.minus_ls ? true : false;
+      }
+
+    send_mess(card, "#TP", PIE710_axis[signal]);
     recv_mess(card, buff, 1);
-    motorData = NINT(atof(&buff[2]));
-     
+
+    motorData = NINT(atof(buff) / cntrl->drive_resolution[signal]);
+
     if (motorData == motor_info->position)
     {
 	if (nodeptr != 0)   /* Increment counter only if motor is moving. */
@@ -285,6 +301,8 @@ static int set_status(int card, int signal)
     }
     else
     {
+
+	status.Bits.RA_DIRECTION = (motorData >= motor_info->position) ? 1 : 0;
 	motor_info->position =  motor_info->encoder_position = motorData;
 	motor_info->no_motion_count = 0;
     }
@@ -317,6 +335,11 @@ static int set_status(int card, int signal)
 
     status.Bits.RA_PROBLEM  = 0;
 
+    /* Parse motor velocity? */
+    /* NEEDS WORK */
+
+    motor_info->velocity = 0;
+
     if (!status.Bits.RA_DIRECTION)
 	motor_info->velocity *= -1;
 
@@ -339,13 +362,13 @@ exit:
 
 
 /*****************************************************/
-/* send a message to the PIC862 board		     */
+/* send a message to the PIE710 board		     */
 /* send_mess()			                     */
 /*****************************************************/
 static RTN_STATUS send_mess(int card, char const *com, char *name)
 {
     char local_buff[MAX_MSG_SIZE];
-    struct PIC862controller *cntrl;
+    struct PIE710controller *cntrl;
     int comsize, namesize;
     size_t nwrite;
 
@@ -354,7 +377,7 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 
     if ((comsize + namesize) > MAX_MSG_SIZE)
     {
-	errlogMessage("drvPIC862.cc:send_mess(); message size violation.\n");
+	errlogMessage("drvPIE710.cc:send_mess(); message size violation.\n");
 	return(ERROR);
     }
     else if (comsize == 0)  /* Normal exit on empty input message. */
@@ -362,18 +385,23 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 
     if (!motor_state[card])
     {
-	errlogPrintf("drvPIC862.cc:send_mess() - invalid card #%d\n", card);
+	errlogPrintf("drvPIE710.cc:send_mess() - invalid card #%d\n", card);
 	return(ERROR);
     }
 
     local_buff[0] = (char) NULL;    /* Terminate local buffer. */
 
-    /*  this device deos not have axis info and so name is ignored!  */
+    if (name == NULL)
+	strcat(local_buff, com);    /* Make a local copy of the string. */
+    else
+    {
+	strcpy(local_buff, com);
+	local_buff[0] = *name;	/* put in axis. */
+    }
 
-    strcat(local_buff, com);    /* Make a local copy of the string. */
     Debug(2, "send_mess(): message = %s\n", local_buff);
 
-    cntrl = (struct PIC862controller *) motor_state[card]->DevicePrivate;
+    cntrl = (struct PIE710controller *) motor_state[card]->DevicePrivate;
     pasynOctetSyncIO->write(cntrl->pasynUser, local_buff, strlen(local_buff),
 			    COMM_TIMEOUT, &nwrite);
 
@@ -382,12 +410,12 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
 
 
 /*****************************************************/
-/* receive a message from the PIC862 board           */
+/* receive a message from the PIE710 board           */
 /* recv_mess()			                     */
 /*****************************************************/
 static int recv_mess(int card, char *com, int flag)
 {
-    struct PIC862controller *cntrl;
+    struct PIE710controller *cntrl;
     size_t nread = 0;
     asynStatus status = asynError;
     int eomReason;
@@ -396,7 +424,7 @@ static int recv_mess(int card, char *com, int flag)
     if (!motor_state[card])
 	return(ERROR);
 
-    cntrl = (struct PIC862controller *) motor_state[card]->DevicePrivate;
+    cntrl = (struct PIE710controller *) motor_state[card]->DevicePrivate;
 
     if (flag == FLUSH)
 	pasynOctetSyncIO->flush(cntrl->pasynUser);
@@ -409,8 +437,6 @@ static int recv_mess(int card, char *com, int flag)
 	com[0] = '\0';
 	nread = 0;
     }
-    else
-        com[nread - 1] = '\0'; /* Strip traling CR. */
 
     Debug(2, "recv_mess(): message = \"%s\"\n", com);
     return(nread);
@@ -419,18 +445,18 @@ static int recv_mess(int card, char *com, int flag)
 
 /*****************************************************/
 /* Setup system configuration                        */
-/* PIC862Setup()                                     */
+/* PIE710Setup()                                     */
 /*****************************************************/
 RTN_STATUS
-PIC862Setup(int num_cards,  /* maximum number of controllers in system.  */
+PIE710Setup(int num_cards,  /* maximum number of controllers in system.  */
 	    int scan_rate)  /* polling rate - 1/60 sec units.  */
 {
     int itera;
 
-    if (num_cards < 1 || num_cards > PIC862_NUM_CARDS)
-	PIC862_num_cards = PIC862_NUM_CARDS;
+    if (num_cards < 1 || num_cards > PIE710_NUM_CARDS)
+	PIE710_num_cards = PIE710_NUM_CARDS;
     else
-	PIC862_num_cards = num_cards;
+	PIE710_num_cards = num_cards;
 
     /* Set motor polling task rate */
     if (scan_rate >= 1 && scan_rate <= 60)
@@ -440,14 +466,14 @@ PIC862Setup(int num_cards,  /* maximum number of controllers in system.  */
 
     /* 
      * Allocate space for motor_state structures.  Note this must be done
-     * before PIC862Config is called, so it cannot be done in motor_init()
+     * before PIE710Config is called, so it cannot be done in motor_init()
      * This means that we must allocate space for a card without knowing
      * if it really exists, which is not a serious problem
      */
-    motor_state = (struct controller **) malloc(PIC862_num_cards *
+    motor_state = (struct controller **) malloc(PIE710_num_cards *
 						sizeof(struct controller *));
 
-    for (itera = 0; itera < PIC862_num_cards; itera++)
+    for (itera = 0; itera < PIE710_num_cards; itera++)
 	motor_state[itera] = (struct controller *) NULL;
 
     return(OK);
@@ -456,21 +482,21 @@ PIC862Setup(int num_cards,  /* maximum number of controllers in system.  */
 
 /*****************************************************/
 /* Configure a controller                            */
-/* PIC862Config()                                    */
+/* PIE710Config()                                    */
 /*****************************************************/
 RTN_STATUS
-PIC862Config(int card,	     /* card being configured */
+PIE710Config(int card,	     /* card being configured */
 	     const char *name,	 /* asyn port name */
-	     int addr)		 /* asyn address ( device address for daisy chaining */
+	     int addr)		 /* asyn address (GPIB) */
 {
-    struct PIC862controller *cntrl;
+    struct PIE710controller *cntrl;
 
-    if (card < 0 || card >= PIC862_num_cards)
+    if (card < 0 || card >= PIE710_num_cards)
 	return(ERROR);
 
     motor_state[card] = (struct controller *) malloc(sizeof(struct controller));
-    motor_state[card]->DevicePrivate = malloc(sizeof(struct PIC862controller));
-    cntrl = (struct PIC862controller *) motor_state[card]->DevicePrivate;
+    motor_state[card]->DevicePrivate = malloc(sizeof(struct PIE710controller));
+    cntrl = (struct PIE710controller *) motor_state[card]->DevicePrivate;
 
     strcpy(cntrl->asyn_port, name);
     cntrl->asyn_address = addr;
@@ -487,21 +513,23 @@ PIC862Config(int card,	     /* card being configured */
 static int motor_init()
 {
     struct controller *brdptr;
-    struct PIC862controller *cntrl;
+    struct PIE710controller *cntrl;
     int card_index, motor_index;
-    char buff[BUFF_SIZE];
+    char buff[2][BUFF_SIZE], *pbuff;
+    int total_axis;
     int status;
+    int version; 
     asynStatus success_rtn;
-    static const char output_terminator[] = "\r";
-    static const char  input_terminator[] = "\n\03";
+    static const char output_terminator[] = "\n";
+    static const char  input_terminator[] = "\n";
 
     initialized = true;	/* Indicate that driver is initialized. */
 
     /* Check for setup */
-    if (PIC862_num_cards <= 0)
+    if (PIE710_num_cards <= 0)
 	return(ERROR);
 
-    for (card_index = 0; card_index < PIC862_num_cards; card_index++)
+    for (card_index = 0; card_index < PIE710_num_cards; card_index++)
     {
 	if (!motor_state[card_index])
 	    continue;
@@ -510,12 +538,13 @@ static int motor_init()
 	brdptr->ident[0] = (char) NULL;	/* No controller identification message. */
 	brdptr->cmnd_response = false;
 	total_cards = card_index + 1;
-	cntrl = (struct PIC862controller *) brdptr->DevicePrivate;
+	cntrl = (struct PIE710controller *) brdptr->DevicePrivate;
+
+        status = version = 0;
 
 	/* Initialize communications channel */
 	success_rtn = pasynOctetSyncIO->connect(cntrl->asyn_port, 0,
 						&cntrl->pasynUser, NULL);
-
 	if (success_rtn == asynSuccess)
 	{
 	    int retry = 0;
@@ -528,34 +557,49 @@ static int motor_init()
 	    /* Send a message to the board, see if it exists */
 	    /* flush any junk at input port - should not be any data available */
 	    pasynOctetSyncIO->flush(cntrl->pasynUser);
-	    
-	    /*  To start communicating with the device requires to enable the device
-	    	To do this send "0x01" and a singel letter address (0-F)
-	    	To make sure we talk ask the status with "TB" command  for the address
-	    	It replies "B:000x"  where x is 0-F
-	        The command "VE" provides a complete Identification string if we need.
-	    */
-            
 
 	    do
 	    {
-                sprintf(buff,"\001%1XVE", cntrl->asyn_address);
-                send_mess(card_index, buff, (char) NULL);
-		status = recv_mess(card_index, buff, 1);
+		send_mess(card_index, GET_IDENT, (char) NULL);
+		status = recv_mess(card_index, buff[0], 1);
+
+		/* Parse out E710 revision (3 decimal places) and convert to int */
+		if ((pbuff = strchr(buff[0], 'V')))
+		  version = NINT(atof(pbuff+1) * 1000);
+		else
+		  version = 0;
+
+		/* Get second return string */
+		status = recv_mess(card_index, buff[1], 1);
 		retry++;
-	    } while (status == 0 && retry < 3);
+	    } while (status == 0 && !version && retry < 3);
 	}
 
 	if (success_rtn == asynSuccess && status > 0)
 	{
-	    strcpy(brdptr->ident, &buff[0]);
+	    strcpy(brdptr->ident, buff[0]);
 	    brdptr->localaddr = (char *) NULL;
 	    brdptr->motor_in_motion = 0;
 
-            /* number of axes is always one.*/
-	    brdptr->total_axis = 1;
-	    motor_index = 0;
+	    /* Check for E710 versions that need the status word shifted up 8 bits */
+	    if ((version >= 5000 || version == 4019 || version == 4020) &&
+		version != 5018)
+	      cntrl->statusShift = false;
+	    else
+	      cntrl->statusShift = true;
 
+            /* Determine # of axes. Request stage name.  See if it responds */
+	    for (total_axis = 0; total_axis < MAX_AXES; total_axis++)
+	    {
+		send_mess(card_index, "#TP", PIE710_axis[total_axis]);
+		status = recv_mess(card_index, buff[0], 1);
+		if (!status)
+		    break;
+	    }
+	    brdptr->total_axis = total_axis;
+
+	    for (motor_index = 0; motor_index < total_axis; motor_index++)
+	    {
 		struct mess_info *motor_info = &brdptr->motor_info[motor_index];
 
 		motor_info->status.All = 0;
@@ -563,14 +607,16 @@ static int motor_init()
 		motor_info->encoder_position = 0;
 		motor_info->position = 0;
 		brdptr->motor_info[motor_index].motor_motion = NULL;
-		/* PIC862 has DC motor support only */
+		/* PIE710 has DC motor support only */
 		motor_info->encoder_present = YES;
 		motor_info->status.Bits.EA_PRESENT = 1;
 		motor_info->pid_present = YES;
 		motor_info->status.Bits.GAIN_SUPPORT = 1;
 
+		cntrl->drive_resolution[motor_index] = POS_RES;
 
 		set_status(card_index, motor_index);  /* Read status of each motor */
+	    }
 	}
 	else
 	    motor_state[card_index] = (struct controller *) NULL;
@@ -584,7 +630,7 @@ static int motor_init()
     free_list.head = (struct mess_node *) NULL;
     free_list.tail = (struct mess_node *) NULL;
 
-    epicsThreadCreate((char *) "PIC862_motor", epicsThreadPriorityMedium,
+    epicsThreadCreate((char *) "PIE710_motor", epicsThreadPriorityMedium,
 		      epicsThreadGetStackSize(epicsThreadStackMedium),
 		      (EPICSTHREADFUNC) motor_task, (void *) &targs);
 
