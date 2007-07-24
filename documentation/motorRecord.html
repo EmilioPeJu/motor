@@ -37,9 +37,9 @@
 </ul>
 <a name="Overview"></a>
 
-<h2>Overview</h2> This documentation describes version 6.0 of the EPICS motor
+<h2>Overview</h2> This documentation describes version R6-2 of the EPICS motor
 record, and related EPICS software required to build and use it.&nbsp; Version
-6.0 of the motor record is compatible with EPICS base R3.14.8.2 and above.
+R6-2 of the motor record is compatible with EPICS base R3.14.9 and above.
 <p>
 The motor record is intended to support motors of all kinds, but currently 
 supports only the following variety of motor controllers (in addition to Soft 
@@ -90,6 +90,9 @@ Channel support):
   </li>
   <li>
     Spectra-Physics, Encoder Mike Controller, Model 18011.
+  </li>
+  <li>
+    Thorlabs, Piezo Controller, Model MDT695.
   </li>
 </ul>
 The record maintains two coordinate systems for motor position ("user" and "dial 
@@ -1545,7 +1548,7 @@ below.
   </tr>
   <tr>
     <td colspan="5">VELO is the speed, in engineering units per second, at which the 
-    motor is move after the acceleration phase of a motion is finished. S is the 
+    motor is moved after the acceleration phase of a motion is finished. S is the 
     same speed expressed in revolutions per second. The record makes sure that VELO 
     and S are consistent, using the equation S = VELO/UREV.</td>
   </tr>
@@ -1776,7 +1779,7 @@ below.
     <td>Desired Output Loc</td>
     <td>INLINK</td>
     <td>If this field contains a valid EPICS link, and the OMSL field has the  value 
-      "closed_loop" (1), then every time the the motor record is processed, it will 
+      "closed_loop" (1), then every time the motor record is processed, it will 
       get a value for the VAL field from the link and move to that location, ignoring 
       all other drive fields. Closed-loop mode has not been tested extensively.&nbsp;</td>
   </tr>
@@ -1787,7 +1790,7 @@ below.
     <td>GBLCHOICE</td>
     <td>(0:"supervisory", 1:"closed_loop")&nbsp; <br>
       If this field has the value "closed_loop" (1), and the field DOL contains a 
-      valid EPICS link, then every time the the motor record is processed, it will get 
+      valid EPICS link, then every time the motor record is processed, it will get 
       a value for the VAL field from the link and move to that location, ignoring all 
       other drive fields. Closed-loop mode has not been tested extensively.&nbsp;</td>
   </tr>
@@ -2822,7 +2825,7 @@ below.
 	</li>
 	<li>
 	  When drive-power status monitoring is enabled and a power failure is detected, 
-	  the device driver will respond by activating the the RA_OVERTRAVEL bit in the 
+	  the device driver will respond by activating the RA_OVERTRAVEL bit in the 
 	  MSTA.&nbsp; This results in either HLS or LLS being activated depending on the 
 	  DIR field. In addition, the following message will appear in the error log; "Drive 
 	  power failure at VME58 card#?? motor#??".

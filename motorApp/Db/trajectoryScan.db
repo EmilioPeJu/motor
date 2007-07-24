@@ -17,7 +17,6 @@
 #   $(DONV)     - Value to write to PV to turn detector on
 #   $(DOFFPV)   - Name of PV to turn detector off
 #   $(DOFFV)    - Value to write to PV to turn detector off
-#   $(PORT)     - asyn port name for the serial port
 #
 #  Modifications:
 #  5-Jun-2002    Mark Rivers  Increased TMOT field of StringOutIn record from 5000 to
@@ -717,4 +716,8 @@ grecord(ao,"$(P)$(R)DetOff") {
     field(DESC,"Turn detector off")
     field(VAL,"$(DOFFV)")
     field(OUT,"$(DOFFPV) PP MS")
+}
+grecord(ao,"$(P)$(R)DebugLevel") {
+    field(DESC,"Debugging level")
+    field(VAL,"0")
 }
