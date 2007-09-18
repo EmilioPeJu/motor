@@ -137,6 +137,7 @@ static void init_controller(struct motorRecord *pmr )
         {
             epicsEventMustWait(initEvent);
             epicsEventDestroy(initEvent);
+            pPvt->initEvent = 0;
         }
     }
     else
@@ -154,7 +155,7 @@ static long init_record(struct motorRecord * pmr )
     asynStatus status;
     asynInterface *pasynInterface;
     motorAsynPvt *pPvt;
-    double resolution;
+    /*    double resolution;*/
 
     /* Allocate motorAsynPvt private structure */
     pPvt = callocMustSucceed(1, sizeof(motorAsynPvt), "devMotorAsyn init_record()");
@@ -261,6 +262,9 @@ static long init_record(struct motorRecord * pmr )
     pasynManager->freeAsynUser(pasynUser);
     pPvt->needUpdate = 1;
 
+    /* Once everything is set-up, we can do the initial setting of position.
+       This should be the first thing that pushes onto the Asyn queue, and the
+       last thing that happens in here. */
     init_controller(pmr);
 
     return(0);
