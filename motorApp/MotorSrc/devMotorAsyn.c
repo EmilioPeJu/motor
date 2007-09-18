@@ -242,6 +242,12 @@ static long init_record(struct motorRecord * pmr )
 	       pmr->name, pasynUser->errorMessage);
     }
 
+    /* Once everything is set-up, we can do the initial setting of position.
+       This should be the first thing that pushes onto the Asyn queue.
+       It needs to be done before we get the initial values back from the
+       controller.*/
+    init_controller(pmr);
+
     /* Initiate calls to get the initial motor parameters
        Have to do it the long-winded way, because before iocInit, none of the
        locks or scan queues are initialised, so calls to scanOnce(),
@@ -261,11 +267,6 @@ static long init_record(struct motorRecord * pmr )
 				 &pPvt->status);
     pasynManager->freeAsynUser(pasynUser);
     pPvt->needUpdate = 1;
-
-    /* Once everything is set-up, we can do the initial setting of position.
-       This should be the first thing that pushes onto the Asyn queue, and the
-       last thing that happens in here. */
-    init_controller(pmr);
 
     return(0);
 bad:
