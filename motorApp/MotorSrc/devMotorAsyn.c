@@ -263,8 +263,13 @@ static long init_record(struct motorRecord * pmr )
 			      resolution);
 */
     pasynUser->reason = motorStatus;
-    pPvt->pasynMotorStatus->read(pPvt->asynMotorStatusPvt, pasynUser,
-				 &pPvt->status);
+    status = pPvt->pasynMotorStatus->read(pPvt->asynMotorStatusPvt, pasynUser,
+					  &pPvt->status);
+    if (status != asynSuccess) {
+	asynPrint(pasynUser, ASYN_TRACE_ERROR,
+		  "%s devMotorAsyn.c::init_record: pasynMotorStatus->read "
+		  "returned %s", pmr->name, pasynUser->errorMessage);
+    }
     pasynManager->freeAsynUser(pasynUser);
     pPvt->needUpdate = 1;
 
@@ -482,8 +487,14 @@ static void asynCallback(asynUser *pasynUser)
     switch (pmsg->command) {
     case motorStatus:
 	/* Read the current status of the device */
-	pPvt->pasynMotorStatus->read(pPvt->asynMotorStatusPvt, pasynUser,
-				     &pPvt->status);
+	status = pPvt->pasynMotorStatus->read(pPvt->asynMotorStatusPvt,
+					      pasynUser,
+					      &pPvt->status);
+	if (status != asynSuccess) {
+	    asynPrint(pasynUser, ASYN_TRACE_ERROR,
+		      "devMotorAsyn::asynCallback: %s pasynMotorStatus->read"
+		      "returned %s\n", pmr->name, pasynUser->errorMessage);
+	}
 	break;
 
     case motorMoveAbs:
@@ -493,12 +504,17 @@ static void asynCallback(asynUser *pasynUser)
 	/* Intentional fall-through */
     default:
         if (pmsg->interface == int32Type) {
-            pPvt->pasynInt32->write(pPvt->asynInt32Pvt, pasynUser,
-                                    pmsg->ivalue);
+            status = pPvt->pasynInt32->write(pPvt->asynInt32Pvt, pasynUser,
+					     pmsg->ivalue);
         } else {
-            pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser,
-                                      pmsg->dvalue);
+            status = pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser,
+					       pmsg->dvalue);
         }
+	if (status != asynSuccess) {
+	    asynPrint(pasynUser, ASYN_TRACE_ERROR,
+		      "devMotorAsyn::asynCallback: %s pasyn{Float64,Int32}->"
+		      "write returned %s\n", pmr->name, pasynUser->errorMessage);
+	}
         break;
     }
 
