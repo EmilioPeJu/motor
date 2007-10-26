@@ -1990,7 +1990,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 	    bool use_rel, preferred_dir;
 	    double relpos = pmr->diff / pmr->mres;
 	    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
-            long rdbdpos = NINT(pmr->rdbd / pmr->mres); /* retry deadband steps */
+        long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
 	    long rpos, npos;
 	    msta_field msta;
 	    msta.All = pmr->msta;
