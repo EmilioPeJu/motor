@@ -23,6 +23,7 @@ DB += TransPos.template
 DB += motorUtil.template
 DB += motorReadback.template
 DB += motorTranslate.template
+DB += trajectoryScan.db
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB

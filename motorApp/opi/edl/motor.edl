@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 91
-y 148
+x 633
+y 84
 w 411
 h 483
 font "arial-medium-r-16.0"
@@ -20,7 +20,6 @@ ctlBgColor2 index 5
 topShadowColor index 1
 botShadowColor index 11
 title "Motor - $(motor)"
-snapToGrid
 endScreenProperties
 
 # (Group)
@@ -128,7 +127,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 205
 y 445
@@ -157,7 +156,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 5
 y 385
@@ -186,7 +185,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 105
 y 385
@@ -215,7 +214,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 205
 y 385
@@ -244,7 +243,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 305
 y 385
@@ -273,7 +272,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 5
 y 415
@@ -302,7 +301,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 105
 y 415
@@ -331,7 +330,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 205
 y 415
@@ -360,7 +359,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 305
 y 415
@@ -389,7 +388,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 5
 y 445
@@ -418,7 +417,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 105
 y 445
@@ -521,29 +520,6 @@ major 4
 minor 0
 release 0
 x 205
-y 181
-w 98
-h 28
-fgColor index 25
-onColor index 4
-offColor index 3
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(motor).HOMF"
-pressValue "1"
-onLabel "Homing"
-offLabel "Forward"
-3d
-font "arial-medium-r-16.0"
-endObjectProperties
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 205
 y 211
 w 98
 h 28
@@ -580,29 +556,6 @@ controlPv "$(motor).TWF"
 pressValue "1"
 onLabel "Tweaking"
 offLabel "Forward"
-3d
-font "arial-medium-r-16.0"
-endObjectProperties
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 105
-y 181
-w 98
-h 28
-fgColor index 25
-onColor index 4
-offColor index 3
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(motor).HOMR"
-pressValue "1"
-onLabel "Homing"
-offLabel "Reverse"
 3d
 font "arial-medium-r-16.0"
 endObjectProperties
@@ -1280,7 +1233,7 @@ beginGroup
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 364
 y 4
@@ -1500,5 +1453,67 @@ endObjectProperties
 
 endGroup
 
+endObjectProperties
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 105
+y 181
+w 98
+h 28
+fgColor index 25
+bgColor index 3
+topShadowColor index 1
+botShadowColor index 11
+font "arial-medium-r-16.0"
+xPosOffset -225
+yPosOffset -25
+buttonLabel "Reverse"
+numPvs 4
+numDsps 1
+displayFileName {
+  0 "motor-home-confirm.edl"
+}
+setPosition {
+  0 "button"
+}
+symbols {
+  0 "homepv=$(motor).HOMR"
+}
+endObjectProperties
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 205
+y 181
+w 98
+h 28
+fgColor index 25
+bgColor index 3
+topShadowColor index 1
+botShadowColor index 11
+font "arial-medium-r-16.0"
+xPosOffset -225
+yPosOffset -25
+buttonLabel "Forward"
+numPvs 4
+numDsps 1
+displayFileName {
+  0 "motor-home-confirm.edl"
+}
+setPosition {
+  0 "button"
+}
+symbols {
+  0 "homepv=$(motor).HOMF"
+}
 endObjectProperties
 
