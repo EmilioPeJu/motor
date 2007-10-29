@@ -2,9 +2,9 @@
 FILENAME...	motorRecord.cc
 USAGE...	Motor Record Support.
 
-Version:	$Revision: 1.38.2.1 $
+Version:	$Revision: 1.39 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2007/04/06 18:37:38 $
+Last Modified:	$Date: 2007/04/06 18:35:38 $
 */
 
 /*
@@ -94,7 +94,7 @@ Last Modified:	$Date: 2007/04/06 18:37:38 $
  *                    motor_init_record_com() before the validation check.
  */
 
-#define VERSION 6.22
+#define VERSION 6.222
 
 #include	<stdlib.h>
 #include	<string.h>

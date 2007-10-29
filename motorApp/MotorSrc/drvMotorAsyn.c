@@ -19,9 +19,9 @@
  *     of this distribution.
  *     ************************************************************************
  *
- * Version: $Revision: 1.14 $
- * Modified by: $Author: peterd $
- * Last Modified: $Date: 2007/02/02 16:21:05 $
+ * Version: $Revision: 1.16 $
+ * Modified by: $Author: rivers $
+ * Last Modified: $Date: 2007/04/23 20:29:20 $
  *
  * Original Author: Peter Denison
  * Current Author: Peter Denison
@@ -732,7 +732,7 @@ static void intCallback(void *axisPvt, unsigned int nChanged,
 	if (addr == pAxis->num) {
 	    pmotorStatusInterrupt->callback(pmotorStatusInterrupt->userPvt, 
 					    pmotorStatusInterrupt->pasynUser,
-					    &pAxis->status );
+					    &pAxis->status);
 	}
 	pnode = (interruptNode *)ellNext(&pnode->node);
     }
