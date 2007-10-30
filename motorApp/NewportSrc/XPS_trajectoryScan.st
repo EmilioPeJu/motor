@@ -50,7 +50,7 @@ option +r;
 #define POLL_INTERVAL 0.1
 
 /* Socket timeouts */
-#define POLL_TIMEOUT 1.0
+#define POLL_TIMEOUT 20.0
 #define DRIVE_TIMEOUT 100000.  /* Forever */
 #define ABORT_TIMEOUT 10.
 
