@@ -389,15 +389,7 @@ static int motorAxisMove(AXIS_HDL pAxis, double position, int relative,
     PRINT(pAxis->logParam, FLOW, "Set card %d, axis %d move to %f, min vel=%f, max_vel=%f, accel=%f\n",
           pAxis->card, pAxis->axis, position, min_velocity, max_velocity, acceleration);
 
-    /* Look at the last poll value of the positioner status.  If it is disabled, then enable it */
-    if (pAxis->axisStatus >= 20 && pAxis->axisStatus <= 36) {
-        status = GroupMotionEnable(pAxis->pollSocket, pAxis->groupName);
-        if (status) {
-            PRINT(pAxis->logParam, ERROR, "motorAxisMove[%d,%d]: error performing GroupMotionEnable %d\n",pAxis->card, pAxis->axis, status);
-            /* Error -27 is caused when the motor record changes dir i.e. when it aborts a move!*/
-            return MOTOR_AXIS_ERROR;
-        }
-    }
+
     status = PositionerSGammaParametersSet(pAxis->pollSocket,
                                            pAxis->positionerName, 
                                            max_velocity*pAxis->stepSize,
