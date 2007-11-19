@@ -2,9 +2,9 @@
 FILENAME...	motorRecord.cc
 USAGE...	Motor Record Support.
 
-Version:	$Revision: 1.39 $
+Version:	$Revision: 1.41 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2007/04/06 18:35:38 $
+Last Modified:	$Date: 2007/11/07 18:54:13 $
 */
 
 /*
@@ -92,6 +92,14 @@ Last Modified:	$Date: 2007/04/06 18:35:38 $
  * .30 03-16-07 rls - Clear home request when soft-limit violation occurs.
  * .31 04-06-07 rls - RDBD was being used in motordevCom.cc
  *                    motor_init_record_com() before the validation check.
+ * .40 11-02-07 pnd - Use absolute value of mres to calculate rdbdpos
+ * .41 11-06-07 rls - Do relative moves only if retries are enabled (RTRY != 0).
+ *                  - Change NTM logic to use reference positions rather than
+ *                    feedback (readback). This eliminates unwanted MR stop
+ *                    commands with DC servoing.
+ *                  - Do not post process previous move on "tdir" detection.
+ *                    Clear post process indicator (pp). This fixes long moves
+ *                    at backlash velocity after a new target position.
  */
 
 #define VERSION 6.222
@@ -724,7 +732,7 @@ static long postProcess(motorRecord * pmr)
 
 	    /* Use if encoder or ReadbackLink is in use. */
 	    msta.All = pmr->msta;
-	    int use_rel = (msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip;
+	    bool use_rel = (pmr->rtry != 0 && (msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip);
 	    double relpos = pmr->diff / pmr->mres;
 	    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
 
@@ -744,7 +752,7 @@ static long postProcess(motorRecord * pmr)
 		WRITE_MSG(SET_VELOCITY, &vel);
 		if (acc > 0.0)	/* Don't SET_ACCEL if vel = vbase. */
 		    WRITE_MSG(SET_ACCEL, &acc);
-		if (use_rel)
+		if (use_rel == true)
 		    WRITE_MSG(MOVE_REL, &relbpos);
 		else
 		    WRITE_MSG(MOVE_ABS, &bpos);
@@ -760,7 +768,7 @@ static long postProcess(motorRecord * pmr)
 		WRITE_MSG(SET_VELOCITY, &bvel);
 		if (bacc > 0.0)	/* Don't SET_ACCEL if bvel = vbase. */
 		    WRITE_MSG(SET_ACCEL, &bacc);
-		if (use_rel)
+		if (use_rel == true)
 		{
 		    relpos = (relpos - relbpos) * pmr->frac;
 		    WRITE_MSG(MOVE_REL, &relpos);
@@ -800,7 +808,7 @@ static long postProcess(motorRecord * pmr)
 
 	/* Use if encoder or ReadbackLink is in use. */
 	msta.All = pmr->msta;
-	int use_rel = (msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip;
+        bool use_rel = (pmr->rtry != 0 && (msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip);
 	double relpos = pmr->diff / pmr->mres;
 	double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
 
@@ -815,7 +823,7 @@ static long postProcess(motorRecord * pmr)
 	WRITE_MSG(SET_VELOCITY, &bvel);
 	if (bacc > 0.0)	/* Don't SET_ACCEL if bvel = vbase. */
 	    WRITE_MSG(SET_ACCEL, &bacc);
-	if (use_rel)
+	if (use_rel == true)
 	{
 	    relpos = (relpos - relbpos) * pmr->frac;
 	    WRITE_MSG(MOVE_REL, &relpos);
@@ -988,10 +996,11 @@ LOGIC:
 	Call process_motor_info().
 	IF motor-in-motion indicator (MOVN) is true.
 	    IF new target position in opposite direction of current motion.
-	       [Sign of RDIF is NOT the same as sign of CDIR], AND,
-	       [Dist. to target {DIFF} > 2 x (|Backlash Dist.| + Retry Deadband)], AND,
-	       [MIP indicates this move is either (a result of a retry),OR,
-	    		(not from a Jog* or Hom*)]
+               [New target monitoring is enabled], AND,
+	       [Sign of the commanded difference is NOT the same as sign of CDIR], AND,
+	       [|commanded difference| > 2 x (|Backlash Dist.| + Retry Deadband)], AND,
+	       [MIP indicates this move is either (a result of a retry), OR, (a
+                normal move; not a Jog or Home)]
 		Send Stop Motor command.
 		Set STOP indicator in MIP true.
 		Mark MIP as changed.
@@ -1111,14 +1120,15 @@ static long process(dbCommon *arg)
 
 	if (pmr->movn)
 	{
-	    int sign_rdif = (pmr->rdif < 0) ? 0 : 1;
+            double cdiff = (pmr->rval - pmr->rmp) * pmr->mres; /* Commanded difference. */
+	    int sign_cdiff = (cdiff < 0.0) ? 0 : 1;
 
 	    /* Test for new target position in opposite direction of current
 	       motion.
 	     */	    
 	    if (pmr->ntm == menuYesNoYES &&
-		(sign_rdif != pmr->cdir) &&
-		(fabs(pmr->diff) > 2 * (fabs(pmr->bdst) + pmr->rdbd)) &&
+		(sign_cdiff != pmr->cdir) &&
+		(fabs(cdiff) > 2 * (fabs(pmr->bdst) + pmr->rdbd)) &&
 		(pmr->mip == MIP_RETRY || pmr->mip == MIP_MOVE))
 	    {
 
@@ -1129,6 +1139,7 @@ static long process(dbCommon *arg)
 		SEND_MSG();
 		pmr->mip |= MIP_STOP;
 		MARK(M_MIP);
+                pmr->pp = FALSE; /* Don't post process the previous move. */
 	    }
 	    status = 0;
 	}
@@ -1990,13 +2001,13 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 	    bool use_rel, preferred_dir;
 	    double relpos = pmr->diff / pmr->mres;
 	    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
-        long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
+	    long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
 	    long rpos, npos;
 	    msta_field msta;
 	    msta.All = pmr->msta;
 
 	    /*** Use if encoder or ReadbackLink is in use. ***/
-	    if ((msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip)
+            if (pmr->rtry != 0 && (msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip)
 		use_rel = true;
 	    else
 		use_rel = false;
