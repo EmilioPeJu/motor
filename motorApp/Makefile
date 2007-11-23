@@ -29,7 +29,7 @@ DIRS += NewFocusSrc
 #DIRS += AcsTech80Src
 #DIRS += OrielSrc
 #DIRS += ThorLabsSrc
-DIRS += SmartMotorSrc
+#DIRS += SmartMotorSrc
 DIRS += PiJenaSrc
 endif
 
