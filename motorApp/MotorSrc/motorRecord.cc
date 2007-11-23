@@ -100,6 +100,7 @@ Last Modified:	$Date: 2007/11/07 18:54:13 $
  *                  - Do not post process previous move on "tdir" detection.
  *                    Clear post process indicator (pp). This fixes long moves
  *                    at backlash velocity after a new target position.
+ * .42 11-23-07 pnd - Correct use of MRES in NTM logic to use absolute value
  */
 
 #define VERSION 6.222
