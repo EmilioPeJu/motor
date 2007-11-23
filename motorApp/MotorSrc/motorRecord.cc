@@ -1120,7 +1120,7 @@ static long process(dbCommon *arg)
 
 	if (pmr->movn)
 	{
-            double cdiff = (pmr->rval - pmr->rmp) * pmr->mres; /* Commanded difference. */
+            double cdiff = (pmr->rval - pmr->rmp) * fabs(pmr->mres); /* Commanded difference. */
 	    int sign_cdiff = (cdiff < 0.0) ? 0 : 1;
 
 	    /* Test for new target position in opposite direction of current
