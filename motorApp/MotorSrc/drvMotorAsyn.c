@@ -563,12 +563,15 @@ static asynStatus writeFloat64(void *drvPvt, asynUser *pasynUser,
 	break;
     case motorVelocity:
 	pAxis->max_velocity = value;
+	status = asynSuccess;
 	break;
     case motorVelBase:
 	pAxis->min_velocity = value;
+	status = asynSuccess;
 	break;
     case motorAccel:
 	pAxis->accel = value;
+	status = asynSuccess;
 	break;
     case motorPosition:
     case motorResolution:
