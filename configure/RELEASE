@@ -15,7 +15,7 @@ WORK=/dls_sw/work/R3.14.8.2/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-# Required ASYN release: R4-7
+# Recommended ASYN release: R4-9
 ASYN=$(SUPPORT)/asyn/4-9
 
 # Need the sequencer for the MM4005 and XPS trajectory scanning
@@ -26,8 +26,8 @@ EPICS_BASE=/dls_sw/epics/R3.14.8.2/base
 
 # The following must be defined if the "WithMPF" example in motorExApp is to
 # be built.
-# Recommended IPAC release: R2-8
-#!IPAC=$(SUPPORT)/ipacR2-8
+# Recommended IPAC release: R2-9
+#!IPAC=$(SUPPORT)/ipacR2-9
 
 # The following must be defined for the MXmotor device driver.
 #!MX=$(SUPPORT)/mx/mx

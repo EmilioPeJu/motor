@@ -1,5 +1,6 @@
 include "base.dbd"
 include "motorSupport.dbd"
+include "drvAsynSerialPort.dbd"
 #include "devAcsMotor.dbd"
 #include "devImsMotor.dbd"
 #include "devMclennanMotor.dbd"
@@ -10,12 +11,5 @@ include "motorSupport.dbd"
 #include "devOms.dbd"
 #include "devSoftMotor.dbd"
 #include "motorSimSupport.dbd"
-
-#include "drvAsynSerialPort.dbd"
-#include "drvGsIP488.dbd"
-
-# Only for IPAC R2.7 and above.
-driver(drvIpac)
-registrar(tvme200Registrar)
-registrar(vipc616Registrar)
-registrar(tyGSOctalRegistrar)
+#include "devSmartMotorMotor.dbd"
+#include "devKohzuMotor.dbd"
