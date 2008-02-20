@@ -18,6 +18,7 @@
 #   $(DOFFPV)   - Name of PV to turn detector off
 #   $(DOFFV)    - Value to write to PV to turn detector off
 
+# %gdatag,template,trajectoryScan,$(gda_name),$(gda_desc)
 
 #
 # PVs controlling the number of trajectory elements and the number of output
@@ -27,13 +28,15 @@ grecord(longout,"$(P)$(R)NumAxes") {
     field(VAL, "$(NAXES)")
     field(DESC,"# of axes being used")
 }
+# %gdatag,pv,rw,$(gda_name),NELM
 grecord(longout,"$(P)$(R)Nelements") {
     field(VAL, "10")
     field(DESC,"# of elements in trajectory")
 }
+
 grecord(mbbi,"$(P)$(R)MoveMode") {
     field(DESC,"Move mode")
-    field(VAL, "0")
+    field(VAL, "1")
     field(PINI, "YES")
     field(ZRVL, "0")
     field(ZRST, "Relative")
@@ -42,18 +45,22 @@ grecord(mbbi,"$(P)$(R)MoveMode") {
     field(TWVL, "2")
     field(TWST, "Hybrid")
 }
+# %gdatag,pv,rw,$(gda_name),NPULSES
 grecord(longout,"$(P)$(R)Npulses") {
     field(DESC,"Number of output pulses")
     field(VAL, "10")
 }
+# %gdatag,pv,rw,$(gda_name),SPULSES
 grecord(longout,"$(P)$(R)StartPulses") {
     field(DESC,"Element # to start pulses")
     field(VAL, "1")
 }
+# %gdatag,pv,rw,$(gda_name),EPULSES
 grecord(longout,"$(P)$(R)EndPulses") {
     field(DESC,"Element # to end pulses")
     field(VAL, "1")
 }
+# %gdatag,pv,ro,$(gda_name),APULSES
 grecord(longout,"$(P)$(R)Nactual") {
     field(DESC,"Actual # of output pulses")
 }
@@ -67,6 +74,7 @@ grecord(bo,"$(P)$(R)TimeMode") {
     field(ZNAM,"Total")
     field(ONAM,"Per element")
 }
+# %gdatag,mbbinary,rw,$(gda_name),TIME
 grecord(ao,"$(P)$(R)Time") {
     field(DESC,"Trajectory time")
     field(VAL, "10.")
@@ -96,48 +104,56 @@ grecord(ao,"$(P)$(R)Accel") {
 #
 # PVs controlling which motors will move
 #
+# %gdatag,binary,rw,$(gda_name),M1MOVE
 grecord(bo,"$(P)$(R)M1Move") {
     field(DESC,"Move M1 motor?")
     field(VAL,"1")
     field(ZNAM,"No")
     field(ONAM,"Yes")
 }
+# %gdatag,binary,rw,$(gda_name),M2MOVE
 grecord(bo,"$(P)$(R)M2Move") {
     field(DESC,"Move M2 motor?")
     field(VAL,"0")
     field(ZNAM,"No")
     field(ONAM,"Yes")
 }
+# %gdatag,binary,rw,$(gda_name),M3MOVE
 grecord(bo,"$(P)$(R)M3Move") {
     field(DESC,"Move M3 motor?")
     field(VAL,"0")
     field(ZNAM,"No")
     field(ONAM,"Yes")
 }
+# %gdatag,binary,rw,$(gda_name),M4MOVE
 grecord(bo,"$(P)$(R)M4Move") {
     field(DESC,"Move M4 motor?")
     field(VAL,"0")
     field(ZNAM,"No")
     field(ONAM,"Yes")
 }
+# %gdatag,binary,rw,$(gda_name),M5MOVE
 grecord(bo,"$(P)$(R)M5Move") {
     field(DESC,"Move M5 motor?")
     field(VAL,"0")
     field(ZNAM,"No")
     field(ONAM,"Yes")
 }
+# %gdatag,binary,rw,$(gda_name),M6MOVE
 grecord(bo,"$(P)$(R)M6Move") {
     field(DESC,"Move M6 motor?")
     field(VAL,"0")
     field(ZNAM,"No")
     field(ONAM,"Yes")
 }
+# %gdatag,binary,rw,$(gda_name),M7MOVE
 grecord(bo,"$(P)$(R)M7Move") {
     field(DESC,"Move M7 motor?")
     field(VAL,"0")
     field(ZNAM,"No")
     field(ONAM,"Yes")
 }
+# %gdatag,binary,rw,$(gda_name),M8MOVE
 grecord(bo,"$(P)$(R)M8Move") {
     field(DESC,"Move M8 motor?")
     field(VAL,"0")
@@ -148,48 +164,56 @@ grecord(bo,"$(P)$(R)M8Move") {
 #
 # PVs containing the trajectory definitions for each motor
 #
+# %gdatag,array,rw,$(gda_name),M1TRAJ
 grecord(waveform,"$(P)$(R)M1Traj") {
     field(DESC,"M1 increments")
     field(NELM,"$(NELM)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,rw,$(gda_name),M2TRAJ
 grecord(waveform,"$(P)$(R)M2Traj") {
     field(DESC,"M2 increments")
     field(NELM,"$(NELM)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,rw,$(gda_name),M3TRAJ
 grecord(waveform,"$(P)$(R)M3Traj") {
     field(DESC,"M3 increments")
     field(NELM,"$(NELM)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,rw,$(gda_name),M4TRAJ
 grecord(waveform,"$(P)$(R)M4Traj") {
     field(DESC,"M4 increments")
     field(NELM,"$(NELM)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,rw,$(gda_name),M5TRAJ
 grecord(waveform,"$(P)$(R)M5Traj") {
     field(DESC,"M5 increments")
     field(NELM,"$(NELM)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,rw,$(gda_name),M6TRAJ
 grecord(waveform,"$(P)$(R)M6Traj") {
     field(DESC,"M6 increments")
     field(NELM,"$(NELM)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,rw,$(gda_name),M7TRAJ
 grecord(waveform,"$(P)$(R)M7Traj") {
     field(DESC,"M7 increments")
     field(NELM,"$(NELM)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,rw,$(gda_name),M8TRAJ
 grecord(waveform,"$(P)$(R)M8Traj") {
     field(DESC,"M8 increments")
     field(NELM,"$(NELM)")
@@ -206,10 +230,12 @@ grecord(bo,"$(P)$(R)SimMode") {
     field(ZNAM,"Real")
     field(ONAM,"Simulate")
 }
+# %gdatag,pv,rw,$(gda_name),BUILD
 grecord(busy,"$(P)$(R)Build") {
     field(DESC,"Build and check trajectory")
     field(VAL,"0")
 }
+# %gdatag,mbbinary,ro,$(gda_name),BSTATE
 grecord(mbbi,"$(P)$(R)BuildState") {
     field(DESC,"Trajectory build state")
     field(VAL, "0")
@@ -221,6 +247,7 @@ grecord(mbbi,"$(P)$(R)BuildState") {
     field(ONST, "Busy")
     field(ONSV, "MINOR")
 }
+# %gdatag,mbbinary,ro,$(gda_name),BSTATUS
 grecord(mbbi,"$(P)$(R)BuildStatus") {
     field(DESC,"Trajectory build status")
     field(VAL, "0")
@@ -235,13 +262,16 @@ grecord(mbbi,"$(P)$(R)BuildStatus") {
     field(TWST, "Failure")
     field(TWSV, "MAJOR")
 }
+# %gdatag,pv,ro,$(gda_name),BMESS
 grecord(stringout,"$(P)$(R)BuildMessage") {
     field(DESC,"Trajectory build message")
 }
+# %gdatag,pv,rw,$(gda_name),EXECUTE
 grecord(busy,"$(P)$(R)Execute") {
     field(DESC,"Start trajectory motion")
     field(VAL,"0")
 }
+# %gdatag,mbbinary,ro,$(gda_name),ESTATE
 grecord(mbbi,"$(P)$(R)ExecState") {
     field(DESC,"Trajectory execute state")
     field(VAL, "0")
@@ -259,6 +289,7 @@ grecord(mbbi,"$(P)$(R)ExecState") {
     field(THST, "Flyback")
     field(THSV, "MINOR")
 }
+# %gdatag,mbbinary,ro,$(gda_name),ESTATUS
 grecord(mbbi,"$(P)$(R)ExecStatus") {
     field(DESC,"Trajectory execute status")
     field(VAL, "0")
@@ -279,9 +310,11 @@ grecord(mbbi,"$(P)$(R)ExecStatus") {
     field(FRST, "Timeout")
     field(FRSV, "MAJOR")
 }
+# %gdatag,pv,ro,$(gda_name),EMESS
 grecord(stringout,"$(P)$(R)ExecMessage") {
     field(DESC,"Trajectory execute message")
 }
+# %gdatag,pv,rw,$(gda_name),ABORT
 grecord(bo,"$(P)$(R)Abort") {
     field(DESC,"Abort trajectory motion")
     field(VAL,"0")
@@ -292,10 +325,12 @@ grecord(bo,"$(P)$(R)Abort") {
 #
 # PVs for readback of actual positions and errors
 #
+# %gdatag,pv,rw,$(gda_name),READ
 grecord(busy,"$(P)$(R)Readback") {
     field(DESC,"Read back actual positions")
     field(VAL,"0")
 }
+# %gdatag,mbbinary,ro,$(gda_name),RSTATE
 grecord(mbbi,"$(P)$(R)ReadState") {
     field(DESC,"Readback state")
     field(VAL, "0")
@@ -307,6 +342,7 @@ grecord(mbbi,"$(P)$(R)ReadState") {
     field(ONST, "Busy")
     field(ONSV, "MINOR")
 }
+# %gdatag,mbbinary,ro,$(gda_name),RSTATUS
 grecord(mbbi,"$(P)$(R)ReadStatus") {
     field(DESC,"Readback status")
     field(VAL, "0")
@@ -321,52 +357,60 @@ grecord(mbbi,"$(P)$(R)ReadStatus") {
     field(TWST, "Failure")
     field(TWSV, "MAJOR")
 }
+# %gdatag,pv,ro,$(gda_name),RMESS
 grecord(stringout,"$(P)$(R)ReadMessage") {
     field(DESC,"Trajectory read message")
 }
-
+# %gdatag,array,ro,$(gda_name),M1ACTUAL
 grecord(waveform,"$(P)$(R)M1Actual") {
     field(DESC,"M1 actual positions")
     field(NELM,"$(NPULSE)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,ro,$(gda_name),M2ACTUAL
 grecord(waveform,"$(P)$(R)M2Actual") {
     field(DESC,"M2 actual positions")
     field(NELM,"$(NPULSE)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,ro,$(gda_name),M3ACTUAL
 grecord(waveform,"$(P)$(R)M3Actual") {
     field(DESC,"M3 actual positions")
     field(NELM,"$(NPULSE)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,ro,$(gda_name),M4ACTUAL
 grecord(waveform,"$(P)$(R)M4Actual") {
     field(DESC,"M4 actual positions")
     field(NELM,"$(NPULSE)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,ro,$(gda_name),M5ACTUAL
 grecord(waveform,"$(P)$(R)M5Actual") {
     field(DESC,"M5 actual positions")
     field(NELM,"$(NPULSE)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,ro,$(gda_name),M6ACTUAL
 grecord(waveform,"$(P)$(R)M6Actual") {
     field(DESC,"M6 actual positions")
     field(NELM,"$(NPULSE)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,ro,$(gda_name),M7ACTUAL
 grecord(waveform,"$(P)$(R)M7Actual") {
     field(DESC,"M7 actual positions")
     field(NELM,"$(NPULSE)")
     field(FTVL,"DOUBLE")
     field(PREC, "4")
 }
+# %gdatag,array,ro,$(gda_name),M8ACTUAL
 grecord(waveform,"$(P)$(R)M8Actual") {
     field(DESC,"M8 actual positions")
     field(NELM,"$(NPULSE)")
