@@ -108,7 +108,7 @@ static long init( int after )
     return 0;
 }
 
-static void init_controller(struct motorRecord *pmr )
+static void init_controller(struct motorRecord *pmr, asynUser *pasynUser )
 {
     /* This routine is copied out of the old motordevCom and initialises the controller
        based on the record values. I think most of it should be transferred to init_record
@@ -129,7 +129,7 @@ static void init_controller(struct motorRecord *pmr )
         build_trans(LOAD_POS, &setPos, pmr);
         end_trans(pmr);
 
-        asynPrint(pPvt->pasynUser, ASYN_TRACE_FLOW,
+        asynPrint(pasynUser, ASYN_TRACE_FLOW,
                   "devMotorAsyn::init_controller, %s set position to %f\n",
                   pmr->name, setPos );
 
@@ -141,7 +141,7 @@ static void init_controller(struct motorRecord *pmr )
         }
     }
     else
-        asynPrint(pPvt->pasynUser, ASYN_TRACE_FLOW,
+        asynPrint(pasynUser, ASYN_TRACE_FLOW,
                   "devMotorAsyn::init_controller, %s setting of position not required, position=%f, mres=%f, dval=%f, rdbd=%f",
                   pmr->name, position, pmr->mres, pmr->dval, rdbd );
 
@@ -242,12 +242,6 @@ static long init_record(struct motorRecord * pmr )
 	       pmr->name, pasynUser->errorMessage);
     }
 
-    /* Once everything is set-up, we can do the initial setting of position.
-       This should be the first thing that pushes onto the Asyn queue.
-       It needs to be done before we get the initial values back from the
-       controller.*/
-    init_controller(pmr);
-
     /* Initiate calls to get the initial motor parameters
        Have to do it the long-winded way, because before iocInit, none of the
        locks or scan queues are initialised, so calls to scanOnce(),
@@ -270,6 +264,17 @@ static long init_record(struct motorRecord * pmr )
 		  "%s devMotorAsyn.c::init_record: pasynMotorStatus->read "
 		  "returned %s", pmr->name, pasynUser->errorMessage);
     }
+
+    /* We must get the first set of status values from the controller before
+     * the initial setting of position. Otherwise we won't be able to decide
+     * whether or not to write new position values to the controller.
+     */
+    init_controller(pmr, pasynUser);
+    /* Do not need to manually retrieve the new status values, as if they are
+     * set, a callback will be generated
+     */
+
+    /* Finally, indicate to the motor record that these values can be used. */
     pasynManager->freeAsynUser(pasynUser);
     pPvt->needUpdate = 1;
 
