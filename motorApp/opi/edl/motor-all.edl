@@ -3233,3 +3233,22 @@ endGroup
 
 endObjectProperties
 
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 452
+y 176
+w 80
+h 16
+font "helvetica-bold-r-10.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Following Error"
+}
+endObjectProperties
+
