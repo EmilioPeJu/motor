@@ -19,9 +19,9 @@
  *     of this distribution.
  *     ************************************************************************
  *
- * Version: $Revision: 1.16 $
- * Modified by: $Author: rivers $
- * Last Modified: $Date: 2007/04/23 20:29:20 $
+ * Version: $Revision: 1.18 $
+ * Modified by: $Author: sluiter $
+ * Last Modified: $Date: 2008/04/02 19:47:34 $
  *
  * Original Author: Peter Denison
  * Current Author: Peter Denison
@@ -500,6 +500,10 @@ static asynStatus writeInt32(void *drvPvt, asynUser *pasynUser,
     case motorSetClosedLoop:
 	status = (*pPvt->drvset->setInteger)(pAxis->axis, motorAxisClosedLoop,
 					     value);
+	break;
+    case motorUpStatus:
+        if (pPvt->drvset->forceCallback != NULL)
+	    status = (*pPvt->drvset->forceCallback)(pAxis->axis);
 	break;
     default:
 	status = (*pPvt->drvset->setInteger)(pAxis->axis, command, value);

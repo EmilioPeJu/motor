@@ -2,9 +2,9 @@
 FILENAME...     drvOmsPC68.cc
 USAGE...        Motor record driver level support for OMS PC68 serial device.
 
-Version:	$Revision: 1.6 $
-Modified By:	$Author: rivers $
-Last Modified:	$Date: 2007/04/23 20:45:38 $
+Version:	$Revision: 1.8 $
+Modified By:	$Author: dkline $
+Last Modified:	$Date: 2008/02/15 12:38:57 $
 */
 
 /*
@@ -38,6 +38,19 @@ Last Modified:	$Date: 2007/04/23 20:45:38 $
  * Verified with firmware:
  *	- PC78 ver 1.14-46
  *      - PC68 ver 6.51-2008
+ *  - The data parameter passed to asynCallback() is represented as follows:
+ *
+ *    +-------------------------------------+
+ *    | Interrupt counter | Status | Done   |
+ *    +-------------------------------------+
+ *
+ *    Where:
+ *    - Interrupt counter - 16bits - Number of interrupts
+ *    - Status register   -  8bits - Status information
+ *    - Done register     -  8bits - Axis done status
+ *
+ *    More information can be found in the User Manual, ICMS document APS_1251701.
+ *
  *
  * Modification Log:
  * -----------------
@@ -50,11 +63,15 @@ Last Modified:	$Date: 2007/04/23 20:45:38 $
  *                    "?KP" command at boot-up; resulted in 1st axis having
  *                    same position (RP command) as last axis.
  * .04 02/09/07 dmk - modified to support interrupts.
+ * .05 02/15/08 dmk - removed unnecessary variants in asynCallback() and
+ *                    added notes. 
  */
 
 #include <string.h>
 #include <math.h>
+#include <stdio.h>
 #include <epicsThread.h>
+#include <epicsString.h>
 #include <dbAccess.h>
 #include <drvSup.h>
 #include <iocsh.h>
@@ -268,8 +285,8 @@ static int set_status(int card, int signal)
 
     Debug(5, "info = (%s)\n", q_buf);
 
-    for (index = 0, p = strtok_r(q_buf, ",", &tok_save); p;
-         p = strtok_r(NULL, ",", &tok_save), index++)
+    for (index = 0, p = epicsStrtok_r(q_buf, ",", &tok_save); p;
+         p = epicsStrtok_r(NULL, ",", &tok_save), index++)
     {
         switch (index)
         {
@@ -394,7 +411,7 @@ static int set_status(int card, int signal)
 
                 /* Point "start" to PV name argument. */
                 tail = NULL;
-                start = strtok_r(&buffer[5], ",", &tail);
+                start = epicsStrtok_r(&buffer[5], ",", &tail);
                 if (tail == NULL)
                     goto errorexit;
 
@@ -406,7 +423,7 @@ static int set_status(int card, int signal)
                 }
 
                 /* Point "start" to PV value argument. */
-                start = strtok_r(NULL, ")", &tail);
+                start = epicsStrtok_r(NULL, ")", &tail);
                 if (dbPutField(&addr, DBR_STRING, start, 1L))
                 {
                     errPrintf(-1, __FILE__, __LINE__, "invalid value: %s",
@@ -653,14 +670,12 @@ static int omsGet(int card, char *pchar)
 
 static void asynCallback(void *drvPvt,asynUser *pasynUser,char *data,size_t len, int eomReason)
 {
-    int d,cnt,stat,done;
+    int d,stat;
     OmsPC68controller* pcntrl;
     struct controller* pstate;
 
     pcntrl = (OmsPC68controller*)drvPvt;
     pstate = motor_state[pcntrl->card];
-
-//printf("drvOmsPC68:asynCallback - %2.2d - cnt %6.6d - stat 0x%2.2X - done 0x%2.2X\n",pcntrl->card,cnt,stat,done);
 
     if( pcntrl->card >= total_cards || pstate == NULL )
     {
@@ -669,15 +684,16 @@ static void asynCallback(void *drvPvt,asynUser *pasynUser,char *data,size_t len,
     }
 
     d = *(int*)data;
-    cnt  = (d & 0xFFFF0000) >> 16;
     stat = (d & 0x0000FF00) >> 8;
-    done = (d & 0x000000FF);
 
     if( stat & STAT_DONE )
         if( stat & STAT_ERROR_MSK )
             ++pcntrl->errcnt;
         else
             motor_sem.signal();
+
+//printf("drvOmsPC68:asynCallback - card %2.2d, error %d, status 0x%8.8X\n",pcntrl->card,pcntrl->errcnt,d);
+
 }
 //_____________________________________________________________________________
 /*****************************************************/
@@ -776,8 +792,8 @@ static int motor_init()
             send_mess (card_index, ALL_POS, (char) NULL);
             recv_mess (card_index, axis_pos, 1);
 
-            for (total_axis = 0, pos_ptr = strtok_r(axis_pos, ",", &tok_save);
-                 pos_ptr; pos_ptr = strtok_r(NULL, ",", &tok_save),
+            for (total_axis = 0, pos_ptr = epicsStrtok_r(axis_pos, ",", &tok_save);
+                 pos_ptr; pos_ptr = epicsStrtok_r(NULL, ",", &tok_save),
                  total_axis++)
             {
                 pmotorState->motor_info[total_axis].motor_motion = NULL;

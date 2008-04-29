@@ -2,9 +2,9 @@
 FILENAME...	drvOms.cc
 USAGE...	Driver level support for OMS models VME8, VME44 and VS4.
 
-Version:	$Revision: 1.25 $
+Version:	$Revision: 1.27 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2006/01/27 23:56:09 $
+Last Modified:	$Date: 2008/03/14 20:36:10 $
 */
 
 /*
@@ -70,6 +70,9 @@ Last Modified:	$Date: 2006/01/27 23:56:09 $
  *		       `tree_list' not supported..." compiler error message.
  * .11  03-23-05 rls - Make OSI.
  * .12  05-02-05 rls - Bug fix for stale data delay; set delay = 10ms.
+ * .13  03-14-08 rls - 64-bit compatiability.
+ *                   - changed IRS to task comm. mechanism from epicsRingPointer
+ *                     to epicsRingByte.
  */
 
 /*========================stepper motor driver ========================
@@ -90,8 +93,10 @@ Last Modified:	$Date: 2006/01/27 23:56:09 $
 ========================stepper motor driver ========================*/
 
 #include	<string.h>
+#include	<stdio.h>
 #include	<drvSup.h>
 #include	<epicsVersion.h>
+#include	<epicsString.h>
 #include	<devLib.h>
 #include	<dbAccess.h>
 #include	<epicsThread.h>
@@ -102,8 +107,6 @@ Last Modified:	$Date: 2006/01/27 23:56:09 $
 #include	"motor.h"
 #include	"drvOms.h"
 #include	"epicsExport.h"
-
-#define PRIVATE_FUNCTIONS 1	/* normal:1, debug:0 */
 
 /* Define for return test on devNoResponseProbe() */
 #define PROBE_SUCCESS(STATUS) ((STATUS)==S_dev_addressOverlap)
@@ -208,9 +211,8 @@ static long report(int level)
     {
 	for (card = 0; card < oms44_num_cards; card++)
 	    if (motor_state[card])
-		printf("    Oms VME8/44 motor card %d @ 0x%X, id: %s \n", card,
-		       (epicsUInt32) motor_state[card]->localaddr,
-		       motor_state[card]->ident);
+		printf("    Oms VME8/44 motor card %d @ %p, id: %s \n", card,
+		       motor_state[card]->localaddr, motor_state[card]->ident);
     }
     return (0);
 }
@@ -266,8 +268,8 @@ static int set_status(int card, int signal)
 
     Debug(5, "info = (%s)\n", q_buf);
 
-    for (index = 0, p = strtok_r(q_buf, ",", &tok_save); p;
-	 p = strtok_r(NULL, ",", &tok_save), index++)
+    for (index = 0, p = epicsStrtok_r(q_buf, ",", &tok_save); p;
+	 p = epicsStrtok_r(NULL, ",", &tok_save), index++)
     {
 	switch (index)
 	{
@@ -385,7 +387,7 @@ static int set_status(int card, int signal)
 		
 		/* Point "start" to PV name argument. */
 		tail = NULL;
-		start = strtok_r(&buffer[5], ",", &tail);
+		start = epicsStrtok_r(&buffer[5], ",", &tail);
 		if (tail == NULL)
 		    goto errorexit;
 
@@ -396,7 +398,7 @@ static int set_status(int card, int signal)
 		}
 
 		/* Point "start" to PV value argument. */
-		start = strtok_r(NULL, ")", &tail);
+		start = epicsStrtok_r(NULL, ")", &tail);
 		if (dbPutField(&addr, DBR_STRING, start, 1L))
 		{
 		    errPrintf(-1, __FILE__, __LINE__, "invalid value: %s", start);
@@ -634,14 +636,14 @@ static int omsGet(int card, char *pchar, bool timeout)
     if (irqdata->irqEnable)
     {
 	/* Get character from isr - if available */
-	while (irqdata->recv_rng->isEmpty() && timeout == true && retry < 5)
+	while (epicsRingBytesIsEmpty(irqdata->recv_rng) && timeout == true && retry < 5)
 	{
 	    irqdata->recv_sem->wait(0.05);	/* Wait 250ms for character */
 	    retry ++;
 	}
-	if (!irqdata->recv_rng->isEmpty())
+	if (!epicsRingBytesIsEmpty(irqdata->recv_rng))
 	{
-	    *pchar = (char) ((epicsUInt32) irqdata->recv_rng->pop() & 0xFF);
+	    epicsRingBytesGet(irqdata->recv_rng, pchar, 1);
 	    getCnt = 1;
 	}
     }
@@ -677,28 +679,21 @@ static RTN_STATUS omsPut(int card, char *pmess)
     volatile struct controller *pmotorState;
     volatile struct vmex_motor *pmotor;
     struct irqdatastr *irqdata;
-    int key;
-    char *putptr;
+    int key, msgsize;
 
     pmotorState = motor_state[card];
     irqdata = (struct irqdatastr *) pmotorState->DevicePrivate;
     pmotor = (struct vmex_motor *) pmotorState->localaddr;
+    msgsize = strlen(pmess);
 
     if (irqdata->irqEnable)
     {
-	putptr = pmess;
 	/* Put string into isr transmitt buffer */
-	while (*putptr != (char) NULL)
-	{
-	    char outchar = *putptr;
-	    if (!irqdata->send_rng->push((char *) outchar))
-	    {
-		errlogPrintf("omsPut: card %d send ring full, lost '%c'\n",
-			     card, *putptr);
-		return(ERROR);
-	    }
-	    putptr++;
-	}
+        if (epicsRingBytesPut(irqdata->send_rng, pmess, msgsize) != msgsize)
+        {
+            errlogPrintf("omsPut: card %d send ring full!\n", card);
+            return(ERROR);
+        }
 
 	/* Turn-on transmit buffer interrupt */
 	key = epicsInterruptLock();
@@ -707,6 +702,8 @@ static RTN_STATUS omsPut(int card, char *pmess)
     }
     else
     {
+        char *putptr;
+
 	/* Send next message */
 	for (putptr = pmess; *putptr != '\0'; putptr++)
 	{
@@ -842,10 +839,13 @@ static void motorIsr(int card)
     /* Send message */
     if (status & STAT_TRANS_BUF_EMPTY)
     {
-	if (irqdata->send_rng->isEmpty())
+	if (epicsRingBytesIsEmpty(irqdata->send_rng))
 	    control &= ~IRQ_TRANS_BUF;	/* Transmit done - disable irq */
 	else
-	    pmotor->data = (char) ((epicsUInt32) irqdata->send_rng->pop() & 0xFF);
+        {
+	    epicsRingBytesGet(irqdata->send_rng, &dataChar, 1);
+            pmotor->data = dataChar;
+        }
     }
 
     /* Read Response */
@@ -853,10 +853,9 @@ static void motorIsr(int card)
     {
 	dataChar = pmotor->data;
 
-	if (!irqdata->recv_rng->push((char *) dataChar))
+	if (epicsRingBytesPut(irqdata->recv_rng, &dataChar, 1) == 0)
 	{
-	    errlogPrintf("card %d recv ring full, lost '%c'\n", card,
-			 dataChar);
+	    errlogPrintf("card %d recv ring full, lost '%c'\n", card, dataChar);
 	    irqdata->irqErrno |= STAT_INPUT_BUF_FULL;
 	}
 	irqdata->recv_sem->signal();
@@ -917,10 +916,10 @@ static int motorIsrEnable(int card)
     /* Setup card for interrupt-on-done */
     pmotor->vector = omsInterruptVector + card;
 
-    irqdata->recv_rng = new epicsRingPointer<char>(OMS_RESP_Q_SZ);
+    irqdata->recv_rng = epicsRingBytesCreate(OMS_RESP_Q_SZ);
     irqdata->recv_sem = new epicsEvent(epicsEventEmpty);
 
-    irqdata->send_rng = new epicsRingPointer<char>(MAX_MSG_SIZE * 2);
+    irqdata->send_rng = epicsRingBytesCreate(MAX_MSG_SIZE * 2);
 
     irqdata->irqEnable = TRUE;
     irqdata->irqErrno = 0;
@@ -961,8 +960,8 @@ static void motorIsrDisable(int card)
     /* Remove interrupt control functions */
     irqdata->irqEnable = FALSE;
     irqdata->irqErrno = 0;
-    delete irqdata->recv_rng;
-    delete irqdata->send_rng;
+    epicsRingBytesDelete(irqdata->recv_rng);
+    epicsRingBytesDelete(irqdata->send_rng);
     delete irqdata->recv_sem;
 }
 
@@ -984,9 +983,13 @@ int omsSetup(int num_cards,	/* maximum number of cards in rack */
 	oms44_num_cards = num_cards;
 
     /* Check boundary(16byte) on base address */
+#ifdef __LP64__
+    if ((motorUInt64) addrs & 0xF)
+#else
     if ((epicsUInt32) addrs & 0xF)
+#endif
     {
-	Debug(1, "omsSetup: invalid base address 0x%X\n", (epicsUInt32) addrs);
+	Debug(1, "omsSetup: invalid base address %p\n", addrs);
 	oms_addrs = (char *) OMS_NUM_ADDRS;
     }
     else
@@ -1061,17 +1064,16 @@ static int motor_init()
     
     for (card_index = 0; card_index < oms44_num_cards; card_index++)
     {
-	int8_t *startAddr;
-	int8_t *endAddr;
+	epicsInt8 *startAddr;
+	epicsInt8 *endAddr;
 
 	Debug(2, "motor_init: card %d\n", card_index);
 
 	probeAddr = oms_addrs + (card_index * OMS_BRD_SIZE);
-	startAddr = (int8_t *) probeAddr + 1;
+	startAddr = (epicsInt8 *) probeAddr + 1;
 	endAddr = startAddr + OMS_BRD_SIZE;
 
-	Debug(9, "motor_init: devNoResponseProbe() on addr 0x%x\n",
-	      (epicsUInt32) probeAddr);
+	Debug(9, "motor_init: devNoResponseProbe() on addr %p\n", probeAddr);
 	/* Scan memory space to assure card id */
 #ifdef vxWorks
 	do
@@ -1097,7 +1099,7 @@ static int motor_init()
 		return (ERROR);
 	    }
 #endif
-	    Debug(9, "motor_init: localaddr = %x\n", (epicsUInt32) localaddr);
+	    Debug(9, "motor_init: localaddr = %p\n", localaddr);
 	    pmotor = (struct vmex_motor *) localaddr;
 
 	    Debug(9, "motor_init: malloc'ing motor_state\n");
@@ -1125,9 +1127,9 @@ static int motor_init()
 	    send_mess(card_index, ALL_POS, (char) NULL);
 	    recv_mess(card_index, axis_pos, 1);
 
-	    for (total_axis = 0, pos_ptr = strtok_r(axis_pos, ",", &tok_save);
+	    for (total_axis = 0, pos_ptr = epicsStrtok_r(axis_pos, ",", &tok_save);
 		 pos_ptr;
-		 pos_ptr = strtok_r(NULL, ",", &tok_save), total_axis++)
+		 pos_ptr = epicsStrtok_r(NULL, ",", &tok_save), total_axis++)
 	    {
 		pmotorState->motor_info[total_axis].motor_motion = NULL;
 		pmotorState->motor_info[total_axis].status.All = 0;
@@ -1174,7 +1176,7 @@ static int motor_init()
 		set_status(card_index, motor_index);
 	    }
 
-	    Debug(2, "Init Address=0x%8.8x\n", (epicsUInt32) localaddr);
+	    Debug(2, "Init Address=%p\n", localaddr);
 	    Debug(3, "Total encoders = %d\n\n", total_encoders);
 	}
 	else

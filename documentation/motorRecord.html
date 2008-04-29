@@ -37,9 +37,9 @@
 </ul>
 <a name="Overview"></a>
 
-<h2>Overview</h2> This documentation describes version R6-3 of the EPICS motor
+<h2>Overview</h2> This documentation describes version R6-4 of the EPICS motor
 record, and related EPICS software required to build and use it.&nbsp; Version
-R6-3 of the motor record is compatible with EPICS base R3.14.9 and above.
+R6-4 of the motor record is compatible with EPICS base R3.14.9 and above.
 <p>
 The motor record is intended to support motors of all kinds, but currently 
 supports only the following variety of motor controllers (in addition to Soft 
@@ -578,7 +578,7 @@ below.
     <td>R/W*</td>
     <td>Soft Channel Position Lock</td>
     <td>RECCHOICE</td>
-    <td>(0:"No", 1:"Yes")</td>
+    <td>(0:"NO", 1:"YES")</td>
   </tr>
   <tr>
     <td><a href="#Fields_alarm">LOLO</a></td>
@@ -711,7 +711,14 @@ below.
     <td>R/W*</td>
     <td>New Target Monitor</td>
     <td>RECCHOICE</td>
-    <td>(0:"No", 1:"Yes")</td>
+    <td>(0:"NO", 1:"YES")</td>
+  </tr>
+  <tr>
+    <td><a href="#Fields_misc">NTMF</a></td>
+    <td>R/W*</td>
+    <td>New Target Monitor Deadband Factor</td>
+    <td>SHORT</td>
+    <td>Determines NTM deadband; NTMF >= 2</td>
   </tr>
   <tr>
     <td><a href="#Fields_calib">OFF</a></td>
@@ -750,7 +757,7 @@ below.
     <td>R/W</td>
     <td>Periodic Limits</td>
     <td>RECCHOICE</td>
-    <td>(0:"No", 1:"Yes")</td>
+    <td>(0:"NO", 1:"YES")</td>
   </tr>
   <tr>
     <td><a href="#Fields_misc">POST</a></td>
@@ -2793,11 +2800,11 @@ below.
 	      In the POST field; only "PUT(<i>pvname</i>, <i>pv-value</i>)".
 	    </li>
 	  </blockquote>
-	  See <i>Driver Power Monitoring</i> below for the DPM_ON directive. &nbsp;The PUT 
-	  directive supports changing the value of a database variable. &nbsp;Note that 
-	  the PREM supports a delay argument, but that POST does not. &nbsp;The <i>Readback 
-	  settle time field</i> (DLY) should be used to create a time delay after the PV 
-	  specified in the POST field is written.
+          See <i>Driver Power Monitoring</i> below for the DPM_ON directive. &nbsp;The PUT 
+          directive supports changing the value of a database variable. &nbsp;Note that 
+          the PREM supports a time delay argument before the motor move , but that POST 
+          does not. &nbsp;The <i>Readback settle time field</i> (DLY) should be used to 
+          create a time delay after the PV specified in the POST field is written.
 	</blockquote>
 	<li>
 	  Device directive strings are stripped of valid device directives (including @'s) 
@@ -2886,7 +2893,7 @@ below.
     readback position.  Soft Channel device support detects that the "hard" motor 
     has initiated the move when it sees the PV pointed to by DINP go false, while 
     the "soft" record's DMOV is true. Automatic synchronization is undesirable in a 
-    multi-axis application. Hence, setting the LOCK field to "Yes" disables this 
+    multi-axis application. Hence, setting the LOCK field to "YES" disables this 
     automatic synchronization.</td>
   </tr>
   <tr>
@@ -2897,24 +2904,33 @@ below.
     <td>The requirements on how the motor record processes a new target position 
     while the motor is in motion are as follows;<BR>
       Case #1: The motor record is given a new position, which is in the opposite 
-      direction from the current motor motion.  If NTM is "Yes", the motor is 
-      immediately stopped and given a motion command to the new position.  If NTM is "No 
+      direction from the current motor motion.  If NTM is "YES", the motor is 
+      immediately stopped and given a motion command to the new position.  If NTM is "NO 
       ", the motor completes the previous move before it is given a motion command to 
       the new position.<BR>
       Case #2: The motor record is given a new position, which is in the same 
       direction as the current motor motion, but the new position is closer to the 
-      motor's current position than the original target position.  If NTM is "Yes", 
+      motor's current position than the original target position.  If NTM is "YES", 
       the motor is stopped after it has gone past the new position; then a command is 
-      given to return to the new position.  If NTM is "No", the motor completes the 
+      given to return to the new position.  If NTM is "NO", the motor completes the 
       previous move before it is given a motion command to the new position.<BR>
       Case #3: The motor record is given a new position, which is in the same 
       direction as the current motor motion, but the new position is further from the 
       motor's current position than the original position.  After the motor reaches 
       the original target position and stops, a command is given to the new target 
       position.  This case is independent of NTM.<BR>
-      NTM defaults to "Yes".  It should be set to "No" only for soft motors. Soft 
-      motors should be configured with NTM set to "No" to prevent Case #1 above from 
+      NTM defaults to "YES".  It should be set to "NO" only for soft motors. Soft 
+      motors should be configured with NTM set to "NO" to prevent Case #1 above from 
       interfering with "hard" motors using backlash correction.  </td>
+  </tr>
+  <tr>
+    <td>NTMF</td>
+    <td>R/W</td>
+    <td>New Target Monitor Deadband Factor</td>
+    <td>SHORT</td>
+    <td>Determines NTM deadband = NTMF * (|BDST| + RDBD).  NTMF must be >= 2.  The 
+    NTM deadband prevents NTM logic from issuing a STOP command at the end of a DC 
+    motor move that overshoots its' target position.</td>
   </tr>
   </tbody>
 </table>

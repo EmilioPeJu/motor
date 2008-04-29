@@ -5,12 +5,127 @@
   <meta name="GENERATOR" content="Mozilla/4.77 [en] (X11; U; SunOS 5.8 sun4u) [Netscape]">
   <meta name="Author" content="Ronald L. Sluiter">
   <meta name="Description" content="Synopsis of modifications, fixes and new features for each motor record release.">
-  <title>EPICS Motor Record Release R6.3 Notice</title>
+  <title>EPICS Motor Record Release R6-4 Notice</title>
   <meta name="author" content="Ronald L. Sluiter">
   <meta name="description" content="Notification of bug fixes, functional changes and new features.">
 </head>
 <body>
 
+
+<CENTER>
+  <H1><B><U>Motor Record Version 6-4 Release Notice</U></B></H1>
+</CENTER>
+
+<center>
+  <h4><u>Modifications to Existing Features</u></h4>
+</CENTER>
+
+<DIV align="left">
+  <P>
+  <U><B>Stale SET position data from OMS VME58 controllers.</B></U>
+  </P>
+  <p>
+  A problem with certain OMS VME58 firmware versions (2.24-8S and all 2.35 
+  versions) has arisen since modifications made under R6-3.  When the user sets 
+  the motor record's position, the previous target and readback positions are read 
+  from the controller on the next update.  This occurs with the previous release (R6-3) 
+  because the "stale data delay" was changed from 10ms to zero for the drvOms58 
+  driver.
+  </P>
+  <P>
+  With this release the driver searches all VME58 board ID's for either 2.24-8S or 
+  any 2.35 version.  If any board is found with these versions, the "stale data 
+  delay" is set to a non-zero value for all VME58 boards in the system.
+  </p>
+  <P>
+  <U><B>"tdir=" error messages</B></U>
+  </P>
+  <p>
+  A problem was reported by Emma Shepherd (Diamond) with the previous release if 
+  the "Use RDBL Link" field (URIP) was set to "Yes".  The NTM logic was sending 
+  stop commands and issuing the "tdir=.." message to the console if the RDBL link 
+  was used.  This error was the result of changes to the NTM logic in R6-3.
+  </p>
+  <p>
+  With this release, the NTM logic is restored to using feedback rather than 
+  reference positions.  In addition, an "NTM deadband factor" field (NTMF) is 
+  added to allow the user to set the NTM deadband as follows;
+  </p>
+  <p>
+  NTM deadband = NTMF * (|BDST| + RDBD)
+  </p>
+  <p>
+  NTMF must be >= 2. If properly configured, the NTM deadband prevents NTM 
+  logic from issuing a STOP command at the end of a DC motor move that overshoots 
+  its' target position.
+  </p>
+  
+  <p>
+  <U><B>Access Security Level changes</B></U>
+  </p>
+  
+  <p>
+  Major changes have been made to the Access Security Level (ASL) attribute of the 
+  motor record fields. With previous releases, the following fields were set to 
+  ASL=0; FOF, VOF, SSET, SUSE, VBAS, VMAX, SBAS, SMAX, UREV and MRES.  All other 
+  fields were set to ASL=1 by default.
+  </p>
+  <p>
+  With this release, the policy is to set all the fields that the user requires to 
+  do the following to ASL = 0;
+  <ul>
+    <li>
+      move a motor; (VAL, DVAL, RVAL, TWF, TWR, TWV, RLV, JOGF, JOGR)
+    </li>
+    <li>
+      stop a motor; (STOP, SPMG)
+    </li>
+    <li>
+      enable/disable motor torque; (CNEN)
+    </li>
+    <li>
+      set the position of a motor; (SSET, SUSE, SET)
+    </li>
+    <li>
+      set the "user" offset of a motor; (FOF, VOF, FOFF,OFF)
+    </li>
+    <li>
+      update the status of a motor; (STUP)
+    </li>
+    <li>
+      adjust or turn off backlash; (BDST)
+    </li>
+  </ul>
+  </p>
+  <p>
+  All other fields are set to ASL = 1.
+  </p>
+  <p>
+  This means that out of the list of fields that were previously set to ASL=0; 
+  VBAS, VMAX, SBAS, SMAX, UREV and MRES are now set to ASL=1.
+  </p>
+</DIV>
+
+<CENTER>
+  <H4><U>New Features</U></H4>
+</CENTER>
+
+<DIV align="left">
+  <P>
+  <U><B>64-bit compatiablity</B></U>
+  </P>
+  <p>
+  Previous releases of the motor record distribution would not compile for 64-bit 
+  platforms.  Numerous minor modifications were made for this release to attain 64-bit 
+  compatibility.  Note that at the time of writing (03/14/08), this release was 
+  successfully compiled on a Linux Fedora Core 6 x86_64 host using gcc version 
+  4.1.2, but there are bugs.  Since EPICS base (R3.14.9) has not had all the bugs 
+  wrung out (Mantis ID's #309, #310), there are no immediate plans to debug 64-bit 
+  related problems.
+  </p>
+</DIV>
+
+<br>
 
 <CENTER>
   <H1><B><U>Motor Record Version 6.3 Release Notice</U></B></H1>
