@@ -10,6 +10,7 @@
 # Macro paramters:
 #   $(P)        - PV name prefix
 #   $(R)        - PV base record name
+#   $(Mn)       - Motor suffixes for n in 1..8
 #   $(NAXES)    - Number of axes to be used. Typically 6 for diffractometer.
 #   $(NELM)     - Maximum trajectory elements
 #   $(NPULSE)   - Maximum number of output pulses
@@ -74,7 +75,7 @@ grecord(bo,"$(P)$(R)TimeMode") {
     field(ZNAM,"Total")
     field(ONAM,"Per element")
 }
-# %gdatag,mbbinary,rw,$(gda_name),TIME
+# %gdatag,pv,rw,$(gda_name),TIME
 grecord(ao,"$(P)$(R)Time") {
     field(DESC,"Trajectory time")
     field(VAL, "10.")
@@ -759,4 +760,48 @@ grecord(ao,"$(P)$(R)DetOff") {
 grecord(ao,"$(P)$(R)DebugLevel") {
     field(DESC,"Debugging level")
     field(VAL,"0")
+}
+
+# 
+# Names for displaying on screen
+#
+# %gdatag,pv,ro,$(gda_name),M1NAME
+grecord(stringout,"$(P)$(R)M1NAME") {
+    field(VAL,"$(P)$(M1)")
+    field(DESC,"Motor record pv for M1")
+}
+# %gdatag,pv,ro,$(gda_name),M2NAME
+grecord(stringout,"$(P)$(R)M2NAME") {
+    field(VAL,"$(P)$(M2)")
+    field(DESC,"Motor record pv for M2")
+}
+# %gdatag,pv,ro,$(gda_name),M3NAME
+grecord(stringout,"$(P)$(R)M3NAME") {
+    field(VAL,"$(P)$(M3)")
+    field(DESC,"Motor record pv for M3")
+}
+# %gdatag,pv,ro,$(gda_name),M4NAME
+grecord(stringout,"$(P)$(R)M4NAME") {
+    field(VAL,"$(P)$(M4)")
+    field(DESC,"Motor record pv for M4")
+}
+# %gdatag,pv,ro,$(gda_name),M5NAME
+grecord(stringout,"$(P)$(R)M5NAME") {
+    field(VAL,"$(P)$(M5)")
+    field(DESC,"Motor record pv for M5")
+}
+# %gdatag,pv,ro,$(gda_name),M6NAME
+grecord(stringout,"$(P)$(R)M6NAME") {
+    field(VAL,"$(P)$(M6)")
+    field(DESC,"Motor record pv for M6")
+}
+# %gdatag,pv,ro,$(gda_name),M7NAME
+grecord(stringout,"$(P)$(R)M7NAME") {
+    field(VAL,"$(P)$(M7)")
+    field(DESC,"Motor record pv for M7")
+}
+# %gdatag,pv,ro,$(gda_name),M8NAME
+grecord(stringout,"$(P)$(R)M8NAME") {
+    field(VAL,"$(P)$(M8)")
+    field(DESC,"Motor record pv for M8")
 }
