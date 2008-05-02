@@ -31,13 +31,13 @@ option +r;
  * is almost unlimited because the data is stored in a file but the channel 
  * access limit with a double data type is 2000 on R3.13 clients.
  */
-#define MAX_ELEMENTS 2000
+#define MAX_ELEMENTS 3500
 
 /* Maximum # of output pulses.  At the moment the pulses are defined by a
  * timer which is synchronised with the trajectory points so the max number
  * of pulses equals the max number of elements.
  */
-#define MAX_PULSES 2000
+#define MAX_PULSES 35000
 
 /* Note that MAX_ELEMENTS, and MAX_PULSES must be defined before
  * including the trajectoryScan.h */
@@ -50,7 +50,7 @@ option +r;
 #define POLL_INTERVAL 0.1
 
 /* Socket timeouts */
-#define POLL_TIMEOUT 20.0
+#define POLL_TIMEOUT 50.0
 #define DRIVE_TIMEOUT 100000.  /* Forever */
 #define ABORT_TIMEOUT 10.
 
@@ -926,7 +926,8 @@ static void buildAndVerify(SS_ID ssId, struct UserVar *pVar)
     
     if (pVar->debugLevel > 0) {
         printf("XPS_trajectoryScan: buildAndVerify:"
-               " entry\n");
+               " entry (%s, %s, %s)\n", 
+            pVar->xpsAddress, pVar->userName, pVar->password);
     }
     /* We create trajectories with an extra element at the beginning and at the end.
      * The distance and time of the first element is defined so that the motors will
@@ -1041,6 +1042,12 @@ static void buildAndVerify(SS_ID ssId, struct UserVar *pVar)
         fprintf(trajFile,", %f, %f", pVar->postDistance[j], 0.);
     fprintf(trajFile,"\n");
     fclose (trajFile);
+
+    if (pVar->debugLevel > 0) {
+    printf("XPS_trajectoryScan: buildAndVerify:"
+            " connecting over ftp (%s, %s, %s)\n", 
+            pVar->xpsAddress, pVar->userName, pVar->password);
+	}
     
     /* FTP the trajectory file from the local directory to the XPS */
     status = ftpConnect(pVar->xpsAddress, pVar->userName, pVar->password, &ftpSocket);
