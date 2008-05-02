@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 633
-y 84
+x 638
+y 105
 w 411
 h 483
 font "arial-medium-r-16.0"
@@ -1515,5 +1515,48 @@ setPosition {
 symbols {
   0 "homepv=$(motor).HOMF"
 }
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 151
+w 98
+h 28
+
+beginGroup
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 151
+w 98
+h 28
+fgColor index 14
+onColor index 21
+offColor index 20
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):ELOSSRC.A"
+pressValue "0"
+onLabel "Encoder Loss Reset"
+offLabel "Encoder Loss Reset"
+3d
+font "arial-medium-r-10.0"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):ELOSS"
+visMin "1"
+visMax "2"
 endObjectProperties
 
