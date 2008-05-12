@@ -85,6 +85,7 @@ static motorCommandStruct motorCommands[] = {
     {motorHighLim,    "HIGH_LIMIT"},
     {motorLowLim,     "LOW_LIMIT"},
     {motorSetClosedLoop, "SET_CLOSED_LOOP"},
+    {motorDeferMoves, "DEFER"},
     {motorStatus,     "STATUS"},
     {motorStatusDirection, "STATUS_DIRECTION"}, 
     {motorStatusDone, "STATUS_DONE"},
