@@ -30,7 +30,7 @@ extern int xps_gathering(int);
 
 motorAxisDrvSET_t motorXPS = 
   {
-    14,
+    15,
     motorAxisReport,            /**< Standard EPICS driver report function (optional) */
     motorAxisInit,              /**< Standard EPICS dirver initialisation function (optional) */
     motorAxisSetLog,            /**< Defines an external logging function (optional) */
