@@ -177,9 +177,9 @@ static char* getXPSError(AXIS_HDL pAxis, int status, char *buffer);
 
 /*Utility functions for dealing with XPS groups and setting corrector information.*/
 static int isAxisInGroup(const AXIS_HDL pAxis);
-static int setXPSAxisPID(AXIS_HDL pAxis, const double * const value, int pidoption);
+static int setXPSAxisPID(AXIS_HDL pAxis, const double * value, int pidoption);
 static int getXPSAxisPID(AXIS_HDL pAxis);
-static void setXPSPIDValue(xpsCorrectorInfo_t *xpsCorrectorInfo, const double * const value, int pidoption); 
+static void setXPSPIDValue(xpsCorrectorInfo_t *xpsCorrectorInfo, const double * value, int pidoption); 
 
 /*Wrapper functions for the verbose PositionerCorrector functions.*/
 static int PositionerCorrectorPIPositionGetWrapper(AXIS_HDL pAxis);
@@ -1371,7 +1371,7 @@ static int isAxisInGroup(const AXIS_HDL pAxis)
  *
  * @return Zero if success, non-zero if error (and equal to XPS API error if error is from XPS).
  */
-static int setXPSAxisPID(AXIS_HDL pAxis, const double * const value, int pidoption)
+static int setXPSAxisPID(AXIS_HDL pAxis, const double * value, int pidoption)
 {
   int status = 0;
   char correctorType[250] = {'\0'};
@@ -1528,7 +1528,7 @@ static int getXPSAxisPID(AXIS_HDL pAxis)
  * @param value The value to set.
  * @param pidoption Set to 0 for P, 1 for I and 2 for D.
  */
-static void setXPSPIDValue(xpsCorrectorInfo_t *xpsCorrectorInfo, const double * const value, int pidoption) 
+static void setXPSPIDValue(xpsCorrectorInfo_t *xpsCorrectorInfo, const double * value, int pidoption) 
 {
   if ((pidoption < 0) || (pidoption > 2)) {
     printf("ERROR: drvXPSAsyn::setXPSPIDValue. pidoption out of range\n");
