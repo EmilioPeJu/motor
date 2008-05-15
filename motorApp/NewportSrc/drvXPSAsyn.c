@@ -193,7 +193,7 @@ static int PositionerCorrectorPIDFFAccelerationSetWrapper(AXIS_HDL pAxis);
 static int PositionerCorrectorPIDDualFFVoltageSetWrapper(AXIS_HDL pAxis);
 
 /*Deferred moves functions.*/
-static int processDeferredMoves(void);
+static int processDeferredMoves(const XPSController * pController);
 static int processDeferredMovesInGroup(const XPSController * pController, char * groupName);
 
 static void motorAxisReportAxis(AXIS_HDL pAxis, int level)
@@ -436,15 +436,14 @@ static int processDeferredMovesInGroup(const XPSController * pController, char *
 }
 
 /**
- * Process deferred moves for all XPS controllers and groups.
- * This function calculates which unique groups in the controllers
+ * Process deferred moves for a controller and groups.
+ * This function calculates which unique groups in the controller
  * and passes the controller pointer and group name to processDeferredMovesInGroup.
  * @return motor driver status code.
  */
-static int processDeferredMoves(void)
+static int processDeferredMoves(const XPSController * pController)
 {
   int status = MOTOR_AXIS_ERROR;
-  int controller = 0;
   int axis = 0;
   int i = 0;
   int dealWith = 0;
@@ -453,38 +452,31 @@ static int processDeferredMoves(void)
   char *blankGroupName = " ";
   AXIS_HDL pAxis = NULL;
 
-  /*Clear group name cache for first controller.*/
+  /*Clear group name cache.*/
   for (i=0; i<XPS_MAX_AXES; i++) {
     groupNames[i] = blankGroupName;
   }
 
-  /*Loop over controllers and axes, testing for unique groups.*/
-  for(controller=0; controller<numXPSControllers; controller++) {
-    for(axis=0; axis<pXPSController[controller].numAxes; axis++) {
-      pAxis = &pXPSController[controller].pAxis[axis];
-
-      PRINT(pAxis->logParam, FLOW, "Processing deferred moves on XPS: %d\n", pAxis->card);
-
-      /*Call processDeferredMovesInGroup only once for each group on this controller.
-	Positioners in the same group may not be adjacent in list, so we have to test for this.*/
-      for (i=0; i<XPS_MAX_AXES; i++) {
-	if (strcmp(pAxis->groupName, groupNames[i])) {
-	  dealWith++;
-	  groupNames[i] = pAxis->groupName;
-	}
-      }
-      if (dealWith == XPS_MAX_AXES) {
-	dealWith = 0;
-	/*Group name was not in cache, so deal with this group.*/
-	status = processDeferredMovesInGroup(&pXPSController[controller], pAxis->groupName);
-      }
-      /*Next axis, and potentially next group.*/
-    }
-    /*Clear cache for next controller.*/
+  /*Loop over axes, testing for unique groups.*/
+  for(axis=0; axis<pController->numAxes; axis++) {
+    pAxis = &pController->pAxis[axis];
+    
+    PRINT(pAxis->logParam, FLOW, "Processing deferred moves on XPS: %d\n", pAxis->card);
+    
+    /*Call processDeferredMovesInGroup only once for each group on this controller.
+      Positioners in the same group may not be adjacent in list, so we have to test for this.*/
     for (i=0; i<XPS_MAX_AXES; i++) {
-      groupNames[i] = blankGroupName;
+      if (strcmp(pAxis->groupName, groupNames[i])) {
+	dealWith++;
+	groupNames[i] = pAxis->groupName;
+      }
     }
-    /*Next controller.*/
+    if (dealWith == XPS_MAX_AXES) {
+      dealWith = 0;
+      /*Group name was not in cache, so deal with this group.*/
+      status = processDeferredMovesInGroup(pController, pAxis->groupName);
+    }
+    /*Next axis, and potentially next group.*/
   }
   
   return status;
@@ -703,7 +695,7 @@ static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double 
 	{
 	  PRINT(pAxis->logParam, FLOW, "Setting deferred move mode on XPS %d to %d\n", pAxis->card, value);
 	  if (value == 0.0 && pAxis->pController->movesDeferred != 0) {
-	    status = processDeferredMoves();
+	    status = processDeferredMoves(pAxis->pController);
 	  }
 	  pAxis->pController->movesDeferred = (int)value;
 	  if (status) {
@@ -757,7 +749,7 @@ static int motorAxisSetInteger(AXIS_HDL pAxis, motorAxisParam_t function, int va
     {
       PRINT(pAxis->logParam, FLOW, "Setting deferred move mode on XPS %d to %d\n", pAxis->card, value);
       if (value == 0 && pAxis->pController->movesDeferred != 0) {
-	status = processDeferredMoves();
+	status = processDeferredMoves(pAxis->pController);
       }
       pAxis->pController->movesDeferred = value;
       if (status) {
@@ -1065,6 +1057,8 @@ static void XPSPoller(XPSController *pController)
                 /* Set the status */
                 motorParam->setInteger(pAxis->params, XPSStatus, pAxis->axisStatus);
                 /* Set the axis done parameter */
+		/* AND the done flag with the inverse of deferred_move.*/
+		axisDone &= !pAxis->deferred_move;
                 motorParam->setInteger(pAxis->params, motorAxisDone, axisDone);
                 if (pAxis->axisStatus == 11) {
                     motorParam->setInteger(pAxis->params, motorAxisHomeSignal, 1);
