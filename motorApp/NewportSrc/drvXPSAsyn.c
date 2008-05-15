@@ -966,6 +966,10 @@ static int motorAxisStop(AXIS_HDL pAxis, double acceleration)
         }
     }
 
+    /*Clear defer move flag for this axis.*/
+    pAxis->deferred_move = 0;
+
+
     PRINT(pAxis->logParam, FLOW, "Set card %d, axis %d to stop with accel=%f\n",
           pAxis->card, pAxis->axis, acceleration);
     return MOTOR_AXIS_OK;
