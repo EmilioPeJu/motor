@@ -57,7 +57,7 @@ option +r;
 /* Used within the exec state as a timeout within the while loops which wait for
  * the ss xpsTrajectoryRun to catch up.  The delays are 0.1 second, so 100 loops
  * is 10 seconds. */
-#define COUNT_TIMEOUT  100
+#define COUNT_TIMEOUT  200
 
 /* The maximum size of the item names in gathering, e.g. "GROUP2.POSITIONER1.CurrentPosition" */
 #define MAX_GATHERING_AXIS_STRING 60
@@ -478,7 +478,7 @@ ss xpsTrajectoryScan {
                 sprintf(execMessage,"XPS Status Error=%d", xpsStatus);
             }
             /* See if the elapsed time is more than expected, time out */
-            if (difftime(time(0), startTime) > (expectedTime+10)) {
+            if (difftime(time(0), startTime) > (expectedTime+20)) {
                 execState = EXECUTE_STATE_FLYBACK;
                 execStatus = STATUS_TIMEOUT;
                 strcpy(execMessage, "Timeout");
