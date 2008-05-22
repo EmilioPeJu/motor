@@ -293,6 +293,11 @@ ss xpsTrajectoryScan {
 
     state execute {
         entry {
+            /* Set exec status to UNDEFINED */
+            execStatus = STATUS_UNDEFINED;
+            pvPut(execStatus);
+            strcpy(execMessage, " ");
+            pvPut(execMessage);
             if (debugLevel > 0) {
                 printf("XPS_trajectoryScan: ss xpsTrajectoryScan: state execute:"
                        " entry\n");
@@ -370,7 +375,7 @@ ss xpsTrajectoryScan {
         }
  
 
-        when (execStatus == STATUS_FAILURE) {
+        when ((execStatus == STATUS_FAILURE) || (execStatus == STATUS_ABORT)) {
             /* Clear execute command, post.  This is a "busy" record, don't
              * want to do this until execution is complete. */
             if (debugLevel > 0) {
@@ -382,7 +387,7 @@ ss xpsTrajectoryScan {
         } state monitor_inputs
 
 
-        when (execStatus != STATUS_FAILURE) {
+        when ((execStatus != STATUS_FAILURE) && (execStatus != STATUS_ABORT)) {
             %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
             /* Setting execState here will cause the xpsTrajectoryRun SS to wake up */
             if (debugLevel > 0) {
@@ -573,8 +578,7 @@ ss xpsTrajectoryScan {
  * state set. */
 ss xpsTrajectoryAbort {
     state monitorAbort {
-        when ((efTestAndClear(abortMon)) && (abort==1) &&
-              (execState==EXECUTE_STATE_EXECUTING)) {
+        when ((efTestAndClear(abortMon)) && (abort==1)) {
 
             execStatus = STATUS_ABORT;
             if (debugLevel > 0) {
@@ -1164,6 +1168,10 @@ static void readGathering(SS_ID ssId, struct UserVar *pVar)
     int ftpSocket;
     int status;
     int dir;
+    int ok;
+    char * bptr;
+    int success;
+    char c;
     
     if (pVar->debugLevel > 0) {
         printf("XPS_trajectoryScan: readGathering:"
@@ -1203,20 +1211,61 @@ static void readGathering(SS_ID ssId, struct UserVar *pVar)
     fgets (buffer, MAX_GATHERING_STRING, gatheringFile);
     
     for (i=0; i<pVar->npulses; i++) {
+    	ok = 1;
         for (j=0; j<pVar->numAxes; j++) {
             /* Note the trailing white space in this format is required to make
              * fscanf read the newline */
             nitems = fscanf(gatheringFile, "%lf %lf ", 
                             &setpointPosition, &actualPosition);
             if (nitems != NUM_GATHERING_ITEMS) {
-                printf("Error reading Gathering.dat file, nitems=%d, should be %d\n",
-                       nitems, NUM_GATHERING_ITEMS);
-                goto done;
+                printf("Invalid position for M%d in Gathering line %d, falling back on slow method\n",j+1,i+1);            
+	        	/* We got bad data, so skip this line and get it from memory on the XPS */
+	        	c = 'a';
+	        	while (c!='\n') {
+	        		c = fgetc (gatheringFile);
+	        	}
+                ok = 0;
+                break;
+            }
+            if (abs(actualPosition - setpointPosition)>0.01) {
+            	printf("Possible bad value, M%d=%f in Gathering line %d, falling back on slow method\n",j+1,actualPosition,i+1);
+            	if (j+1<pVar->numAxes) {
+		        	c = 'a';
+		        	while (c!='\n') {
+		        		c = fgetc (gatheringFile);
+		        	}
+				}
+            	ok = 0;
+            	break;
             }
             pVar->motorError[j][i] = actualPosition - setpointPosition;
             /* Convert from XPS units to EPICS motor user units */
             if (pVar->epicsMotorDir[j] == 0) dir=1; else dir=-1;
             pVar->motorReadbacks[j][i] = actualPosition * dir + pVar->epicsMotorOff[j];
+        }
+        if (ok==0) {
+			GatheringDataGet(pVar->pollSocket, i+1, buffer);
+			printf("New buffer: %s\n",buffer);
+			bptr = strtok(buffer,";");
+		    for (j=0; j<pVar->numAxes; j++) {
+		        success = sscanf(bptr, "%lf", &setpointPosition);
+		        if (success != 1) {
+		            printf("Invalid position for M%d in Gathering line %d\n",j+1,i+1);
+		            goto done;
+		        }
+		        bptr = strtok(NULL,";");
+		        success = sscanf(bptr, "%lf", &actualPosition);
+		        if (success != 1) {
+		            printf("Invalid position for M%d in Gathering line %d\n",j+1,i+1);
+		            goto done;
+		        }
+		        bptr = strtok(NULL,";");            
+		        pVar->motorError[j][i] = actualPosition - setpointPosition;
+		        /* Convert from XPS units to EPICS motor user units */
+		        if (pVar->epicsMotorDir[j] == 0) dir=1; else dir=-1;
+		        pVar->motorReadbacks[j][i] = actualPosition * dir + pVar->epicsMotorOff[j];
+		    }
+		    ok = 1;
         }
     }
     
