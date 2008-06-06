@@ -569,7 +569,7 @@ static void statusCallback(void *drvPvt, asynUser *pasynUser,
     if (dbScanLockOK) {
         dbScanLock((dbCommon *)pmr);
         memcpy(&pPvt->status, value, sizeof(struct MotorStatus));
-        if (!pPvt->needUpdate && !pPvt->moveRequestPending) {
+        if (!pPvt->moveRequestPending) {
 	    pPvt->needUpdate = 1;
 	    /* pmr->rset->process((dbCommon*)pmr); */
             dbProcess((dbCommon*)pmr);
