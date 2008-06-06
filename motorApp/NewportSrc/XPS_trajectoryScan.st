@@ -459,6 +459,12 @@ ss xpsTrajectoryScan {
             for (j=0; j<numAxes; j++) pvPut(motorCurrent[j]);
 
             %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
+            if (xpsStatus != 45) {
+            	/* Check again */
+		        printf("Possible odd status value=%d, retrying\n",xpsStatus);            	
+		        delay(0.1);
+                %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
+            }
             if (xpsStatus == 45) {
                 %%pVar->ncomplete = currentElement(ssId, pVar);
                 sprintf(execMessage, "Executing element %d/%d", 
