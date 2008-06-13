@@ -358,16 +358,16 @@ ss xpsTrajectoryScan {
                                                            axisName[j],
                                                            &motorLowLimit[j], 
                                                            &motorHighLimit[j]);
-                    if ((epicsMotorPos[j] + motorMinPos[j]) < motorLowLimit[j]) {
+                    if ((epicsMotorPos[j] + motorMinPos[j] - epicsMotorOff[j]) < motorLowLimit[j]) {
                         execStatus = STATUS_FAILURE;
                         pvPut(execStatus);
-                        sprintf(execMessage, "Low soft limit violation on motor %d", j);
+                        sprintf(execMessage, "Low soft limit violation on motor %d", j+1);
                         pvPut(execMessage);
                     }
-                    if ((epicsMotorPos[j] + motorMaxPos[j]) > motorHighLimit[j]) {
+                    if ((epicsMotorPos[j] + motorMaxPos[j] - epicsMotorOff[j]) > motorHighLimit[j]) {
                         execStatus = STATUS_FAILURE;
                         pvPut(execStatus);
-                        sprintf(execMessage, "High soft limit violation on motor %d", j);
+                        sprintf(execMessage, "High soft limit violation on motor %d", j+1);
                         pvPut(execMessage);
                     }
                 }
