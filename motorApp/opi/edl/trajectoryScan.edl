@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 561
-y 334
+x 515
+y 651
 w 952
 h 387
 font "arial-medium-r-18.0"
@@ -1664,30 +1664,6 @@ indicatorPv "$(P)$(R)M1Move"
 font "arial-bold-r-14.0"
 endObjectProperties
 
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 615
-y 100
-w 75
-h 30
-fgColor index 25
-onColor index 4
-offColor index 3
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(P)$(R)Build"
-pressValue "1"
-onLabel "Build"
-offLabel "Build"
-3d
-useEnumNumeric
-font "arial-bold-r-14.0"
-endObjectProperties
-
 # (Text Monitor)
 object activeXTextDspClass:noedit
 beginObjectProperties
@@ -1716,9 +1692,9 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 695
+x 705
 y 100
-w 120
+w 110
 h 30
 controlPv "$(P)$(R)BuildState"
 format "decimal"
@@ -1730,55 +1706,6 @@ nullColor index 0
 useHexPrefix
 newPos
 objType "monitors"
-endObjectProperties
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 615
-y 180
-w 75
-h 30
-fgColor index 25
-onColor index 4
-offColor index 3
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(P)$(R)Execute"
-pressValue "1"
-onLabel "Execute"
-offLabel "Execute"
-3d
-useEnumNumeric
-font "arial-bold-r-14.0"
-endObjectProperties
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 610
-y 345
-w 230
-h 35
-fgColor index 20
-onColor index 4
-offColor index 3
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(P)$(R)Abort"
-pressValue "1"
-releaseValue "0"
-onLabel "STOP"
-offLabel "STOP"
-3d
-useEnumNumeric
-font "arial-bold-r-18.0"
 endObjectProperties
 
 # (Text Monitor)
@@ -1916,9 +1843,9 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 695
+x 705
 y 180
-w 120
+w 110
 h 30
 controlPv "$(P)$(R)ExecState"
 format "decimal"
@@ -1982,9 +1909,9 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 695
+x 705
 y 260
-w 120
+w 110
 h 30
 controlPv "$(P)$(R)ReadState"
 format "decimal"
@@ -2391,7 +2318,7 @@ minor 1
 release 0
 x 615
 y 260
-w 75
+w 85
 h 30
 font "arial-bold-r-14.0"
 fontAlign "center"
@@ -2401,34 +2328,6 @@ value {
   "Readback"
 }
 border
-endObjectProperties
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 615
-y 260
-w 75
-h 30
-fgColor index 25
-onColor index 4
-offColor index 3
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(P)$(R)Readback"
-pressValue "1"
-onLabel "Readback"
-offLabel "Readback"
-3d
-useEnumNumeric
-font "arial-bold-r-14.0"
-visPv "$(P)$(R)ReadStatus"
-visInvert
-visMin "1"
-visMax "2"
 endObjectProperties
 
 # (Menu Mux PV)
@@ -2519,5 +2418,113 @@ symbol3 {
 PV3 {
   0 "$(P)$(R)M8NAME"
 }
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 615
+y 100
+w 85
+h 30
+fgColor index 25
+onColor index 4
+offColor index 3
+inconsistentColor index 14
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(P)$(R)Build"
+indicatorPv "$(P)$(R)Build"
+onLabel "Building..."
+offLabel "Build"
+labelType "literal"
+3d
+font "arial-bold-r-14.0"
+objType "controls"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 615
+y 180
+w 85
+h 30
+fgColor index 25
+onColor index 4
+offColor index 3
+inconsistentColor index 14
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(P)$(R)Execute"
+indicatorPv "$(P)$(R)Execute"
+onLabel "Executing..."
+offLabel "Execute"
+labelType "literal"
+3d
+font "arial-bold-r-14.0"
+objType "controls"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 615
+y 260
+w 85
+h 30
+fgColor index 25
+onColor index 4
+offColor index 3
+inconsistentColor index 14
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(P)$(R)Readback"
+indicatorPv "$(P)$(R)Readback"
+onLabel "Reading..."
+offLabel "Readback"
+labelType "literal"
+3d
+font "arial-bold-r-14.0"
+objType "controls"
+visPv "$(P)$(R)ReadStatus"
+visInvert
+visMin "1"
+visMax "2"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 610
+y 345
+w 230
+h 35
+fgColor index 20
+onColor index 4
+offColor index 3
+inconsistentColor index 14
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(P)$(R)Abort"
+indicatorPv "$(P)$(R)Abort"
+onLabel "Aborting..."
+offLabel "Abort"
+labelType "literal"
+3d
+font "arial-bold-r-18.0"
+objType "controls"
 endObjectProperties
 

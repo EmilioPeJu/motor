@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 189
-y 497
+x 590
+y 888
 w 663
 h 231
 font "arial-medium-r-16.0"
@@ -19,7 +19,7 @@ ctlBgColor1 index 3
 ctlBgColor2 index 5
 topShadowColor index 1
 botShadowColor index 11
-title "Auto Save"
+title "Motor Limits - $(motor)"
 disableScroll
 endScreenProperties
 
