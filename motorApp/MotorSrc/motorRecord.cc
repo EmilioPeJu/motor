@@ -2087,7 +2087,9 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 	    {
 		double velocity, position, accel;
 
-		pmr->mip = MIP_MOVE;
+                /* AJF fix for the bug where the retry count is not incremented when doing retries */
+                /* This bug is seen when we use the readback link field                            */
+		pmr->mip |= MIP_MOVE;
 		MARK(M_MIP);
 		/* v1.96 Don't post dmov if special already did. */
 		if (pmr->dmov)
