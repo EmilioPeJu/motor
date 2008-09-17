@@ -3052,6 +3052,12 @@ static void alarm_sub(motorRecord * pmr)
 	MARK(M_MSTA);
 	status = recGblSetSevr((dbCommon *) pmr, COMM_ALARM, INVALID_ALARM);
     }
+
+    if (msta.Bits.EA_SLIP_STALL != 0)
+    {
+      status = recGblSetSevr((dbCommon *) pmr, STATE_ALARM, MAJOR_ALARM);
+    }
+
     return;
 }
 
