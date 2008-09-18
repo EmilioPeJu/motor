@@ -1060,11 +1060,22 @@ static void XPSPoller(XPSController *pController)
 		/* AND the done flag with the inverse of deferred_move.*/
 		axisDone &= !pAxis->deferred_move;
                 motorParam->setInteger(pAxis->params, motorAxisDone, axisDone);
+
+		/*Set the ATHM signal.*/
                 if (pAxis->axisStatus == 11) {
                     motorParam->setInteger(pAxis->params, motorAxisHomeSignal, 1);
                 } else {
                     motorParam->setInteger(pAxis->params, motorAxisHomeSignal, 0);
                 }
+
+		/*Set the HOMED signal.*/
+		if ((pAxis->axisStatus >= 10 && pAxis->axisStatus <= 21) || 
+		    (pAxis->axisStatus == 44)) {
+		  motorParam->setInteger(pAxis->params, motorAxisHomed, 1);
+		} else {
+		  motorParam->setInteger(pAxis->params, motorAxisHomed, 0);
+		}
+
                 if ((pAxis->axisStatus >= 0 && pAxis->axisStatus <= 9) || 
                     (pAxis->axisStatus >= 20 && pAxis->axisStatus <= 42)) {
                     /* Not initialized, homed or disabled */
