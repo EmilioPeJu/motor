@@ -325,6 +325,7 @@ typedef enum
     motorAxisHasClosedLoop,    /**< Motor supports closed-loop position control. */
     motorAxisCommError,        /**< Controller communication error. */
     motorAxisLowHardLimit,     /**< minus limit switch has been hit */
+    motorAxisHomed,            /**< Motor has been homed.*/
     motorAxisDeferMoves,       /**< Moves are not executed immediately, but are deferred until this parameter is set to zero */
     motorAxisLastParam
 } motorAxisParam_t;
