@@ -2764,13 +2764,13 @@ release 0
 x 432
 y 80
 w 16
-h 224
+h 236
 controlPv "$(P)$(M).MSTA"
 lineColor index 14
 onColor index 15
 offColor index 19
 endian "little"
-numBits 14
+numBits 15
 endObjectProperties
 
 # (Static Text)
@@ -2883,7 +2883,7 @@ fgColor index 14
 bgColor index 3
 useDisplayBg
 value {
-  "At Home"
+  "Encoder Home"
 }
 endObjectProperties
 
@@ -3249,6 +3249,44 @@ bgColor index 3
 useDisplayBg
 value {
   "Following Error"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 452
+y 304
+w 80
+h 16
+font "helvetica-bold-r-10.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Homed"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 452
+y 144
+w 80
+h 16
+font "helvetica-bold-r-10.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Unused"
 }
 endObjectProperties
 

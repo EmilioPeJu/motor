@@ -719,7 +719,7 @@ fgColor index 14
 bgColor index 0
 useDisplayBg
 value {
-  "Home"
+  "Homed"
 }
 endObjectProperties
 
@@ -733,12 +733,13 @@ x 380
 y 218
 w 20
 h 20
-controlPv "$(motor).ATHM"
+controlPv "$(motor).MSTA"
 lineColor index 14
 onColor index 15
 offColor index 19
 lineWidth 2
 numBits 1
+shift 14
 endObjectProperties
 
 # (Static Text)
