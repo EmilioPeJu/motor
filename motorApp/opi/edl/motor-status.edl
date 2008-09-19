@@ -781,14 +781,14 @@ minor 1
 release 0
 x 405
 y 235
-w 66
+w 116
 h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
 useDisplayBg
 value {
-  "At Home"
+  "Encoder Home"
 }
 autoSize
 endObjectProperties
