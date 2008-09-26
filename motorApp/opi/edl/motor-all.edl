@@ -2764,13 +2764,12 @@ release 0
 x 432
 y 80
 w 16
-h 236
+h 252
 controlPv "$(P)$(M).MSTA"
 lineColor index 14
 onColor index 15
 offColor index 19
 endian "little"
-numBits 15
 endObjectProperties
 
 # (Static Text)
@@ -3287,6 +3286,25 @@ bgColor index 3
 useDisplayBg
 value {
   "Unused"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 452
+y 320
+w 80
+h 16
+font "helvetica-bold-r-10.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Hardware Prob"
 }
 endObjectProperties
 

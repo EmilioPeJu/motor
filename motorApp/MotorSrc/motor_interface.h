@@ -326,6 +326,7 @@ typedef enum
     motorAxisCommError,        /**< Controller communication error. */
     motorAxisLowHardLimit,     /**< minus limit switch has been hit */
     motorAxisHomed,            /**< Motor has been homed.*/
+    motorAxisHardwareProb,     /**< Motor or Controller has a general hardware problem.*/
     motorAxisDeferMoves,       /**< Moves are not executed immediately, but are deferred until this parameter is set to zero */
     motorAxisLastParam
 } motorAxisParam_t;
