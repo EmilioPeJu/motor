@@ -1020,6 +1020,7 @@ static void XPSPoller(XPSController *pController)
             status = GroupStatusGet(pAxis->pollSocket, 
                                     pAxis->groupName, 
                                     &pAxis->axisStatus);
+
             if (status != 0) {
                 PRINT(pAxis->logParam, ERROR, "XPSPoller: error calling GroupStatusGet[%d,%d], status=%d\n", pAxis->card, pAxis->axis, status);
                 motorParam->setInteger(pAxis->params, motorAxisCommError, 1);
@@ -1076,16 +1077,6 @@ static void XPSPoller(XPSController *pController)
 		  motorParam->setInteger(pAxis->params, motorAxisHomed, 0);
 		}
 
-                if ((pAxis->axisStatus >= 0 && pAxis->axisStatus <= 9) || 
-                    (pAxis->axisStatus >= 20 && pAxis->axisStatus <= 42)) {
-                    /* Not initialized, homed or disabled */
-                     PRINT(pAxis->logParam, FLOW, "axis %d in bad state %d\n",
-                           pAxis->axis, pAxis->axisStatus);
-                    /* motorParam->setInteger(pAxis->params, motorAxisHighHardLimit, 1);
-                     * motorParam->setInteger(pAxis->params, motorAxisLowHardLimit,  1);
-                     */
-                }
-
 		/*Test for following error, and set appropriate param.*/
 		if ((pAxis->axisStatus == 21 || pAxis->axisStatus == 22) ||
 		    (pAxis->axisStatus >= 24 && pAxis->axisStatus <= 26) ||
@@ -1096,6 +1087,18 @@ static void XPSPoller(XPSController *pController)
 		} else {
 		  motorParam->setInteger(pAxis->params, motorAxisFollowingError, 0);
 		}
+
+		/*Test for states that mean we cannot move an axis (disabled, uninitialised, etc.) 
+		  and set hardware problem bit in MSTA.*/
+		if ((pAxis->axisStatus < 10) || ((pAxis->axisStatus >= 20) && (pAxis->axisStatus <= 42)) ||
+		    (pAxis->axisStatus == 64)) {
+		  PRINT(pAxis->logParam, FLOW, "XPS Axis %d is uninitialised/disabled/not referenced. XPS State Code: %d\n",
+                           pAxis->axis, pAxis->axisStatus);
+		  motorParam->setInteger(pAxis->params, motorAxisHardwareProb, 1);
+		} else {
+		  motorParam->setInteger(pAxis->params, motorAxisHardwareProb, 0);
+		}
+		
 
             }
 
