@@ -1089,14 +1089,14 @@ static void XPSPoller(XPSController *pController)
 		}
 
 		/*Test for states that mean we cannot move an axis (disabled, uninitialised, etc.) 
-		  and set hardware problem bit in MSTA.*/
+		  and set problem bit in MSTA.*/
 		if ((pAxis->axisStatus < 10) || ((pAxis->axisStatus >= 20) && (pAxis->axisStatus <= 42)) ||
 		    (pAxis->axisStatus == 64)) {
 		  PRINT(pAxis->logParam, FLOW, "XPS Axis %d is uninitialised/disabled/not referenced. XPS State Code: %d\n",
                            pAxis->axis, pAxis->axisStatus);
-		  motorParam->setInteger(pAxis->params, motorAxisHardwareProb, 1);
+		  motorParam->setInteger(pAxis->params, motorAxisProblem, 1);
 		} else {
-		  motorParam->setInteger(pAxis->params, motorAxisHardwareProb, 0);
+		  motorParam->setInteger(pAxis->params, motorAxisProblem, 0);
 		}
 		
 
