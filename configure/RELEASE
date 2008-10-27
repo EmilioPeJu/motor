@@ -17,6 +17,7 @@ WORK=/dls_sw/work/R3.14.8.2/support
 # required, then ASYN must be defined.
 # Recommended ASYN release: R4-9
 ASYN=$(SUPPORT)/asyn/4-9
+#ASYN=/home/mp49/epics/support/asyn
 
 # Need the sequencer for the MM4005 and XPS trajectory scanning
 SNCSEQ=$(SUPPORT)/seq/2-0-11dls1

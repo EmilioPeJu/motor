@@ -107,9 +107,7 @@ Last Modified:	$Date: 2008/05/08 21:44:41 $
  *                  - NTM logic is restored to using feedbacks; NTMF added.
  * .45 03-24-08 rls - Set DRBV based on RRBV only if URIP = NO.
  * .46 05-08-08 rls - Missing "break" in special().
- *  47 26-09-08 mrp - In alarm_sub test for EA_SLIP_STALL and HARDWARE_PROB in MSTA
- *                    and put record into MAJOR STATE alarm.
- *  
+ *
  */
 
 #define VERSION 6.4
@@ -3055,7 +3053,7 @@ static void alarm_sub(motorRecord * pmr)
 	status = recGblSetSevr((dbCommon *) pmr, COMM_ALARM, INVALID_ALARM);
     }
 
-    if ((msta.Bits.EA_SLIP_STALL != 0) || (msta.Bits.HARDWARE_PROB != 0))
+    if (msta.Bits.EA_SLIP_STALL != 0)
     {
       status = recGblSetSevr((dbCommon *) pmr, STATE_ALARM, MAJOR_ALARM);
     }

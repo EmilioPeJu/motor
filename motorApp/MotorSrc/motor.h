@@ -141,8 +141,7 @@ typedef union
     struct
     {
 #ifdef MSB_First
-	unsigned int na		    :16;/* N/A bits  */
-        unsigned int HARDWARE_PROB  :1; /* General hardware problem.*/
+	unsigned int na		    :17;/* N/A bits  */
         unsigned int RA_HOMED       :1; /* Axis has been homed.*/
 	unsigned int RA_MINUS_LS    :1;	/* minus limit switch has been hit */
 	unsigned int CNTRL_COMM_ERR :1;	/* Controller communication error. */
@@ -174,8 +173,7 @@ typedef union
 	unsigned int CNTRL_COMM_ERR :1;	/* Controller communication error. */
 	unsigned int RA_MINUS_LS    :1;	/* minus limit switch has been hit */
         unsigned int RA_HOMED       :1; /* Axis has been homed.*/
-        unsigned int HARDWARE_PROB  :1; /* General hardware problem.*/
-        unsigned int na		    :16;/* N/A bits  */
+	unsigned int na		    :17;/* N/A bits  */
 #endif
     } Bits;                                
 } msta_field;

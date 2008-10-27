@@ -40,9 +40,7 @@ typedef enum {
     motorStatusSlip, motorStatusPowerOn, motorStatusFollowingError,
     motorStatusHome, motorStatusHasEncoder, motorStatusProblem,
     motorStatusMoving, motorStatusGainSupport, motorStatusCommsError,
-    motorStatusLowLimit, motorStatusHomed,
-    motorStatusHardwareProb,
-    motorStatusLast
+    motorStatusLowLimit, motorStatusHomed, motorStatusLast
 } motorCommand; 
 
 #endif
