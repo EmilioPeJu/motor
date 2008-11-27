@@ -38,5 +38,6 @@ record(motor,"$(P)$(M)")
 	field(VMAX, "$(VMAX)")
 	field(OFF, "$(OFF)")
 	field(RDBD, "$(RDBD)")
+	field(FOFF, "$(FOFF)")
 }
 
