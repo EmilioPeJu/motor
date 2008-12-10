@@ -37,7 +37,6 @@ Last Modified:	$Date: 2004/09/15 18:48:35 $
 #ifndef	INCdrvPmach
 #define	INCdrvPmach 1
 
-#include <devLib.h>
 #include "motor.h"
 #include "motordrvCom.h"
 
@@ -48,7 +47,7 @@ Last Modified:	$Date: 2004/09/15 18:48:35 $
 
 /* Default profile. */
 
-#define Pmac_NUM_CARDS		10	/* Maximum number of cards. */
+#define Pmac_NUM_CARDS		1	/* Maximum number of cards. */
 #define Pmac_BRD_SIZE		0x4000	/* card address boundary */
 #define Pmac_MAX_AXES		32
 #define Pmac_INTERRUPT_TYPE	intVME
@@ -63,82 +62,140 @@ struct PMACcontroller
 {
     int	status;
     bool irqEnable;
-    char *mbox_addr;
-    char *dpram_addr;
-    int interrupt_vector;
-    int interrupt_level;
-    epicsAddressType addr_type;
     double pos_scaleFac[Pmac_MAX_AXES];	/* Position scale factor (Ixx08 * 32). */
 };
 
-typedef enum
+typedef struct
 {
-    w1_maxrapid_speed,
-    w1_alt_cmndout_mode,
-    w1_soft_pos_capture,
-    w1_error_trigger,
-    w1_follow_enable,
-    w1_follow_offset,
-    w1_phased_motor,
-    w1_alt_src_dest,
-    w1_user_servo,
-    w1_user_phase,
-    w1_homing,
-    w1_block_request,
-    w1_decel_abort,
-    w1_CmndVelZero,
-    w1_DataBlkErr,
-    w1_dwell,
-    w1_integrate_mode,
-    w1_move_time_on,
-    w1_open_loop,
-    w1_amp_enabled,
-    w1_x_servo_on,
-    w1_pos_limit_set,
-    w1_neg_limit_set,
-    w1_motor_on
-} pmacStatusWordOneBits;
+    union
+    {
+	epicsUInt16 All;
+	struct
+	{
+#ifdef MSB_First
+	    unsigned int motor_on       :1; /* Motor Activated (23). */
+	    unsigned int neg_limit_set  :1; /* Negative End Limit Set (22). */
+	    unsigned int pos_limit_set  :1; /* Positive End Limit Set (21). */
+	    unsigned int x_servo_on     :1; /* Extended Servo Algorithm Enabled (20). */
+	    unsigned int amp_enabled    :1; /* Amplifier Enabled (19). */
+	    unsigned int open_loop      :1; /* Open Loop Mode (18). */
+	    unsigned int move_time_on   :1; /* Move Timer Active (17). */
+	    unsigned int integrate_mode :1; /* Integration Mode (16). */
+	    unsigned int dwell		:1; /* Dwell in Progress (15). */
+	    unsigned int DataBlkErr	:1; /* Data Block Error (14). */
+	    unsigned int CmndVelZero	:1; /* Desired Velocity Zero (13). */
+	    unsigned int decel_abort    :1; /* Abort Deceleration (12). */
+	    unsigned int block_request  :1; /* Block Request (11). */
+	    unsigned int homeing        :1; /* Home Search in Progress (10). */
+	    unsigned int user_phase     :1; /* User-Written Phase Enable (9). */
+	    unsigned int user_servo	:1; /* User-Written Servo Enable (8). */
+#else
+	    unsigned int follow_enable  :1; /* . */
+	    unsigned int follow_offset  :1; /* . */
+	    unsigned int phased_motor   :1; /* . */
+	    unsigned int alt_src_dest   :1; /* . */
+	    unsigned int user_enable    :1; /* . */
+	    unsigned int user_phase     :1; /* . */
+	    unsigned int homeing        :1; /* . */
+	    unsigned int block_request  :1; /* . */
+	    unsigned int decel_abort    :1; /* . */
+	    unsigned int move_time_on   :1; /* . */
+	    unsigned int open_loop      :1; /* . */
+	    unsigned int amp_enabled    :1; /* . */
+	    unsigned int x_servo_on     :1; /* . */
+	    unsigned int pos_limit_set  :1; /* . */
+	    unsigned int neg_limit_set  :1; /* . */
+	    unsigned int motor_on       :1; /* . */
+#endif
+	} Bits;
+    } word1;
 
-typedef enum
-{
-    w2_in_position,
-    w2_warn_follow_err,
-    w2_err_follow_err,
-    w2_amp_fault,
-    w2_neg_backlash,
-    w2_i2t_amp_fault,
-    w2_i2_follow_err,
-    w2_trigger_move,
-    w2_phase_ref_err,
-    w2_phase_search,
-    w2_home_complete,
-    w2_pos_limit_stop,
-    w2_desired_stop,
-    w2_fore_in_pos,
-    w2_na14,
-    w2_assigned_CS
-} pmacStatusWordTwoBits;
+    union
+    {
+	epicsUInt16 All;
+	struct
+	{
+#ifdef MSB_First
+	    unsigned int alt_src_dest   :1; /* Alternate Source/Destination (7). */
+	    unsigned int phased_motor   :1; /* Phased Motor (6). */
+	    unsigned int follow_offset  :1; /* Following Offset Mode (5). */
+	    unsigned int follow_enable  :1; /* Following Enabled (4). */
+	    unsigned int error_trigger  :1; /* . */
+	    unsigned int soft_pos_capture  :1;	/* . */
+	    unsigned int alt_cmndout_mode  :1;	/* . */
+	    unsigned int maxrapid_speed  :1; /* . */
+	    unsigned int CS_assignment  :4; /* Coordinate System Number. */
+	    unsigned int CD_assignment  :4; /* Coordinate Definition. */
+#else
+	    unsigned int desired_stop   :1; /* . */
+	    unsigned int fore_in_pos    :1; /* Foreground In-Position. */
+	    unsigned int na14           :1; /* . */
+	    unsigned int assigned_CS    :1; /* Assigned to C.S. */
+	    unsigned int CD_assignment  :4; /* Coordinate Definition. */
+	    unsigned int CS_assignment  :4; /* Coordinate System Number. */
+	    unsigned int maxrapid_speed  :1; /* . */
+	    unsigned int alt_cmndout_mode  :1;	/* . */
+	    unsigned int soft_pos_capture  :1;	/* . */
+	    unsigned int error_trigger  :1; /* . */
+#endif
+	} Bits;
+    } word2;
+
+    union
+    {
+	epicsUInt16 All;
+	struct
+	{
+#ifdef MSB_First
+	    unsigned int assigned_CS    :1; /* Assigned to C.S. (15).*/
+	    unsigned int na14           :1; /* N/A (14). */
+	    unsigned int fore_in_pos    :1; /* Foreground In-Position (13). */
+	    unsigned int desired_stop   :1; /* Stopped on Desired Position Limit (12) . */
+	    unsigned int pos_limit_stop :1; /* Stopped on Position Limit (11). */
+	    unsigned int home_complete  :1; /* Home Complete (10). */
+	    unsigned int phase_search   :1; /* Phase Search/Read Active (9). */
+	    unsigned int phase_ref_err  :1; /* Phase Reference Error (8). */
+	    unsigned int trigger_move   :1; /* Trigger Move (7). */
+	    unsigned int i2_follow_err  :1; /* Integrated Fatal Following Error (6). */
+	    unsigned int i2t_amp_fault  :1; /* I2T Aplifier Fault (5). */
+	    unsigned int neg_backlash   :1; /* Negative Backlash Direction Flag (4). */
+	    unsigned int amp_fault      :1; /* Amplifier Fault (3). */
+	    unsigned int err_follow_err :1; /* Fatal Following Error (2). */
+	    unsigned int warn_follow_err:1; /* Warning Following Error (1). */
+	    unsigned int in_position    :1; /* In position (0). */
+#else
+	    unsigned int in_position    :1; /* In position. */
+	    unsigned int warn_follow_err:1; /* Following error warning. */
+	    unsigned int err_follow_err :1; /* Fatal Following error. */
+	    unsigned int amp_fault      :1; /* Amplifier Fault. */
+	    unsigned int neg_backlash   :1; /* Negative Backlash Direction Flag. */
+	    unsigned int i2t_amp_fault  :1; /* I2T Aplifier Fault. */
+	    unsigned int i2_follow_err  :1; /* Integrated Fatal Following Error. */
+	    unsigned int trigger_move   :1; /* Trigger Move. */
+	    unsigned int phase_ref_err  :1; /* Phase Reference Error. */
+	    unsigned int home_complete  :1; /* Home Complete. */
+	    unsigned int pos_limit_stop :1; /* Stopped on Position Limit. */
+#endif
+	} Bits;
+    } word3;
+} MOTOR_STATUS;
 
 
 typedef union
 {
-    volatile epicsUInt16 All;
+    epicsUInt16 All;
     struct
     {
-        volatile epicsUInt8 term;
-        volatile epicsUInt8 ctrl;
-#if 0
 #ifdef MSB_First
-        epicsUInt16 cntrl_char :8;  /* Response control charcter. */
-        epicsUInt16 type       :2;  /* Response type. */
-        epicsUInt16 na1        :5;  /* n/a bit #1-4. */
-        epicsUInt16 error      :1;  /* Error indicator. */
+	unsigned int cntrl_char     :8;	/* Response control charcter. */
+	unsigned int type	    :2;	/* Response type. */
+	unsigned int na1	    :5;	/* n/a bit #1-4. */
+	unsigned int error	    :1;	/* Error indicator. */
 #else
-        epicsUInt16 error      :1;  /* Error indicator. */
-        epicsUInt16 na1        :5;  /* n/a bit #1-4. */
-        epicsUInt16 type       :2;  /* Response type. */
-        epicsUInt16 cntrl_char :8;  /* Response control charcter. */
-#endif
+	unsigned int error	    :1;	/* Error indicator. */
+	unsigned int na1	    :5;	/* n/a bit #1-4. */
+	unsigned int type	    :2;	/* Response type. */
+	unsigned int cntrl_char     :8;	/* Response control charcter. */
 #endif
     } Bits;                                
 } REPLY_STATUS;
@@ -148,42 +205,14 @@ typedef union
 struct pmac_dpram
 {
     epicsUInt8 na0[0xE9C];
-    volatile epicsUInt8 out_cntrl_wd;	/* Control Word at 0x0E9C. */
+    epicsUInt8 out_cntrl_wd;	/* Control Word at 0x0E9C. */
     epicsUInt8 na1;
-    volatile epicsUInt16 out_cntrl_char;	/* Control Character at 0x0E9E. */
-    volatile epicsUInt8 cmndbuff[160];	/* Command Buffer at 0x0EA0. */
-    REPLY_STATUS reply_status;	        /* Response Buffer Control Characters. */
-    volatile epicsUInt8 reply_count;	/* Response Character count - 1. */
+    epicsUInt16 out_cntrl_char;	/* Control Character at 0x0E9E. */
+    epicsUInt8 cmndbuff[160];	/* Command Buffer at 0x0EA0. */
+    REPLY_STATUS reply_status;	/* Response Buffer Control Characters. */
+    epicsUInt8 reply_count;	/* Response Character count - 1. */
     epicsUInt8 na2;
-    volatile epicsUInt8 response[256];	/* Response Buffer at 0x0F44. */
+    epicsUInt8 response[256];	/* Response Buffer at 0x0F44. */
 };
-
-typedef struct simargs_s
-{
-  int numcards;
-  struct pmac_dpram *pdpram[Pmac_NUM_CARDS];
-} simargs_t;
-
-/* Driver status bits (MN 13/4/05) */
-#define PM_MOTPROGRAM 0x4000
-#define PM_AXISHOMED  0x8000
-/* Driver status bits (MN 13/4/05) */
-#define PM_MOTPROGRAM   0x4000
-#define PM_AXISHOMED    0x8000
-#define PM_MOTACTIVATE  0x10000
-#define PM_AMPENABLE    0x20000
-#define PM_MOTTIMACT    0x40000
-#define PM_DWELLACT     0x80000
-#define PM_DATAERR      0x100000
-#define PM_DESVELZERO   0x200000
-#define PM_HOMESEARCH   0x400000
-#define PM_POSLIMIT     0x800000
-#define PM_HOMCOMPLETE  0x1000000
-#define PM_TRIGGERMOVE  0x2000000
-#define PM_INTFOLERR    0x4000000
-#define PM_AMPFAULT     0x8000000
-#define PM_FOLERR       0x10000000
-#define PM_INPOSITION   0x20000000
-
 
 #endif	/* INCdrvPmach */

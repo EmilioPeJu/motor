@@ -11,9 +11,9 @@
  * Notwithstanding the above, explicit permission is granted for APS to 
  * redistribute this software.
  *
- * Version: $Revision: 1.22 $
- * Modified by: $Author: sluiter $
- * Last Modified: $Date: 2008/04/02 19:47:23 $
+ * Version: $Revision: 1.26 $
+ * Modified by: $Author: mp49 $
+ * Last Modified: $Date: 2008/12/01 12:18:35 $
  *
  * Original Author: Peter Denison
  * Current Author: Peter Denison
