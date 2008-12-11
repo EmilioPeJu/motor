@@ -127,10 +127,10 @@ typedef enum  {
     #define LSB_First (TRUE)  /* LSB is packed first. */
 #elif defined (__i386__) || defined(_armv4l_) || defined (_X86_64_)
     #define LSB_First (TRUE)  /* LSB is packed first. */
-#elif #cpu(sparc) || #cpu(m68k) || #cpu(powerpc)
+#elif #cpu(sparc) || #cpu(m68k) || #cpu(powerpc) || defined(_ARM_NWFP_) /*DLS Hack to get Arm compiling working. MRP 11Dec08.*/
     #define MSB_First (TRUE)  /* MSB is packed first. */
 #else
-/*Error: unknown bit order!*/
+  #error: unknown bit order!
 #endif
 
 /* -------------------------------------------------- */
