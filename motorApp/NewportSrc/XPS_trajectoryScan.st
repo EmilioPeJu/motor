@@ -22,6 +22,7 @@ program XPS_trajectoryScan("P=13BMC:,R=traj1,IPADDR=164.54.160.34,PORT=5001,"
 %% #include "XPS_C8_drivers.h"
 %% #include "Socket.h"
 %% #include "xps_ftp.h"
+%% #include "drvXPSAsyn.h"
 
 
 /* This program must be compiled with the recursive option */
@@ -484,7 +485,8 @@ ss xpsTrajectoryScan {
                 sprintf(execMessage,"XPS Status Error=%d", xpsStatus);
             }
             /* See if the elapsed time is more than expected, time out */
-            if (difftime(time(0), startTime) > (expectedTime+20)) {
+            if (difftime(time(0), startTime) > (npulses/1000+expectedTime+10.0)) {
+				printf("Timeout: difftime = %f\n",difftime(time(0), startTime) - (npulses/1000+expectedTime+10.0));     
                 execState = EXECUTE_STATE_FLYBACK;
                 execStatus = STATUS_TIMEOUT;
                 strcpy(execMessage, "Timeout");
@@ -906,8 +908,10 @@ static void trajectoryExecute(SS_ID ssId, struct UserVar *pVar)
         printf("XPS_trajectoryScan: trajectoryExecute:"
                " calling GatheringStopAndSave(%d)\n", pVar->pollSocket);
     }
+    XPSDisablePoll(1);
+	sleep(1);
     status = GatheringStopAndSave(pVar->pollSocket);
-    
+    XPSDisablePoll(0);    
     /* status -30 means gathering not started i.e. aborted before the end of
        1 trajectory element */
     if ((status != 0) && (status != -30))
