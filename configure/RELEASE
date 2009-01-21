@@ -16,7 +16,7 @@ WORK=/dls_sw/work/R3.14.8.2/support
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
 # Recommended ASYN release: R4-9
-ASYN=$(SUPPORT)/asyn/4-9
+ASYN=$(SUPPORT)/asyn/4-10
 #ASYN=/home/mp49/epics/support/asyn
 
 # Need the sequencer for the MM4005 and XPS trajectory scanning
