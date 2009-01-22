@@ -526,6 +526,7 @@ static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double 
 	      if (status != 0) {
 		PRINT(pAxis->logParam, ERROR, " Error performing GroupPositionCurrentGet(%d,%d). Aborting set position. XPS API Error: %d.\n", 
 		      pAxis->card, pAxis->axis, status);
+		ret_status = MOTOR_AXIS_ERROR;
 	      } else {
 		status = GroupKill(pAxis->pollSocket, 
 				   pAxis->groupName);
@@ -534,6 +535,7 @@ static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double 
 		if (status != 0) {
 		  PRINT(pAxis->logParam, ERROR, " Error performing GroupKill/GroupInitialize(%d,%d). Aborting set position. XPS API Error: %d.\n", 
 			pAxis->card, pAxis->axis, status);
+		  ret_status = MOTOR_AXIS_ERROR;
 		} else {
 
 		  /*Wait after axis initialisation (we don't want to set position immediately after
@@ -569,6 +571,9 @@ static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double 
 		  if (status != 0) {
 		    PRINT(pAxis->logParam, ERROR, " Error performing referencing set position (%d,%d). XPS API Error: %d.", 
 			  pAxis->card, pAxis->axis, status);
+		    ret_status = MOTOR_AXIS_ERROR;
+		  } else {
+		    ret_status = MOTOR_AXIS_OK;
 		  }
 		}
 	      }
@@ -582,8 +587,8 @@ static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double 
 	      if (status != 0) {
 		PRINT(pAxis->logParam, ERROR, " Error performing GroupKill/GroupInitialize(%d,%d). XPS API Error: %d. Aborting set position.\n", 
 		      pAxis->card, pAxis->axis, status);
+		ret_status = MOTOR_AXIS_ERROR;
 	      } else {
-
 		/*Wait after axis initialisation (we don't want to set position immediately after
 		  initialisation because the stage can oscillate slightly).*/
 		epicsThreadSleep(setPosSleepTime);
@@ -600,6 +605,9 @@ static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double 
 		if (status != 0) {
 		  PRINT(pAxis->logParam, ERROR, " Error performing referencing set position (%d,%d). XPS API Error: %d.", 
 			pAxis->card, pAxis->axis, status);
+		  ret_status = MOTOR_AXIS_ERROR;
+		} else {
+		  ret_status = MOTOR_AXIS_OK;
 		}
 	      }
 	    }
