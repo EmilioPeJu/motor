@@ -1121,7 +1121,7 @@ static void XPSPoller(XPSController *pController)
 		  and set problem bit in MSTA.*/
 		if ((pAxis->axisStatus < 10) || ((pAxis->axisStatus >= 20) && (pAxis->axisStatus <= 42)) ||
 		    (pAxis->axisStatus == 64)) {
-		  if ( (pAxis->noDisabledError > 0) && ((pAxis->axisStatus>=20)||(pAxis->axisStatus<=21)) ) {
+		  if ( (pAxis->noDisabledError > 0) && (pAxis->axisStatus==20) ) {
 		    motorParam->setInteger(pAxis->params, motorAxisProblem, 0);		    
 		  } else {
 		    PRINT(pAxis->logParam, FLOW, "XPS Axis %d is uninitialised/disabled/not referenced. XPS State Code: %d\n",
