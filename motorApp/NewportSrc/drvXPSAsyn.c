@@ -89,6 +89,7 @@ typedef struct motorAxisHandle
     XPSController *pController;
     int moveSocket;
     int pollSocket;
+    int noDisabledError;
     PARAMS params;
     double currentPosition;
     double currentVelocity;
@@ -1120,9 +1121,13 @@ static void XPSPoller(XPSController *pController)
 		  and set problem bit in MSTA.*/
 		if ((pAxis->axisStatus < 10) || ((pAxis->axisStatus >= 20) && (pAxis->axisStatus <= 42)) ||
 		    (pAxis->axisStatus == 64)) {
-		  PRINT(pAxis->logParam, FLOW, "XPS Axis %d is uninitialised/disabled/not referenced. XPS State Code: %d\n",
+		  if ( (pAxis->noDisabledError > 0) && ((pAxis->axisStatus>=20)||(pAxis->axisStatus<=21)) ) {
+		    motorParam->setInteger(pAxis->params, motorAxisProblem, 0);		    
+		  } else {
+		    PRINT(pAxis->logParam, FLOW, "XPS Axis %d is uninitialised/disabled/not referenced. XPS State Code: %d\n",
                            pAxis->axis, pAxis->axisStatus);
-		  motorParam->setInteger(pAxis->params, motorAxisProblem, 1);
+		    motorParam->setInteger(pAxis->params, motorAxisProblem, 1);
+		  }
 		} else {
 		  motorParam->setInteger(pAxis->params, motorAxisProblem, 0);
 		}
@@ -1310,7 +1315,8 @@ int XPSConfig(int card,           /* Controller number */
 int XPSConfigAxis(int card,                   /* specify which controller 0-up*/
                   int axis,                   /* axis number 0-7 */
                   const char *positionerName, /* groupName.positionerName e.g. Diffractometer.Phi */
-                  int stepsPerUnit)           /* steps per user unit */
+                  int stepsPerUnit,           /* steps per user unit */
+                  int noDisabledError)        /* If 1 then don't report disabled state as error */
 {
     XPSController *pController;
     AXIS_HDL pAxis;
@@ -1338,6 +1344,7 @@ int XPSConfigAxis(int card,                   /* specify which controller 0-up*/
     }
     pAxis->positionerName = epicsStrDup(positionerName);
     pAxis->groupName = epicsStrDup(positionerName);
+    pAxis->noDisabledError = noDisabledError;
     index = strchr(pAxis->groupName, '.');
     if (index != NULL) *index = '\0';  /* Terminate group name at place of '.' */
 
@@ -1845,15 +1852,18 @@ static const iocshArg XPSConfigAxisArg0 = {"Card number", iocshArgInt};
 static const iocshArg XPSConfigAxisArg1 = {"Axis number", iocshArgInt};
 static const iocshArg XPSConfigAxisArg2 = {"Axis name", iocshArgString};
 static const iocshArg XPSConfigAxisArg3 = {"Steps per unit", iocshArgInt};
-static const iocshArg * const XPSConfigAxisArgs[4] = {&XPSConfigAxisArg0,
+static const iocshArg XPSConfigAxisArg4 = {"No Disabled Error", iocshArgInt};
+static const iocshArg * const XPSConfigAxisArgs[5] = {&XPSConfigAxisArg0,
                                                       &XPSConfigAxisArg1,
                                                       &XPSConfigAxisArg2,
-                                                      &XPSConfigAxisArg3};
-static const iocshFuncDef configXPSAxis = {"XPSConfigAxis", 4, XPSConfigAxisArgs};
+                                                      &XPSConfigAxisArg3,
+                                                      &XPSConfigAxisArg4};
+                                                      
+static const iocshFuncDef configXPSAxis = {"XPSConfigAxis", 5, XPSConfigAxisArgs};
 
 static void configXPSAxisCallFunc(const iocshArgBuf *args)
 {
-    XPSConfigAxis(args[0].ival, args[1].ival, args[2].sval, args[3].ival);
+    XPSConfigAxis(args[0].ival, args[1].ival, args[2].sval, args[3].ival, args[4].ival);
 }
 
 
