@@ -40,3 +40,15 @@ record(motor,"$(P)$(M)")
 	field(FOFF, "$(FOFF)")
 }
 
+# dummy record that looks like a kill command
+record(ao, "$(P)$(M):KILL") {
+    field(VAL, "1")
+}
+
+# dummy record that looks like eloss status
+record(ai, "$(P)$(M):ELOSS") {
+}
+
+# dummy record that looks like an eloss reset
+record(calcout, "$(P)$(M):ELOSSRC") {
+}
