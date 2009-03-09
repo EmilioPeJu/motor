@@ -3,10 +3,10 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 638
-y 105
+x 643
+y 127
 w 411
-h 483
+h 503
 font "arial-medium-r-16.0"
 ctlFont "arial-bold-r-16.0"
 btnFont "arial-medium-r-16.0"
@@ -20,6 +20,9 @@ ctlBgColor2 index 5
 topShadowColor index 1
 botShadowColor index 11
 title "Motor - $(motor)"
+showGrid
+snapToGrid
+gridSize 5
 endScreenProperties
 
 # (Group)
@@ -130,7 +133,7 @@ major 4
 minor 2
 release 0
 x 205
-y 445
+y 470
 w 98
 h 28
 fgColor index 44
@@ -159,7 +162,7 @@ major 4
 minor 2
 release 0
 x 5
-y 385
+y 410
 w 98
 h 28
 fgColor index 44
@@ -188,7 +191,7 @@ major 4
 minor 2
 release 0
 x 105
-y 385
+y 410
 w 98
 h 28
 fgColor index 44
@@ -217,7 +220,7 @@ major 4
 minor 2
 release 0
 x 205
-y 385
+y 410
 w 98
 h 28
 fgColor index 44
@@ -246,7 +249,7 @@ major 4
 minor 2
 release 0
 x 305
-y 385
+y 410
 w 98
 h 28
 fgColor index 44
@@ -275,7 +278,7 @@ major 4
 minor 2
 release 0
 x 5
-y 415
+y 440
 w 98
 h 28
 fgColor index 44
@@ -304,7 +307,7 @@ major 4
 minor 2
 release 0
 x 105
-y 415
+y 440
 w 98
 h 28
 fgColor index 44
@@ -333,7 +336,7 @@ major 4
 minor 2
 release 0
 x 205
-y 415
+y 440
 w 98
 h 28
 fgColor index 44
@@ -362,7 +365,7 @@ major 4
 minor 2
 release 0
 x 305
-y 415
+y 440
 w 98
 h 28
 fgColor index 44
@@ -391,7 +394,7 @@ major 4
 minor 2
 release 0
 x 5
-y 445
+y 470
 w 98
 h 28
 fgColor index 44
@@ -420,7 +423,7 @@ major 4
 minor 2
 release 0
 x 105
-y 445
+y 470
 w 98
 h 28
 fgColor index 44
@@ -449,7 +452,7 @@ major 4
 minor 1
 release 0
 x 305
-y 445
+y 470
 w 98
 h 28
 fgColor index 46
@@ -749,7 +752,7 @@ major 4
 minor 1
 release 0
 x 300
-y 287
+y 310
 w 70
 h 20
 font "arial-medium-r-16.0"
@@ -769,7 +772,7 @@ major 4
 minor 0
 release 0
 x 380
-y 287
+y 310
 w 20
 h 20
 controlPv "$(motor).MISS"
@@ -787,7 +790,7 @@ major 4
 minor 0
 release 0
 x 105
-y 315
+y 340
 w 98
 h 28
 fgColor index 25
@@ -807,7 +810,7 @@ major 4
 minor 1
 release 0
 x 10
-y 320
+y 345
 w 68
 h 17
 font "arial-medium-r-16.0"
@@ -827,7 +830,7 @@ major 4
 minor 0
 release 0
 x 105
-y 345
+y 370
 w 98
 h 28
 fgColor index 25
@@ -847,7 +850,7 @@ major 4
 minor 1
 release 0
 x 210
-y 320
+y 345
 w 61
 h 17
 font "arial-medium-r-16.0"
@@ -867,7 +870,7 @@ major 4
 minor 0
 release 0
 x 305
-y 315
+y 340
 w 98
 h 28
 fgColor index 25
@@ -886,8 +889,8 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 210
-y 350
+x 205
+y 380
 w 101
 h 17
 font "arial-medium-r-16.0"
@@ -907,7 +910,7 @@ major 4
 minor 0
 release 0
 x 305
-y 345
+y 370
 w 98
 h 28
 fgColor index 25
@@ -1082,7 +1085,7 @@ major 4
 minor 0
 release 0
 x 0
-y 310
+y 335
 w 475
 h 1
 lineColor index 6
@@ -1096,7 +1099,7 @@ major 4
 minor 0
 release 0
 x 0
-y 378
+y 405
 w 475
 h 1
 lineColor index 6
@@ -1110,7 +1113,7 @@ major 4
 minor 1
 release 0
 x 10
-y 350
+y 380
 w 44
 h 17
 font "arial-medium-r-16.0"
@@ -1559,5 +1562,43 @@ endGroup
 visPv "$(motor):ELOSS"
 visMin "1"
 visMax "2"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 302
+y 289
+w 70
+h 20
+font "arial-medium-r-16.0"
+fontAlign "right"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Soft Limit"
+}
+endObjectProperties
+
+# (Byte)
+object ByteClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 380
+y 287
+w 20
+h 20
+controlPv "$(motor).LVIO"
+lineColor index 14
+onColor index 35
+offColor index 39
+lineWidth 2
+numBits 1
 endObjectProperties
 
