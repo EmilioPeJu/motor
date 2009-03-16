@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 526
-y 494
+x 912
+y 535
 w 190
 h 110
 font "helvetica-medium-r-14.0"
@@ -29,7 +29,7 @@ endScreenProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 0
 y 0
@@ -80,9 +80,9 @@ major 4
 minor 0
 release 0
 x 133
-y 82
+y 83
 w 52
-h 23
+h 22
 fgColor index 21
 onColor index 4
 offColor index 3
@@ -164,12 +164,12 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 5
-y 82
+y 83
 w 52
-h 23
+h 22
 fgColor index 43
 bgColor index 3
 topShadowColor index 1
@@ -179,7 +179,7 @@ buttonLabel "More"
 numPvs 4
 numDsps 1
 displayFileName {
-  0 "motor.edl"
+  0 "$(filename)"
 }
 symbols {
   0 "motor=$(motor)"
@@ -194,7 +194,7 @@ minor 1
 release 0
 x 0
 y 0
-w 12
+w 84
 h 14
 font "arial-medium-r-12.0"
 fgColor index 14
@@ -204,31 +204,6 @@ value {
 }
 autoSize
 border
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 38
-y 57
-w 115
-h 20
-controlPv "$(motor).RBV"
-font "arial-bold-r-14.0"
-fontAlign "center"
-fgColor index 15
-fgAlarm
-bgColor index 10
-limitsFromDb
-precision 4
-nullColor index 0
-showUnits
-useAlarmBorder
-newPos
-objType "monitors"
 endObjectProperties
 
 # (Menu Mux PV)
@@ -370,5 +345,110 @@ botShadowColor index 11
 controlPv "$(motor).SPMG"
 indicatorPv "$(motor).SPMG"
 font "helvetica-medium-r-8.0"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 158
+y 56
+w 28
+h 21
+
+beginGroup
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 158
+y 56
+w 28
+h 21
+fgColor index 14
+onColor index 21
+offColor index 20
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):ELOSSRC.A"
+pressValue "0"
+onLabel "ELoss"
+offLabel "Eloss"
+3d
+font "helvetica-medium-r-8.0"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):ELOSS"
+visMin "1"
+visMax "2"
+endObjectProperties
+
+# (Textupdate)
+object TextupdateClass
+beginObjectProperties
+major 10
+minor 0
+release 0
+x 38
+y 57
+w 115
+h 20
+controlPv "$(motor).RBV"
+fgColor index 15
+fgAlarm
+bgColor index 10
+fill
+font "arial-bold-r-14.0"
+fontAlign "center"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 121
+y 6
+w 18
+h 11
+
+beginGroup
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 121
+y 6
+w 18
+h 13
+fgColor index 22
+onColor index 4
+offColor index 3
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):KILL.PROC"
+pressValue "1"
+onLabel "Kill"
+offLabel "Kill"
+3d
+font "helvetica-medium-r-8.0"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):KILL"
+visMin "0"
+visMax "1"
 endObjectProperties
 

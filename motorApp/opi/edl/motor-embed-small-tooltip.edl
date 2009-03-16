@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 444
-y 425
+x 449
+y 447
 w 390
 h 310
 font "helvetica-medium-r-14.0"
@@ -21,7 +21,6 @@ topShadowColor index 1
 botShadowColor index 11
 title "Tooltip"
 showGrid
-snapToGrid
 gridSize 5
 disableScroll
 endScreenProperties
@@ -100,9 +99,9 @@ major 4
 minor 0
 release 0
 x 233
-y 182
+y 183
 w 52
-h 23
+h 22
 fgColor index 21
 onColor index 4
 offColor index 3
@@ -184,12 +183,12 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 0
+minor 2
 release 0
 x 105
-y 182
+y 183
 w 52
-h 23
+h 22
 fgColor index 43
 bgColor index 3
 topShadowColor index 1
@@ -214,7 +213,7 @@ minor 1
 release 0
 x 100
 y 100
-w 95
+w 84
 h 14
 font "arial-medium-r-12.0"
 fgColor index 14
@@ -418,8 +417,8 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 265
-y 20
+x 251
+y 6
 w 86
 h 14
 font "arial-medium-r-12.0"
@@ -438,8 +437,8 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 300
-y 60
+x 295
+y 83
 w 83
 h 28
 font "arial-medium-r-12.0"
@@ -856,21 +855,21 @@ beginObjectProperties
 major 4
 minor 0
 release 1
-x 280
-y 85
-w 50
-h 45
+x 279
+y 108
+w 46
+h 32
 lineColor index 14
 fillColor index 5
 arrows "to"
 numPoints 2
 xPoints {
-  0 330
-  1 280
+  0 325
+  1 279
 }
 yPoints {
-  0 85
-  1 130
+  0 108
+  1 140
 }
 endObjectProperties
 
@@ -902,21 +901,21 @@ beginObjectProperties
 major 4
 minor 0
 release 1
-x 220
-y 35
-w 85
-h 90
+x 178
+y 18
+w 88
+h 111
 lineColor index 14
 fillColor index 5
 arrows "to"
 numPoints 2
 xPoints {
-  0 305
-  1 220
+  0 266
+  1 178
 }
 yPoints {
-  0 35
-  1 125
+  0 18
+  1 129
 }
 endObjectProperties
 
@@ -1093,5 +1092,201 @@ useOriginalSize
 useOriginalColors
 fgColor index 14
 bgColor index 3
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 258
+y 156
+w 28
+h 21
+
+beginGroup
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 258
+y 156
+w 28
+h 21
+fgColor index 14
+onColor index 21
+offColor index 20
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):ELOSSRC.A"
+pressValue "0"
+onLabel "ELoss"
+offLabel "Eloss"
+3d
+font "helvetica-medium-r-8.0"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):ELOSS"
+visMin "1"
+visMax "2"
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 241
+y 106
+w 43
+h 13
+fgColor index 25
+bgColor index 3
+inconsistentColor index 14
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor).SPMG"
+indicatorPv "$(motor).SPMG"
+font "helvetica-medium-r-8.0"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 221
+y 106
+w 18
+h 11
+
+beginGroup
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 221
+y 106
+w 18
+h 13
+fgColor index 22
+onColor index 4
+offColor index 3
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):KILL.PROC"
+pressValue "1"
+onLabel "Kill"
+offLabel "Kill"
+3d
+font "helvetica-medium-r-8.0"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):KILL"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 226
+y 45
+w 57
+h 61
+lineColor index 14
+fillColor index 5
+arrows "to"
+numPoints 2
+xPoints {
+  0 283
+  1 226
+}
+yPoints {
+  0 45
+  1 106
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 295
+y 53
+w 86
+h 28
+font "arial-medium-r-12.0"
+fgColor index 14
+bgColor index 5
+useDisplayBg
+value {
+  "Move Mode"
+  "(Should be Go)"
+}
+autoSize
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 259
+y 66
+w 36
+h 41
+lineColor index 14
+fillColor index 5
+arrows "to"
+numPoints 2
+xPoints {
+  0 295
+  1 259
+}
+yPoints {
+  0 66
+  1 107
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 276
+y 23
+w 98
+h 28
+font "arial-medium-r-12.0"
+fgColor index 14
+bgColor index 5
+useDisplayBg
+value {
+  "Kill (de-energise) "
+  "the motor"
+}
+autoSize
 endObjectProperties
 
