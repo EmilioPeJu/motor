@@ -38,7 +38,7 @@ option +r;
  * timer which is synchronised with the trajectory points so the max number
  * of pulses equals the max number of elements.
  */
-#define MAX_PULSES 35000
+#define MAX_PULSES 100000
 
 /* Note that MAX_ELEMENTS, and MAX_PULSES must be defined before
  * including the trajectoryScan.h */
