@@ -541,6 +541,8 @@ static void asynCallback(asynUser *pasynUser)
 	    }
 	}
 	dbScanUnlock((dbCommon *)pmr);
+    } else {
+      pPvt->moveRequestPending = 0;
     }
 
     pasynManager->memFree(pmsg, sizeof(*pmsg));
