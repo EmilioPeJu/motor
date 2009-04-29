@@ -536,6 +536,7 @@ static void asynCallback(asynUser *pasynUser)
 	if (commandIsMove) {
 	    pPvt->moveRequestPending--;
 	    if (!pPvt->moveRequestPending) {
+	      pPvt->needUpdate = 1;
                 /* pmr->rset->process((dbCommon*)pmr); */
                 dbProcess((dbCommon*)pmr);
 	    }
