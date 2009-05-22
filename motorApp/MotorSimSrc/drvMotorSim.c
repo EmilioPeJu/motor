@@ -63,6 +63,18 @@ typedef enum { none, positionMove, velocityMove, homeReverseMove, homeForwardsMo
 
 /* typedef struct motorAxis * AXIS_ID; */
 
+typedef struct drvSim * DRVSIM_ID;
+typedef struct drvSim
+{
+  AXIS_HDL pFirst;
+  epicsThreadId motorThread;
+  motorAxisLogFunc print;
+  void * logParam;
+  epicsTimeStamp now;
+  int movesDeferred;
+  int nAxes;
+} motorSim_t;
+
 typedef struct motorAxisHandle
 {
   AXIS_HDL pNext;
@@ -83,16 +95,13 @@ typedef struct motorAxisHandle
   void * logParam;
   epicsTimeStamp tLast;
   epicsMutexId axisMutex;
+  double deferred_position;
+  int deferred_move;
+  int deferred_relative;
+  DRVSIM_ID pDrv;
 } motorAxis;
 
-typedef struct
-{
-  AXIS_HDL pFirst;
-  epicsThreadId motorThread;
-  motorAxisLogFunc print;
-  void * logParam;
-  epicsTimeStamp now;
-} motorSim_t;
+
 
 static int motorSimLogMsg( void * param, const motorAxisLogMask_t logMask, const char *pFormat, ...);
 #define TRACE_FLOW    motorAxisTraceFlow
@@ -102,6 +111,9 @@ static motorSim_t drv={ NULL, NULL, motorSimLogMsg, NULL, { 0, 0 } };
 
 #define MAX(a,b) ((a)>(b)? (a): (b))
 #define MIN(a,b) ((a)<(b)? (a): (b))
+
+/*Deferred moves functions.*/
+static int processDeferredMoves(const motorSim_t * pDrv);
 
 static void motorAxisReportAxis( AXIS_HDL pAxis, int level )
 {
@@ -197,7 +209,14 @@ static int motorAxisGetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int *
   if (pAxis == NULL) return MOTOR_AXIS_ERROR;
   else
     {
-      return motorParam->getInteger( pAxis->params, (paramIndex) function, value );
+      switch (function) {
+      case motorAxisDeferMoves:
+	*value = pAxis->pDrv->movesDeferred;
+	return MOTOR_AXIS_OK;
+	break;
+      default:
+	return motorParam->getInteger( pAxis->params, (paramIndex) function, value );
+      }
     }
 }
 
@@ -206,7 +225,14 @@ static int motorAxisGetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double
   if (pAxis == NULL) return MOTOR_AXIS_ERROR;
   else
     {
-      return motorParam->getDouble( pAxis->params, (paramIndex) function, value );
+      switch (function) {
+      case motorAxisDeferMoves:
+	*value = (double)pAxis->pDrv->movesDeferred;
+	return MOTOR_AXIS_OK;
+	break;
+      default:
+	return motorParam->getDouble( pAxis->params, (paramIndex) function, value );
+      }
     }
 }
 
@@ -218,6 +244,40 @@ static int motorAxisSetCallback( AXIS_HDL pAxis, motorAxisCallbackFunc callback,
       return motorParam->setCallback( pAxis->params, callback, param );
     }
 }
+
+static int processDeferredMoves(const motorSim_t * pDrv)
+{
+  int status = MOTOR_AXIS_ERROR;
+  double position = 0.0;
+  AXIS_HDL pAxis = NULL;
+
+  for ( pAxis = pDrv->pFirst; pAxis != NULL; pAxis = pAxis->pNext )
+    { 
+      if (pAxis->deferred_move) {
+
+	position = pAxis->deferred_position;
+	
+	/* Check to see if in hard limits */
+	if ((pAxis->nextpoint.axis[0].p >= pAxis->hiHardLimit  &&  position > pAxis->nextpoint.axis[0].p) ||
+	    (pAxis->nextpoint.axis[0].p <= pAxis->lowHardLimit &&  position < pAxis->nextpoint.axis[0].p)  ) return MOTOR_AXIS_ERROR;
+	else if (epicsMutexLock( pAxis->axisMutex ) == epicsMutexLockOK)
+	  { 
+	    pAxis->endpoint.axis[0].p = position - pAxis->enc_offset;
+	    pAxis->endpoint.axis[0].v = 0.0;
+	    
+	    motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
+	    motorParam->setInteger( pAxis->params, motorAxisMoving, 1 );
+
+	    pAxis->deferred_move = 0;
+	    epicsMutexUnlock( pAxis->axisMutex );	    
+	  }
+	
+      }
+    }
+  
+  return status;
+}
+
 
 static int motorAxisSetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double value )
 {
@@ -274,6 +334,17 @@ static int motorAxisSetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double
             pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d closed loop to %s", pAxis->card, pAxis->axis, (value!=0?"ON":"OFF") );
             break;
         }
+	case motorAxisDeferMoves:
+	{
+	  pAxis->print( pAxis->logParam, TRACE_FLOW,
+			"%sing Deferred Move flag on PMAC card %d\n",
+			value != 0.0?"Sett":"Clear",pAxis->card);
+	  if (value == 0.0 && pAxis->pDrv->movesDeferred != 0) {
+	    processDeferredMoves(pAxis->pDrv);
+	  }
+	  pAxis->pDrv->movesDeferred = (int)value;
+	  break;
+	}
         default:
             status = MOTOR_AXIS_ERROR;
             break;
@@ -314,6 +385,17 @@ static int motorAxisSetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int v
             pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d closed loop to %s", pAxis->card, pAxis->axis, (value?"ON":"OFF") );
             break;
         }
+	case motorAxisDeferMoves:
+	{
+	  pAxis->print( pAxis->logParam, TRACE_FLOW,
+			"%sing Deferred Move flag on PMAC card %d\n",
+			value != 0.0?"Sett":"Clear",pAxis->card);
+	  if (value == 0.0 && pAxis->pDrv->movesDeferred != 0) {
+	    processDeferredMoves(pAxis->pDrv);
+	  }
+	  pAxis->pDrv->movesDeferred = value;
+	  break;
+	}
         default:
             status = MOTOR_AXIS_ERROR;
             break;
@@ -327,6 +409,7 @@ static int motorAxisSetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int v
 
 static int motorAxisMove( AXIS_HDL pAxis, double position, int relative, double min_velocity, double max_velocity, double acceleration )
 {
+
   if (pAxis == NULL) return MOTOR_AXIS_ERROR;
   else
     {
@@ -339,19 +422,28 @@ static int motorAxisMove( AXIS_HDL pAxis, double position, int relative, double 
 	{
 	  route_pars_t pars;
 
-	  pAxis->endpoint.axis[0].p = position - pAxis->enc_offset;
-	  pAxis->endpoint.axis[0].v = 0.0;
+	  if (pAxis->pDrv->movesDeferred == 0) { /*Normal move.*/
+	    pAxis->endpoint.axis[0].p = position - pAxis->enc_offset;
+	    pAxis->endpoint.axis[0].v = 0.0;
+	  } else { /*Deferred moves.*/
+	    pAxis->deferred_position = position;
+	    pAxis->deferred_move = 1;
+	    pAxis->deferred_relative = relative;
+	  }
 	  routeGetParams( pAxis->route, &pars );
 	  if (max_velocity != 0) pars.axis[0].Vmax = fabs(max_velocity);
 	  if (acceleration != 0) pars.axis[0].Amax = fabs(acceleration);
-	  routeSetParams( pAxis->route, &pars );
+	  routeSetParams( pAxis->route, &pars ); 
+	  
           motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
           motorParam->setInteger( pAxis->params, motorAxisMoving, 1 );
+	  motorParam->callCallback( pAxis->params );
 	  epicsMutexUnlock( pAxis->axisMutex );
 
 	  pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d move to %f, min vel=%f, max_vel=%f, accel=%f",
                         pAxis->card, pAxis->axis, position, min_velocity, max_velocity, acceleration );
 	}
+
     }
   return MOTOR_AXIS_OK;
 }
@@ -438,6 +530,9 @@ static int motorAxisStop( AXIS_HDL pAxis, double acceleration )
 
       pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d to stop with accel=%f",
                     pAxis->card, pAxis->axis, acceleration );
+
+      pAxis->deferred_move = 0;
+
     }
   return MOTOR_AXIS_OK;
 }
@@ -460,6 +555,7 @@ static int motorAxisStop( AXIS_HDL pAxis, double acceleration )
 static void motorSimProcess( AXIS_HDL pAxis, double delta )
 {
   double lastpos = pAxis->nextpoint.axis[0].p;
+  int done = 0;
 
   pAxis->nextpoint.T += delta;
   routeFind( pAxis->route, pAxis->reroute, &(pAxis->endpoint), &(pAxis->nextpoint) );
@@ -497,13 +593,21 @@ static void motorSimProcess( AXIS_HDL pAxis, double delta )
 	}
     }
 
+  if (pAxis->nextpoint.axis[0].v ==  0) {
+    if (!pAxis->deferred_move) {
+      done = 1;
+    }
+  } else {
+    done = 0;
+  }
+
   motorParam->setDouble(  pAxis->params, motorAxisPosition,      (pAxis->nextpoint.axis[0].p+pAxis->enc_offset) );
   motorParam->setDouble(  pAxis->params, motorAxisEncoderPosn,   (pAxis->nextpoint.axis[0].p+pAxis->enc_offset) );
   motorParam->setInteger( pAxis->params, motorAxisDirection,     (pAxis->nextpoint.axis[0].v >  0) );
-  motorParam->setInteger( pAxis->params, motorAxisDone,          (pAxis->nextpoint.axis[0].v ==  0) );
+  motorParam->setInteger( pAxis->params, motorAxisDone,          done );
   motorParam->setInteger( pAxis->params, motorAxisHighHardLimit, (pAxis->nextpoint.axis[0].p >= pAxis->hiHardLimit) );
   motorParam->setInteger( pAxis->params, motorAxisHomeSignal,    (pAxis->nextpoint.axis[0].p == pAxis->home) );
-  motorParam->setInteger( pAxis->params, motorAxisMoving,        (pAxis->nextpoint.axis[0].v != 0) );
+  motorParam->setInteger( pAxis->params, motorAxisMoving,        !done );
   motorParam->setInteger( pAxis->params, motorAxisLowHardLimit,  (pAxis->nextpoint.axis[0].p <= pAxis->lowHardLimit) );
 }
 
@@ -559,6 +663,8 @@ static int motorSimCreateAxis( motorSim_t * pDrv, int card, int axis, double low
       if (pAxis != NULL)
 	{
 	  route_pars_t pars;
+
+	  pAxis->pDrv = pDrv;
 
 	  pars.numRoutedAxes = 1;
 	  pars.routedAxisList[0] = 1;
@@ -625,6 +731,8 @@ void motorSimCreate( int card, int axis, int lowLimit, int hiLimit, int home, in
 
   if (nCards < 1) nCards = 1;
   if (nAxes < 1 ) nAxes = 1;
+
+  drv.nAxes = nAxes;
 
   drv.print( drv.logParam, TRACE_FLOW,
 	 "Creating motor simulator: card: %d, axis: %d, hi: %d, low %d, home: %d, ncards: %d, naxis: %d",
