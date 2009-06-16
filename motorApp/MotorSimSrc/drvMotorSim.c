@@ -265,8 +265,7 @@ static int processDeferredMoves(const motorSim_t * pDrv)
 	    pAxis->endpoint.axis[0].p = position - pAxis->enc_offset;
 	    pAxis->endpoint.axis[0].v = 0.0;
 	    
-	    motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
-	    motorParam->setInteger( pAxis->params, motorAxisMoving, 1 );
+	    motorParam->setInteger( pAxis->params, motorAxisDone, 0 ); 
 
 	    pAxis->deferred_move = 0;
 	    epicsMutexUnlock( pAxis->axisMutex );	    
@@ -286,6 +285,8 @@ static int motorAxisSetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double
     if (pAxis == NULL) return MOTOR_AXIS_ERROR;
     else
     {
+      if (epicsMutexLock( pAxis->axisMutex ) == epicsMutexLockOK)
+        {
         switch (function)
         {
         case motorAxisPosition:
@@ -350,7 +351,12 @@ static int motorAxisSetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double
             break;
         }
 
-        if (status != MOTOR_AXIS_ERROR ) status = motorParam->setDouble( pAxis->params, function, value );
+	if (status == MOTOR_AXIS_OK ) {
+	  status = motorParam->setDouble( pAxis->params, function, value );
+	  motorParam->callCallback( pAxis->params );
+	}
+	epicsMutexUnlock( pAxis->axisMutex );
+	}
     }
   return status;
 }
@@ -436,7 +442,6 @@ static int motorAxisMove( AXIS_HDL pAxis, double position, int relative, double 
 	  routeSetParams( pAxis->route, &pars ); 
 	  
           motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
-          motorParam->setInteger( pAxis->params, motorAxisMoving, 1 );
 	  motorParam->callCallback( pAxis->params );
 	  epicsMutexUnlock( pAxis->axisMutex );
 
@@ -470,7 +475,7 @@ static int motorAxisVelocity( AXIS_HDL pAxis, double velocity, double accelerati
       pAxis->endpoint.axis[0].p = ( pAxis->nextpoint.axis[0].p +
 				    time * ( pAxis->nextpoint.axis[0].v + 0.5 * deltaV ));
       motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
-      motorParam->setInteger( pAxis->params, motorAxisMoving, 1 );
+      motorParam->callCallback( pAxis->params );
       pAxis->reroute = ROUTE_NEW_ROUTE;
   }
   return MOTOR_AXIS_OK;
@@ -483,11 +488,13 @@ static int motorAxisHome( AXIS_HDL pAxis, double min_velocity, double max_veloci
   if (pAxis == NULL) status = MOTOR_AXIS_ERROR;
   else
     {
-      status = motorAxisVelocity( pAxis, (forwards? max_velocity: -max_velocity), acceleration );
-      pAxis->homing = 1;
-
-      pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d to home %s, min vel=%f, max_vel=%f, accel=%f",
-                    pAxis->card, pAxis->axis, (forwards?"FORWARDS":"REVERSE"), min_velocity, max_velocity, acceleration );
+      if (epicsMutexLock( pAxis->axisMutex ) == epicsMutexLockOK) {
+	status = motorAxisVelocity( pAxis, (forwards? max_velocity: -max_velocity), acceleration );
+	pAxis->homing = 1;
+	epicsMutexUnlock( pAxis->axisMutex );
+	pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d to home %s, min vel=%f, max_vel=%f, accel=%f",
+		      pAxis->card, pAxis->axis, (forwards?"FORWARDS":"REVERSE"), min_velocity, max_velocity, acceleration );
+      }
     }
   return status;
 }
@@ -526,12 +533,14 @@ static int motorAxisStop( AXIS_HDL pAxis, double acceleration )
   if (pAxis == NULL) return MOTOR_AXIS_ERROR;
   else
     {
-      motorAxisVelocity( pAxis, 0.0, acceleration );
+      if (epicsMutexLock( pAxis->axisMutex ) == epicsMutexLockOK) {
+	motorAxisVelocity( pAxis, 0.0, acceleration );
+	pAxis->deferred_move = 0;
+	epicsMutexUnlock( pAxis->axisMutex );
 
-      pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d to stop with accel=%f",
-                    pAxis->card, pAxis->axis, acceleration );
-
-      pAxis->deferred_move = 0;
+	pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d to stop with accel=%f",
+		      pAxis->card, pAxis->axis, acceleration );
+      }
 
     }
   return MOTOR_AXIS_OK;
