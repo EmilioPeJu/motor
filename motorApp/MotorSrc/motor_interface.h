@@ -645,6 +645,7 @@ typedef int (*motorAxisVelocityMoveFunc)( AXIS_HDL pAxis, double min_velocity, d
 static int motorAxisVelocityMove(  AXIS_HDL pAxis, double min_velocity, double max_velocity, double acceleration );
 #endif
 
+#if 0
 typedef int (*motorAxisProfileMoveFunc)( AXIS_HDL pAxis, int npoints, double positions[], double times[], int relative, int trigger );
 /** Starts the axis moving along a tabulated position profile
 
@@ -720,6 +721,7 @@ typedef int (*motorAxisTriggerProfileFunc)( AXIS_HDL pAxis );
 
 #ifdef DEFINE_MOTOR_PROTOTYPES
 static int motorAxisTriggerProfile( AXIS_HDL pAxis );
+#endif
 #endif
 
 typedef int (*motorAxisStopFunc)( AXIS_HDL pAxis, double acceleration );
