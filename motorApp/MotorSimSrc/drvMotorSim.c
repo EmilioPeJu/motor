@@ -474,8 +474,6 @@ static int motorAxisVelocity( AXIS_HDL pAxis, double velocity, double accelerati
       pAxis->endpoint.axis[0].v = velocity;
       pAxis->endpoint.axis[0].p = ( pAxis->nextpoint.axis[0].p +
 				    time * ( pAxis->nextpoint.axis[0].v + 0.5 * deltaV ));
-      motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
-      motorParam->callCallback( pAxis->params );
       pAxis->reroute = ROUTE_NEW_ROUTE;
   }
   return MOTOR_AXIS_OK;
@@ -491,6 +489,8 @@ static int motorAxisHome( AXIS_HDL pAxis, double min_velocity, double max_veloci
       if (epicsMutexLock( pAxis->axisMutex ) == epicsMutexLockOK) {
 	status = motorAxisVelocity( pAxis, (forwards? max_velocity: -max_velocity), acceleration );
 	pAxis->homing = 1;
+	motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
+	motorParam->callCallback( pAxis->params );
 	epicsMutexUnlock( pAxis->axisMutex );
 	pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d to home %s, min vel=%f, max_vel=%f, accel=%f",
 		      pAxis->card, pAxis->axis, (forwards?"FORWARDS":"REVERSE"), min_velocity, max_velocity, acceleration );
@@ -510,6 +510,8 @@ static int motorAxisVelocityMove(  AXIS_HDL pAxis, double min_velocity, double v
       if (epicsMutexLock( pAxis->axisMutex ) == epicsMutexLockOK)
 	{
 	  status = motorAxisVelocity( pAxis, velocity, acceleration );
+	  motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
+	  motorParam->callCallback( pAxis->params );
 	  epicsMutexUnlock( pAxis->axisMutex );
 	  pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d move with velocity of %f, accel=%f",
                         pAxis->card, pAxis->axis, velocity, acceleration );
@@ -579,7 +581,7 @@ static void motorSimProcess( AXIS_HDL pAxis, double delta )
       pAxis->homing = 0;
       pAxis->reroute = ROUTE_NEW_ROUTE;
       pAxis->endpoint.axis[0].p = pAxis->home;
-      pAxis->endpoint.axis[0].v = 0.0;   
+      pAxis->endpoint.axis[0].v = 0.0;
     }
   if ( pAxis->nextpoint.axis[0].p > pAxis->hiHardLimit && pAxis->nextpoint.axis[0].v > 0 )
     {
