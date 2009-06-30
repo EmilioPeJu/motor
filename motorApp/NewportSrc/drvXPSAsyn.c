@@ -1126,7 +1126,7 @@ static void XPSPoller(XPSController *pController)
 		/*Test for states that mean we cannot move an axis (disabled, uninitialised, etc.) 
 		  and set problem bit in MSTA.*/
 		if ((pAxis->axisStatus < 10) || ((pAxis->axisStatus >= 20) && (pAxis->axisStatus <= 42)) ||
-		    (pAxis->axisStatus == 64)) {
+		    (pAxis->axisStatus == 50) || (pAxis->axisStatus == 64)) {
 		  if ( (pAxis->noDisabledError > 0) && (pAxis->axisStatus==20) ) {
 		    motorParam->setInteger(pAxis->params, motorAxisProblem, 0);		    
 		  } else {
