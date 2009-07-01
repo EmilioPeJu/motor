@@ -642,8 +642,19 @@ static int recv_mess(int card, char *com, int amount)
 
         bufptr = readbuf(pmotor, bufptr);
         if (--amount > 0)
-            *(bufptr-1) = ',';  /* Replace '\n' with delimiter ','. */
-
+        {
+            /* For pre V1.29 version MAXv cards, there is the extra NULL character */
+            if (*(bufptr-1) == '\n')
+            {
+                *(bufptr-1) = ',';  /* Replace '\n' with delimiter ','. */
+            }
+            /* For post V1.29 version MAXv cards, the extra NULL character has been removed */
+            else
+            {
+                *(bufptr++) = ',';  /* Replace '\n' with delimiter ','. */
+                *bufptr = (char) NULL;
+            }
+        }
     } while (amount > 0);
 
     Debug(4, "recv_mess(): card#%d - %s\n", card, com);
