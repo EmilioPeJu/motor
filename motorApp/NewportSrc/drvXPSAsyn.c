@@ -810,11 +810,10 @@ static int motorAxisMove(AXIS_HDL pAxis, double position, int relative,
     PRINT(pAxis->logParam, FLOW, "Set card %d, axis %d move to %f, min vel=%f, max_vel=%f, accel=%f\n",
           pAxis->card, pAxis->axis, position, min_velocity, max_velocity, acceleration);
 
-
     status = PositionerSGammaParametersSet(pAxis->pollSocket,
                                            pAxis->positionerName, 
                                            max_velocity*pAxis->stepSize,
-                                           acceleration*pAxis->stepSize,
+                                           ((acceleration!=0) ? acceleration*pAxis->stepSize : pAxis->accel),
                                            pAxis->minJerkTime,
                                            pAxis->maxJerkTime);
     if (status != 0) {
