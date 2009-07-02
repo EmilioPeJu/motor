@@ -2,9 +2,9 @@
 FILENAME...	drvMotorSim.c
 USAGE...	Simulated Motor Support.
 
-Version:	$Revision: $
-Modified By:	$Author: $
-Last Modified:	$Date: $
+Version:	$Revision: 1.7.6.2 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2009/06/22 18:52:00 $
 */
 
 /*
@@ -12,7 +12,15 @@ Last Modified:	$Date: $
  *
  * Modification Log:
  * -----------------
- * 20060506 npr Added prolog
+ * 2006-05-06 npr Added prolog
+ * 2009-02-11 rls lock/unlock motorAxisSetDouble().
+ * 2009-06-18 rls - Matthew Pearson's fix for record seeing motorAxisDone True
+ *                on 1st status update after a move; set motorAxisDone False
+ *                in motorAxisDrvSET_t functions that start motion
+ *                (motorAxisHome, motorAxisMove, motorAxisVelocityMove) and
+ *                force a status update with a call to callCallback().
+ *                - Matthew Pearson added deferred move support.
+ *
  */
 
 #include <stddef.h>
@@ -213,7 +221,6 @@ static int motorAxisGetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int *
       case motorAxisDeferMoves:
 	*value = pAxis->pDrv->movesDeferred;
 	return MOTOR_AXIS_OK;
-	break;
       default:
 	return motorParam->getInteger( pAxis->params, (paramIndex) function, value );
       }
@@ -229,7 +236,6 @@ static int motorAxisGetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double
       case motorAxisDeferMoves:
 	*value = (double)pAxis->pDrv->movesDeferred;
 	return MOTOR_AXIS_OK;
-	break;
       default:
 	return motorParam->getDouble( pAxis->params, (paramIndex) function, value );
       }
@@ -265,7 +271,7 @@ static int processDeferredMoves(const motorSim_t * pDrv)
 	    pAxis->endpoint.axis[0].p = position - pAxis->enc_offset;
 	    pAxis->endpoint.axis[0].v = 0.0;
 	    
-	    motorParam->setInteger( pAxis->params, motorAxisDone, 0 ); 
+	    motorParam->setInteger( pAxis->params, motorAxisDone, 0 );
 
 	    pAxis->deferred_move = 0;
 	    epicsMutexUnlock( pAxis->axisMutex );	    
@@ -285,8 +291,7 @@ static int motorAxisSetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double
     if (pAxis == NULL) return MOTOR_AXIS_ERROR;
     else
     {
-      if (epicsMutexLock( pAxis->axisMutex ) == epicsMutexLockOK)
-        {
+        epicsMutexLock(pAxis->axisMutex);
         switch (function)
         {
         case motorAxisPosition:
@@ -350,13 +355,12 @@ static int motorAxisSetDouble( AXIS_HDL pAxis, motorAxisParam_t function, double
             status = MOTOR_AXIS_ERROR;
             break;
         }
-
-	if (status == MOTOR_AXIS_OK ) {
-	  status = motorParam->setDouble( pAxis->params, function, value );
-	  motorParam->callCallback( pAxis->params );
-	}
-	epicsMutexUnlock( pAxis->axisMutex );
-	}
+        if (status == MOTOR_AXIS_OK )
+        {
+            motorParam->setDouble(pAxis->params, function, value);
+            motorParam->callCallback(pAxis->params);
+        }
+        epicsMutexUnlock(pAxis->axisMutex);
     }
   return status;
 }
@@ -365,53 +369,58 @@ static int motorAxisSetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int v
 {
     int status = MOTOR_AXIS_OK;
 
-    if (pAxis == NULL) return MOTOR_AXIS_ERROR;
+    if (pAxis == NULL)
+        return (MOTOR_AXIS_ERROR);
     else
     {
-        switch (function)
+        if (epicsMutexLock( pAxis->axisMutex ) == epicsMutexLockOK)
         {
-        case motorAxisPosition:
-        {
-            pAxis->enc_offset = (double) value - pAxis->nextpoint.axis[0].p;
-            pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d to position %d", pAxis->card, pAxis->axis, value );
-            break;
-        }
-        case motorAxisLowLimit:
-        {
-            pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d low limit to %d", pAxis->card, pAxis->axis, value );
-            break;
-        }
-        case motorAxisHighLimit:
-        {
-            pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d high limit to %d", pAxis->card, pAxis->axis, value );
-            break;
-        }
-        case motorAxisClosedLoop:
-        {
-            pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d closed loop to %s", pAxis->card, pAxis->axis, (value?"ON":"OFF") );
-            break;
-        }
-	case motorAxisDeferMoves:
-	{
-	  pAxis->print( pAxis->logParam, TRACE_FLOW,
-			"%sing Deferred Move flag on PMAC card %d\n",
-			value != 0.0?"Sett":"Clear",pAxis->card);
-	  if (value == 0.0 && pAxis->pDrv->movesDeferred != 0) {
-	    processDeferredMoves(pAxis->pDrv);
-	  }
-	  pAxis->pDrv->movesDeferred = value;
-	  break;
-	}
-        default:
-            status = MOTOR_AXIS_ERROR;
-            break;
-        }
+            switch (function)
+            {
+            case motorAxisPosition:
+                {
+                    pAxis->enc_offset = (double) value - pAxis->nextpoint.axis[0].p;
+                    pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d to position %d", pAxis->card, pAxis->axis, value );
+                    break;
+                }
+            case motorAxisLowLimit:
+                {
+                    pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d low limit to %d", pAxis->card, pAxis->axis, value );
+                    break;
+                }
+            case motorAxisHighLimit:
+                {
+                    pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d high limit to %d", pAxis->card, pAxis->axis, value );
+                    break;
+                }
+            case motorAxisClosedLoop:
+                {
+                    pAxis->print( pAxis->logParam, TRACE_FLOW, "Set card %d, axis %d closed loop to %s", pAxis->card, pAxis->axis, (value?"ON":"OFF") );
+                    break;
+                }
+            case motorAxisDeferMoves:
+                {
+                    pAxis->print( pAxis->logParam, TRACE_FLOW,
+                                  "%sing Deferred Move flag on PMAC card %d\n",
+                                  value != 0.0?"Sett":"Clear",pAxis->card);
+                    if (value == 0.0 && pAxis->pDrv->movesDeferred != 0)
+                    {
+                        processDeferredMoves(pAxis->pDrv);
+                    }
+                    pAxis->pDrv->movesDeferred = value;
+                    break;
+                }
+            default:
+                status = MOTOR_AXIS_ERROR;
+                break;
+            }
 
-        if (status != MOTOR_AXIS_ERROR ) status = motorParam->setInteger( pAxis->params, function, value );
+            if (status != MOTOR_AXIS_ERROR )
+                status = motorParam->setInteger( pAxis->params, function, value );
+        }
+        return (status);
     }
-  return status;
 }
-
 
 static int motorAxisMove( AXIS_HDL pAxis, double position, int relative, double min_velocity, double max_velocity, double acceleration )
 {

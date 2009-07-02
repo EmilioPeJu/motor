@@ -5,11 +5,142 @@
   <meta name="GENERATOR" content="Mozilla/4.77 [en] (X11; U; SunOS 5.8 sun4u) [Netscape]">
   <meta name="Author" content="Ronald L. Sluiter">
   <meta name="Description" content="Synopsis of modifications, fixes and new features for each motor record release.">
-  <title>EPICS Motor Record Release R6-4 Notice</title>
+  <title>EPICS Motor Record Release R6-4-3 Notice</title>
   <meta name="author" content="Ronald L. Sluiter">
   <meta name="description" content="Notification of bug fixes, functional changes and new features.">
 </head>
 <body>
+
+
+<CENTER>
+  <H1><B><U>Motor Record Version 6-4-4 Release Notice</U></B></H1>
+</CENTER>
+
+
+<div align="left">
+  <p>
+  <u><b>save/restore problem with asyn motor</b></u>
+  </p>
+  <P>
+  The asynMotor device support would erroneously leave a motor-in-motion indicator on 
+  if the motor record issued a LOAD_POS command before the 2nd pass of device 
+  support initialization.
+  </P>
+</div>
+<div align="left">
+  <p>
+  <u><b>Aerotech Ensemble device driver</b></u>
+  </p>
+  <P>
+  Fixes for incorrect Jog speeds, support for a negative PosScaleFactor parameter 
+  and detecting maximum travel limit switch faults.
+  </P>
+</div>
+<div align="left">
+  <p>
+  <u><b>MSVC compiler support</b></u>
+  </p>
+  <P>
+  Preprocessor assertions in motor.h were moved to the end of conditional logic to 
+  avoid MSVC compiler errors.
+  </P>
+</div>
+<div align="left">
+  <p>
+  <u><b>save/restore problem with simulated motor</b></u>
+  </p>
+  <P>
+  The motor simulator would get stuck in the Moving state after multiple LOAD_POS
+  commands to the same position.
+  </P>
+</div>
+<br>
+
+
+<CENTER>
+  <H1><B><U>Motor Record Version 6-4-3 Release Notice</U></B></H1>
+</CENTER>
+
+
+<div align="left">
+  <p>
+  <u><b>Backlash after a new target position</b></u>
+  </p>
+  <P>
+  A change in R6-4 prevented the motor from doing its' backlash move when a motor 
+  move was interrupted by a new target position.  The user would see a "tdir" 
+  message in the iocsh and the motor would move to the target position minus the 
+  backlash distance.
+  </P>
+</div>
+<div align="left">
+  <p>
+  <u><b>Multiple STOP commands</b></u>
+  </p>
+  <P>
+  A modification was made to prevent multiple STOP commands from occurring while the 
+  motor was decelerating to a stop.
+  </P>
+</div>
+<br>
+
+
+<CENTER>
+  <H1><B><U>Motor Record Version 6-4-2 Release Notice</U></B></H1>
+</CENTER>
+
+<div align="left">
+  <p>
+  <u><b>OMS MAXv home switch status</b></u>
+  </p>
+  <p>
+  Dirk Zimoch (PSI) fixed a bug in the OMS MAXv driver that caused the home switch 
+  status in the response string to be overwritten.
+  </p>
+</div>
+
+<div align="left">
+  <p>
+  <u><b>asyn motor</b></u>
+  </p>
+  <p>
+  Matthew Pearson (Diamond) discovered a bug in the Newport XPS asyn motor port 
+  drive that was causing idle polling to interfere with setting positions and 
+  preventing auto save/restore from working.  This fix was copied to the other 
+  asyn motor port drives in the motor record distribution; i.e., attocube ANC 150 
+  (drvANC150Asyn.cc) and the motor simulator (drvMotorSim.c).
+  </p>
+</div>
+
+<div align="left">
+  <p>
+  <u><b>old device drive architecture</b></u>
+  </p>
+  <p>
+  A problem was introduced in R6-4 (fixed in R6-4-2) of the old motor record 
+  device drive architecture.  If during the move of one or more motors the motor 
+  task did not issue an OS delay during status updates, it could potentially not 
+  respond to any further motor commands.
+  </p>
+</div>
+
+<br>
+
+<CENTER>
+  <H1><B><U>Motor Record Version 6-4-1 Release Notice</U></B></H1>
+</CENTER>
+
+<div align="left">
+  <p>
+  <u><b>64-bit compatiablity</b></u>
+  </p>
+  <p>
+  Fixed 64 bit compile problems with the PI E816 and Aerotech Ensemble device 
+  drivers.
+  </p>
+</div>
+
+<br>
 
 
 <CENTER>

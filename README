@@ -1,8 +1,8 @@
-Motor Record R6-4 Release Notice
+Motor Record R6-4-4 Release Notice
 ===============================================================================
 
 The motor record software in this release is compatible with EPICS base
-R3-14-9.
+R3-14-10.
 
 
 Contents
@@ -123,6 +123,114 @@ Known Problems
           In other words, the status update is skipped when DMOV=0 and record
           is processed from a periodic scan.
 
+6) The MM4000 sets its' "Axis in Motion" status bit (MS command) false before
+        the target position (as read by the TP command) is reached.  This can
+        appear to the motor record as a following error causing a needless
+        retry if retries are enabled.
+
+
+Modification Log from R6-4-3 to R6-4-4
+======================================
+
+1) The asynMotor device support would erroneously leave a motor-in-motion
+        indicator on if the motor record issued a LOAD_POS command before the
+        2nd pass of device support initialization.  Added logic to
+        devMotorAsyn.c:asynCallback() to prevent moveRequestPending from being
+        left in a nonzero state after the execution of a LOAD_POS command done
+        as a result of save/restore during boot-up.
+
+        File modified:  devMotorAsyn.c:asynCallback()
+
+
+2) Aerotech Ensemble device driver fixes for incorrect Jog speeds, support for
+        a negative PosScaleFactor parameter and detecting maximum travel limit
+        switch faults.
+        
+        Files modified: devEnsemble.cc, drvEnsemble.h, drvEnsemble.cc
+
+
+3) Moved preprocessor assertions in motor.h to the end of the conditional logic
+        to avoid MSVC compiler errors.
+   
+        File modified: MotorSrc/motor.h
+
+4) Matthew Pearson's (Diamond) fix for the motor simulator getting stuck in
+        the Moving state after multiple LOAD_POS commands to the same position.
+        
+        File modified: MotorSrc/devMotorAsyn.c; set needUpdate = 1 in
+                       asynCallback() before dbProcess() call.
+
+5) A consequence of the fix for item #4 above caused the motor record to see
+        RA_DONE in the MSTA field True on the 1st status update after a move;
+        whether or not the motor was done moving.  Matthew Pearson's fix is to
+        set motorAxisDone False in motorAxisDrvSET_t functions that start
+        motion (motorAxisHome, motorAxisMove, motorAxisVelocityMove) and force
+        a status update with a motorParam->callCallback(pAxis->params) call.
+        
+        Files modified: - NewportSrc/drvMM4000Asyn.c
+                        - AtttoCube/drvANC150.cc
+                        - MotorSimSrc/drvMotorSim.c
+
+6) An error was introduced with R5-3 when the STUP field was added (item #4
+        under R5-3) that resulted in the PACT field being cleared before
+        recGblGetTimeStamp(), alarm_sub() and monitor() were called.
+
+        File modified: process() in motorRecord.cc
+
+
+Modification Log from R6-4-2 to R6-4-3
+======================================
+
+1) Modifications were made to motorRecord.cc:do_work() with R6-4 to limit the
+        ramifications of ORing MIP_MOVE with MIP_RETRY.  Unfortunately, the
+        effect of one of those changes prevented the motor from doing its'
+        backlash move when a motor move was interrupted by "New Target
+        Monitoring".  The user would see a "tdir" message in the iocsh and
+        the motor would move, not the target position, but to the target minus
+        the backlash distance.
+
+        File modified: do_work() in motorRecord.cc; unconditionally set the
+                       postprocess indicator TRUE so postProcess() can do the
+                       backlash move.
+
+2) Prevent multiple STOP commands.
+
+        File modified: motorRecord.cc:process(); added check for !MIP_STOP to
+                       NTM logic.
+
+
+Modification Log from R6-4-1 to R6-4-2
+======================================
+
+1) Dirk Zimoch (PSI) fixed a bug in the OMS MAXv driver that caused the
+        set_status() function to overwrite the home switch status in the
+        response string.
+
+        File modified: drvMAXv.cc
+
+2) Matthew Pearson (Diamond) fixed a bug on Newport XPS and MM4000 asyn motor
+        port drives that was causing idle polling to interfere with setting
+        positions and prevented auto save/restore from working.
+
+        Files modified: drvMM4000Asyn.c and drvXPSAsyn.c; added
+                        epicsMutex[Lock/Unlock] to motorAxisSetDouble().
+
+3) A problem was introduced in R6-4 (fixed in R6-4-2) of the old motor record
+        device drive architecture.  If during the move of one or more motors
+        the motor task did not issue an OS delay during status updates, it
+        could potentially not respond to any further motor commands.
+          
+        Files modified: - MotorSrc/motordrvCom.cc; always check for incoming
+                                                   messages.
+                        - OmsSrc/drvOms58.cc; reduced start_status() delays.
+
+
+Modification Log from R6-4 to R6-4-1
+====================================
+
+1) Fixed 64 bit compile problems with PI E816 and Aerotech Ensemble.
+
+        Files modified: devPIE816.cc and devEnsemble.cc
 
 
 Modification Log from R6-3 to R6-4

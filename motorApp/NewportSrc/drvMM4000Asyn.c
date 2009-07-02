@@ -1,3 +1,53 @@
+/*
+FILENAME... drvMM4000Asyn.cc
+USAGE...    Motor record asyn driver level support for Newport MM4000.
+
+Version:        $Revision: 1.6.2.3 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2009/06/22 18:03:34 $
+*/
+
+/*
+ *      Original Author: Mark Rivers
+ *      Date: 05/03/06
+ *      Current Author: Mark Rivers
+ *
+ -----------------------------------------------------------------------------
+                                COPYRIGHT NOTICE
+ -----------------------------------------------------------------------------
+   Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+      National Laboratory.
+   Copyright (c) 2002 The Regents of the University of California, as
+      Operator of Los Alamos National Laboratory.
+   Synapps Versions 4-5
+   and higher are distributed subject to a Software License Agreement found
+   in file LICENSE that is included with this distribution.
+ -----------------------------------------------------------------------------
+ *
+ * Modification Log:
+ * -----------------
+ *
+ * .01 09-09-08 rls Default to motorAxisHasClosedLoop on from motorAxisInit(),
+ *                  so that CNEN functions.
+ * .02 01-29-09 rls Copied Matthew Pearson's (Diamond) fix on XPS for;
+ *                  - idle polling interfering with setting position.
+ *                  - auto save/restore not working.
+ * .03 02-18-09 rls - Intermittent "set position" problem; set position cmnd.
+ *                  sometimes occurred during polling causing motor record
+ *                  to get old position value.  Lock/Unlock all controller's
+ *                  axis during status update.
+ *                  - Check for controller error.
+ * .04 06-11-09 rls - Matthew Pearson's fix for record seeing motorAxisDone True
+ *                  on 1st status update after a move; set motorAxisDone False
+ *                  in motorAxisDrvSET_t functions that start motion
+ *                  (motorAxisHome, motorAxisMove, motorAxisVelocityMove) and
+ *                  force a status update with a call to callCallback().
+ *                  - bug fix; limit commands reversed.
+ *                  - set motorAxisDirection.
+ *
+ */
+ 
+ 
 #include <stddef.h>
 #include "epicsThread.h"
 #include <stdlib.h>
@@ -94,7 +144,7 @@ typedef struct
 
 static int motorMM4000LogMsg(void * param, const motorAxisLogMask_t logMask, const char *pFormat, ...);
 static int sendOnly(MM4000Controller *pController, char *outputString);
-static int sendAndReceive(MM4000Controller *pController, char *outputString, char *inputString, int inputSize);
+static asynStatus sendAndReceive(MM4000Controller *pController, char *outputString, char *inputString, int inputSize);
 
 #define PRINT   (drv.print)
 #define FLOW    motorAxisTraceFlow
@@ -121,8 +171,6 @@ static MM4000Controller *pMM4000Controller=NULL;
 
 #define MAX(a,b) ((a)>(b)? (a): (b))
 #define MIN(a,b) ((a)<(b)? (a): (b))
-
-static char* getMM4000Error(AXIS_HDL pAxis, int status, char *buffer);
 
 static void motorAxisReportAxis(AXIS_HDL pAxis, int level)
 {
@@ -159,7 +207,26 @@ static void motorAxisReport(int level)
 
 static int motorAxisInit(void)
 {
-  return MOTOR_AXIS_OK;
+    int controller, axis;
+
+    for (controller = 0; controller < numMM4000Controllers; controller++)
+    {
+        AXIS_HDL pAxis;
+        for (axis = 0; axis < pMM4000Controller[controller].numAxes; axis++)
+        {
+            pAxis = &pMM4000Controller[controller].pAxis[axis];
+            if (!pAxis->mutexId)
+                break;
+            epicsMutexLock(pAxis->mutexId);
+
+            /*Set GAIN_SUPPORT on so that at least, CNEN functions. */
+            motorParam->setInteger(pAxis->params, motorAxisHasClosedLoop, 1);
+
+            motorParam->callCallback(pAxis->params);
+            epicsMutexUnlock(pAxis->mutexId);
+        }
+    }
+    return(MOTOR_AXIS_OK);
 }
 
 static int motorAxisSetLog( AXIS_HDL pAxis, motorAxisLogFunc logFunc, void * param )
@@ -238,13 +305,14 @@ static int motorAxisSetCallback(AXIS_HDL pAxis, motorAxisCallbackFunc callback, 
 static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double value)
 {
     int ret_status = MOTOR_AXIS_ERROR;
-    int status;
     double deviceValue;
     char buff[100];
 
-    if (pAxis == NULL) return MOTOR_AXIS_ERROR;
+    if (pAxis == NULL)
+        return MOTOR_AXIS_ERROR;
     else
     {
+        epicsMutexLock(pAxis->mutexId);
         switch (function)
         {
         case motorAxisPosition:
@@ -268,14 +336,14 @@ static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double 
         case motorAxisLowLimit:
         {
             deviceValue = value*pAxis->stepSize;
-            sprintf(buff, "%dSR%.*f", pAxis->axis+1, pAxis->maxDigits,  deviceValue);
+            sprintf(buff, "%dSL%.*f", pAxis->axis+1, pAxis->maxDigits,  deviceValue);
             ret_status = sendOnly(pAxis->pController, buff);
             break;
         }
         case motorAxisHighLimit:
         {
             deviceValue = value*pAxis->stepSize;
-            sprintf(buff, "%dSL%.*f", pAxis->axis+1, pAxis->maxDigits,  deviceValue);
+            sprintf(buff, "%dSR%.*f", pAxis->axis+1, pAxis->maxDigits,  deviceValue);
             ret_status = sendOnly(pAxis->pController, buff);
             break;
         }
@@ -303,8 +371,13 @@ static int motorAxisSetDouble(AXIS_HDL pAxis, motorAxisParam_t function, double 
             PRINT(pAxis->logParam, ERROR, "motorAxisSetDouble: unknown function %d\n", function);
             break;
         }
+        if (ret_status == MOTOR_AXIS_OK )
+        {
+            motorParam->setDouble(pAxis->params, function, value);
+            motorParam->callCallback(pAxis->params);
+        }
+        epicsMutexUnlock(pAxis->mutexId);
     }
-    if (ret_status != MOTOR_AXIS_ERROR) status = motorParam->setDouble(pAxis->params, function, value);
     return ret_status;
 }
 
@@ -356,7 +429,16 @@ static int motorAxisMove(AXIS_HDL pAxis, double position, int relative,
             pAxis->axis+1, pAxis->maxDigits, max_velocity * pAxis->stepSize,
             pAxis->axis+1, moveCommand, pAxis->maxDigits, position * pAxis->stepSize);
     status = sendOnly(pAxis->pController, buff);
-    if (status) return MOTOR_AXIS_ERROR;
+    if (status)
+        return MOTOR_AXIS_ERROR;
+
+    if (epicsMutexLock(pAxis->mutexId) == epicsMutexLockOK)
+    {
+        /* Insure that the motor record's next status update sees motorAxisDone = False. */
+        motorParam->setInteger(pAxis->params, motorAxisDone, 0);
+        motorParam->callCallback(pAxis->params);
+        epicsMutexUnlock(pAxis->mutexId);
+    }
 
     /* Send a signal to the poller task which will make it do a poll, and switch to the moving poll rate */
     epicsEventSignal(pAxis->pController->pollEventId);
@@ -369,7 +451,8 @@ static int motorAxisHome(AXIS_HDL pAxis, double min_velocity, double max_velocit
     int status;
     char buff[100];
 
-    if (pAxis == NULL) return MOTOR_AXIS_ERROR;
+    if (pAxis == NULL)
+        return MOTOR_AXIS_ERROR;
 
     PRINT(pAxis->logParam, FLOW, "motorAxisHome: set card %d, axis %d to home\n",
           pAxis->card, pAxis->axis);
@@ -379,7 +462,16 @@ static int motorAxisHome(AXIS_HDL pAxis, double min_velocity, double max_velocit
             pAxis->axis+1, pAxis->maxDigits, max_velocity * pAxis->stepSize,
             pAxis->axis+1);
     status = sendOnly(pAxis->pController, buff);
-    if (status) return(MOTOR_AXIS_ERROR);
+    if (status)
+        return(MOTOR_AXIS_ERROR);
+
+    if (epicsMutexLock(pAxis->mutexId) == epicsMutexLockOK)
+    {
+        /* Insure that the motor record's next status update sees motorAxisDone = False. */
+        motorParam->setInteger(pAxis->params, motorAxisDone, 0);
+        motorParam->callCallback(pAxis->params);
+        epicsMutexUnlock(pAxis->mutexId);
+    }
 
     /* Send a signal to the poller task which will make it do a poll, and switch to the moving poll rate */
     epicsEventSignal(pAxis->pController->pollEventId);
@@ -450,7 +542,7 @@ static int motorAxisforceCallback(AXIS_HDL pAxis)
     return (MOTOR_AXIS_OK);
 }
 
-
+
 static void MM4000Poller(MM4000Controller *pController)
 {
     /* This is the task that polls the MM4000 */
@@ -471,60 +563,75 @@ static void MM4000Poller(MM4000Controller *pController)
     timeout = pController->idlePollPeriod;
     epicsEventSignal(pController->pollEventId);  /* Force on poll at startup */
 
-    while(1) {
-        if (timeout != 0.) status = epicsEventWaitWithTimeout(pController->pollEventId, timeout);
-        else               status = epicsEventWait(pController->pollEventId);
-        if (status == epicsEventWaitOK) {
+    while (1)
+    {
+        if (timeout != 0.)
+            status = epicsEventWaitWithTimeout(pController->pollEventId, timeout);
+        else
+            status = epicsEventWait(pController->pollEventId);
+
+        if (status == epicsEventWaitOK)
+        {
             /* We got an event, rather than a timeout.  This is because other software
              * knows that an axis should have changed state (started moving, etc.).
              * Force a minimum number of fast polls, because the controller status
              * might not have changed the first few polls
              */
             forcedFastPolls = 10;
-         }
-        
+        }
+
         anyMoving = 0;
-        comStatus = sendAndReceive(pController, "MS;", statusAllString, sizeof(statusAllString));
-        if (comStatus == 0) comStatus = sendAndReceive(pController, "TP;", 
-                                                       positionAllString, sizeof(positionAllString));
-        for (i=0; i<pController->numAxes; i++) {
+
+        /* Lock all the controller's axis. */
+        for (i = 0; i < pController->numAxes; i++)
+        {
             pAxis = &pController->pAxis[i];
-            if (!pAxis->mutexId) break;
+            if (!pAxis->mutexId)
+                break;
             epicsMutexLock(pAxis->mutexId);
-            if (comStatus != 0) {
+        }
+
+        comStatus = sendAndReceive(pController, "MS;", statusAllString, sizeof(statusAllString));
+        if (comStatus == 0)
+            comStatus = sendAndReceive(pController, "TP;", positionAllString, sizeof(positionAllString));
+        
+        for (i=0; i<pController->numAxes; i++)
+        {
+            pAxis = &pController->pAxis[i];
+            if (!pAxis->mutexId)
+                break;
+            if (comStatus != 0)
+            {
                 PRINT(pAxis->logParam, ERROR, "MM4000Poller: error reading status=%d\n", comStatus);
                 motorParam->setInteger(pAxis->params, motorAxisCommError, 1);
-            } else {
-                motorParam->setInteger(pAxis->params, motorAxisCommError, 0);
+            }
+            else
+            {
+                PARAMS params = pAxis->params;
+                int intval, axisStatus;
+
+                motorParam->setInteger(params, motorAxisCommError, 0);
                 /*
                  * Parse the status string
                  * Status string format: 1MSx,2MSy,3MSz,... where x, y and z are the status
                  * bytes for the motors
                  */
                 offset = pAxis->axis*5 + 3;  /* Offset in status string */
-                pAxis->axisStatus = statusAllString[offset];
-                if (pAxis->axisStatus & MM4000_MOVING) {
+                axisStatus = pAxis->axisStatus = statusAllString[offset];
+                if (axisStatus & MM4000_MOVING)
+                {
                     axisDone = 0;
                     anyMoving = 1;
-                } else {
+                }
+                else
                     axisDone = 1;
-                }
-                motorParam->setInteger(pAxis->params, motorAxisDone, axisDone);
-                if (pAxis->axisStatus & MM4000_HOME) {
-                    motorParam->setInteger(pAxis->params, motorAxisHomeSignal, 1);
-                } else {
-                    motorParam->setInteger(pAxis->params, motorAxisHomeSignal, 0);
-                }
-                if (pAxis->axisStatus & MM4000_HIGH_LIMIT) {
-                    motorParam->setInteger(pAxis->params, motorAxisHighHardLimit, 1);
-                } else {
-                    motorParam->setInteger(pAxis->params, motorAxisHighHardLimit, 0);
-                }
-                if (pAxis->axisStatus & MM4000_LOW_LIMIT) {
-                    motorParam->setInteger(pAxis->params, motorAxisLowHardLimit, 1);
-                } else {
-                    motorParam->setInteger(pAxis->params, motorAxisLowHardLimit, 0);
-                }
+                motorParam->setInteger(params, motorAxisDone, axisDone);
+
+                motorParam->setInteger(params, motorAxisHomeSignal,    (axisStatus & MM4000_HOME));
+                motorParam->setInteger(params, motorAxisHighHardLimit, (axisStatus & MM4000_HIGH_LIMIT));
+                motorParam->setInteger(params, motorAxisLowHardLimit,  (axisStatus & MM4000_LOW_LIMIT));
+                motorParam->setInteger(params, motorAxisDirection,     (axisStatus & MM4000_DIRECTION));
+
                 /*
                  * Parse motor position
                  * Position string format: 1TP5.012,2TP1.123,3TP-100.567,...
@@ -534,30 +641,50 @@ static void MM4000Poller(MM4000Controller *pController)
                 strcpy(buff, positionAllString);
                 tokSave = NULL;
                 p = epicsStrtok_r(buff, ",", &tokSave);
-                for (j=0; j < pAxis->axis; j++) 
+                for (j=0; j < pAxis->axis; j++)
                     p = epicsStrtok_r(NULL, ",", &tokSave);
                 pAxis->currentPosition = atof(p+3);
-                motorParam->setDouble(pAxis->params, motorAxisPosition,    (pAxis->currentPosition/pAxis->stepSize));
-                motorParam->setDouble(pAxis->params, motorAxisEncoderPosn, (pAxis->currentPosition/pAxis->stepSize));
+                motorParam->setDouble(params, motorAxisPosition,    (pAxis->currentPosition/pAxis->stepSize));
+                motorParam->setDouble(params, motorAxisEncoderPosn, (pAxis->currentPosition/pAxis->stepSize));
                 PRINT(pAxis->logParam, IODRIVER, "MM4000Poller: axis %d axisStatus=%x, position=%f\n", 
                       pAxis->axis, pAxis->axisStatus, pAxis->currentPosition);
 
                 /* We would like a way to query the actual velocity, but this is not possible.  If we could we could
                  * set the direction, and Moving flags */
+
+                /* Check for controller error. */
+                comStatus = sendAndReceive(pController, "TE;", buff, sizeof(statusAllString));
+                if (buff[2] == '@')
+                    intval = 0;
+                else
+                {
+                    intval = 1;
+                    PRINT(pAxis->logParam, ERROR, "MM4000Poller: controller error %s\n", buff);
+                }
+                motorParam->setInteger(params, motorAxisProblem, intval);
             }
 
             motorParam->callCallback(pAxis->params);
-            epicsMutexUnlock(pAxis->mutexId);
-
         } /* Next axis */
-        if (forcedFastPolls > 0) {
+
+        /* UnLock all the controller's axis. */
+        for (i = 0; i < pController->numAxes; i++)
+        {
+            pAxis = &pController->pAxis[i];
+            if (!pAxis->mutexId)
+                break;
+            epicsMutexUnlock(pAxis->mutexId);
+        }
+
+        if (forcedFastPolls > 0)
+        {
             timeout = pController->movingPollPeriod;
             forcedFastPolls--;
-        } else if (anyMoving) {
-            timeout = pController->movingPollPeriod;
-        } else {
-            timeout = pController->idlePollPeriod;
         }
+        else if (anyMoving)
+            timeout = pController->movingPollPeriod;
+        else
+            timeout = pController->idlePollPeriod;
     } /* End while */
 }
 
@@ -606,7 +733,6 @@ int MM4000AsynConfig(int card,             /* Controller number */
     int digits;
     int modelNum;
     int retry = 0;
-    asynStatus rtnval;
     char *p, *tokSave;
     char inputBuff[BUFFER_SIZE];
     char outputBuff[BUFFER_SIZE];
@@ -639,10 +765,10 @@ int MM4000AsynConfig(int card,             /* Controller number */
 
     do
     {
-        rtnval = sendAndReceive(pController, "VE;", inputBuff, sizeof(inputBuff));
+        status = sendAndReceive(pController, "VE;", inputBuff, sizeof(inputBuff));
         retry++;
         /* Return value is length of response string */
-    } while (rtnval != asynSuccess && retry < 3);
+    } while (status != asynSuccess && retry < 3);
 
     if (status != asynSuccess)
         return (MOTOR_AXIS_ERROR);
@@ -732,7 +858,7 @@ int MM4000AsynConfig(int card,             /* Controller number */
 static int sendOnly(MM4000Controller *pController, char *outputBuff)
 {
     int nRequested=strlen(outputBuff);
-    int nActual;
+    size_t nActual;
     asynStatus status;
 
     status = pasynOctetSyncIO->write(pController->pasynUser, outputBuff, 
@@ -747,11 +873,10 @@ static int sendOnly(MM4000Controller *pController, char *outputBuff)
 }
 
 
-static int sendAndReceive(MM4000Controller *pController, char *outputBuff, char *inputBuff, int inputSize) 
+static asynStatus sendAndReceive(MM4000Controller *pController, char *outputBuff, char *inputBuff, int inputSize) 
 {
     int nWriteRequested=strlen(outputBuff);
-    int nWrite;
-    int nRead;
+    size_t nWrite, nRead;
     int eomReason;
     asynStatus status;
     
