@@ -860,6 +860,7 @@ static int motorAxisMove(AXIS_HDL pAxis, double position, int relative,
     /* Tell paramLib that the motor is moving.  
      * This will force a callback on the next poll, even if the poll says the motor is already done. */
     motorParam->setInteger(pAxis->params, motorAxisDone, 0);
+    motorParam->callCallback( pAxis->params );
     /* Send a signal to the poller task which will make it do a poll, and switch to the moving poll rate */
     epicsEventSignal(pAxis->pController->pollEventId);
 
@@ -905,6 +906,7 @@ static int motorAxisHome(AXIS_HDL pAxis, double min_velocity, double max_velocit
     /* Tell paramLib that the motor is moving.  
      * This will force a callback on the next poll, even if the poll says the motor is already done. */
     motorParam->setInteger(pAxis->params, motorAxisDone, 0);
+    motorParam->callCallback( pAxis->params );
     /* Send a signal to the poller task which will make it do a poll, and switch to the moving poll rate */
     epicsEventSignal(pAxis->pController->pollEventId);
     PRINT(pAxis->logParam, FLOW, "motorAxisHome: set card %d, axis %d to home\n",
@@ -936,6 +938,7 @@ static int motorAxisVelocityMove(AXIS_HDL pAxis, double min_velocity, double vel
     /* Tell paramLib that the motor is moving.  
      * This will force a callback on the next poll, even if the poll says the motor is already done. */
     motorParam->setInteger(pAxis->params, motorAxisDone, 0);
+    motorParam->callCallback( pAxis->params );
     /* Send a signal to the poller task which will make it do a poll, and switch to the moving poll rate */
     epicsEventSignal(pAxis->pController->pollEventId);
     PRINT(pAxis->logParam, FLOW, "motorAxisVelocityMove card %d, axis %d move velocity=%f, accel=%f\n",
