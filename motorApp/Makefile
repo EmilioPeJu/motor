@@ -32,6 +32,7 @@ DIRS += NewFocusSrc
 #DIRS += SmartMotorSrc
 DIRS += PiJenaSrc
 #DIRS += KohzuSrc
+DIRS += AerotechSrc
 endif
 
 # Install the edl files
