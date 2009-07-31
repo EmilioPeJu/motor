@@ -213,13 +213,13 @@ minor 1
 release 0
 x 100
 y 100
-w 84
+w 79
 h 14
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 8
 value {
-  "  $(auto-label)  "
+  "  $(box-label)  "
 }
 autoSize
 border
@@ -229,7 +229,7 @@ endObjectProperties
 object activeXTextDspClass:noedit
 beginObjectProperties
 major 4
-minor 1
+minor 4
 release 0
 x 138
 y 157
@@ -248,6 +248,7 @@ showUnits
 useAlarmBorder
 newPos
 objType "monitors"
+noExecuteClipMask
 endObjectProperties
 
 # (Menu Mux PV)
@@ -281,7 +282,7 @@ endObjectProperties
 object activeXTextDspClass
 beginObjectProperties
 major 4
-minor 1
+minor 4
 release 0
 x 165
 y 185
@@ -299,6 +300,7 @@ nullColor index 30
 useHexPrefix
 newPos
 objType "controls"
+noExecuteClipMask
 endObjectProperties
 
 # (Message Button)
@@ -1015,7 +1017,7 @@ endObjectProperties
 object activeXTextDspClass:noedit
 beginObjectProperties
 major 4
-minor 1
+minor 4
 release 0
 x 5
 y 285
@@ -1034,6 +1036,7 @@ showUnits
 useAlarmBorder
 newPos
 objType "monitors"
+noExecuteClipMask
 endObjectProperties
 
 # (Symbol)

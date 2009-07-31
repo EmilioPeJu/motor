@@ -54,7 +54,7 @@ setPosition {
   0 "button"
 }
 symbols {
-  0 "auto-label=$(auto-label),motor=$(motor)"
+  0 "box-label=$(box-label),motor=$(motor)"
 }
 endObjectProperties
 
@@ -194,50 +194,23 @@ minor 1
 release 0
 x 0
 y 0
-w 84
+w 79
 h 14
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 8
 value {
-  "  $(auto-label)  "
+  "  $(box-label)  "
 }
 autoSize
 border
-endObjectProperties
-
-# (Menu Mux PV)
-object menuMuxPVClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 2000
-y 2000
-w 20
-h 20
-fgColour index 14
-bgColour index 3
-topShadowColour index 1
-botShadowColour index 11
-font "helvetica-medium-r-14.0"
-numItems 1
-symbolTag {
-  0 "."
-}
-symbol0 {
-  0 "auto-label"
-}
-PV0 {
-  0 "$(motor).DESC"
-}
 endObjectProperties
 
 # (Text Control)
 object activeXTextDspClass
 beginObjectProperties
 major 4
-minor 1
+minor 4
 release 0
 x 65
 y 85
@@ -255,6 +228,7 @@ nullColor index 30
 useHexPrefix
 newPos
 objType "controls"
+noExecuteClipMask
 endObjectProperties
 
 # (Message Button)
