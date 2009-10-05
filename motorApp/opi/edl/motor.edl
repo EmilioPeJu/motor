@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 643
-y 127
+x 858
+y 486
 w 411
 h 503
 font "arial-medium-r-16.0"
@@ -1600,5 +1600,48 @@ onColor index 35
 offColor index 39
 lineWidth 2
 numBits 1
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 310
+w 100
+h 20
+
+beginGroup
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 310
+w 98
+h 25
+fgColor index 22
+onColor index 4
+offColor index 3
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):KILL.PROC"
+pressValue "1"
+onLabel "Kill"
+offLabel "Kill"
+3d
+font "arial-bold-r-14.0"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):KILL"
+visMin "0"
+visMax "1"
 endObjectProperties
 
