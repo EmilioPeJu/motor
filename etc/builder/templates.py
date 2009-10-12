@@ -5,9 +5,10 @@ __all__ = ['basic_asyn_motor', 'MotorController', 'MotorSimLib']
 
 
 from iocbuilder.modules.asyn import Asyn
+from Oms import MotorLib
 
 class MotorSimLib(Device):
-    Dependencies = (Asyn,)
+    Dependencies = (Asyn, MotorLib)
     LibFileList = [ "motorSimSupport" ]
     DbdFileList = [ "motorSimSupport" ]
     AutoInstantiate = True    

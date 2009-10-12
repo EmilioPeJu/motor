@@ -56,6 +56,7 @@ record(ao, "$(P)$(M):KILL") {
 
 # dummy record that looks like eloss status
 record(ai, "$(P)$(M):ELOSS") {
+    field(PINI, "YES")
 }
 
 # dummy record that looks like an eloss reset
