@@ -47,7 +47,7 @@ record(motor,"$(P)$(M)")
 	field(OFF, "$(OFF)")
 	field(RDBD, "$(RDBD)")
 	field(FOFF, "$(FOFF)")
-	field(ADEL, "$(ADEL)")
+	field(ADEL, "$(ADEL=0)")
 }
 
 # dummy record that looks like a kill command
