@@ -48,6 +48,7 @@ record(motor,"$(P)$(M)")
 	field(RDBD, "$(RDBD)")
 	field(FOFF, "$(FOFF)")
 	field(ADEL, "$(ADEL=0)")
+	field(NTM, "$(NTM=1)")
 }
 
 # dummy record that looks like a kill command
