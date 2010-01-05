@@ -664,8 +664,9 @@ static int getMotorPositions(SS_ID ssId, struct UserVar *pVar, double *pos)
 
     /* Read the current positions of all the axes */
     
-    status = GroupPositionCurrentGet(pVar->positionSocket,
+    status = GroupPositionCurrentGet(pVar->pollSocket,
                                      pVar->groupName,pVar->numAxes,pos);
+
     if (status != 0)
         printf("Error performing GroupPositionCurrentGet%i\n", status);
     /* Convert from XPS units (which are EPICS motor dial units) to user units */
