@@ -2,6 +2,9 @@
 #! DBDSTART
 #! DBDEND
 
+#% macro, __doc__, Template providing motors moving and stop all records for 
+# all motor records on this IOC
+#% macro, P, Device Prefix including colon
 
 # Setting VAL to "stop", stops ALL motorRecord's in this IOC.
 # $(P)allstop.VAL is monitored by motorUtil.

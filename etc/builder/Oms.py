@@ -1,14 +1,8 @@
 from iocbuilder import Device, records, RecordFactory
 from iocbuilder.modules.asyn import Asyn
+from common import MotorLib
 
-__all__ = ['MotorLib', 'OmsVme58']
-
-
-class MotorLib(Device):
-    Dependencies = (Asyn,)
-    LibFileList = ['motor', 'softMotor']
-    DbdFileList = ['motorSupport', 'devSoftMotor']
-    AutoInstantiate = True
+__all__ = ['OmsVme58']
 
 class OmsVme(Device):
     Dependencies = (MotorLib,)
