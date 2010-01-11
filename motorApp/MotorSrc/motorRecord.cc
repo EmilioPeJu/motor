@@ -3201,6 +3201,9 @@ static void post_MARKed_fields(motorRecord * pmr, unsigned short mask)
         db_post_events(pmr, &pmr->rbv, mask);
         UNMARK(M_RBV);
     }
+
+    /*Now we have posted change on RBV, reset the monitor mask.*/
+    mask = recGblResetAlarms(pmr);
     
     if ((local_mask = mask | (MARKED(M_RRBV) ? DBE_VAL_LOG : 0)))
     {
