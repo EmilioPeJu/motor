@@ -1,0 +1,19 @@
+# save/restore V5.1	Automatically generated - DO NOT MODIFY - 090518-120658
+! 4 channel(s) not connected - or not all gets were successful
+mp49:sim1.DVAL 0
+mp49:sim1.OFF 0
+mp49:sim2.DVAL 0
+mp49:sim2.OFF 0
+mp49:sim3.DVAL 0
+mp49:sim3.OFF 0
+mp49:sim4.DVAL 0
+mp49:sim4.OFF 0
+mp49:sim5.DVAL 0
+mp49:sim5.OFF 0
+mp49:sim6.DVAL 0
+mp49:sim6.OFF 0
+#mp49:sim7.DVAL Search Issued
+#mp49:sim7.OFF Search Issued
+#mp49:sim8.DVAL Search Issued
+#mp49:sim8.OFF Search Issued
+<END>
