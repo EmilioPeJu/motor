@@ -31,8 +31,4 @@ pattern {device, file}
         { mp49:sim:SR, 0}
 }
 
-file ioc.db
-{
-pattern {IOCNAME}
-        {mp49:sim}
-}
+

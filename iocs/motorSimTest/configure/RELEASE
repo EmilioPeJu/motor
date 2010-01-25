@@ -21,12 +21,11 @@ SUPPORT=/dls_sw/prod/R3.14.8.2/support
 WORK=/dls_sw/work/R3.14.8.2/support
 
 ASYN=           $(SUPPORT)/asyn/4-10
-#MOTOR=          $(SUPPORT)/motor/6-4-4dls4
-MOTOR=          /home/mp49/epics/support/motor
+MOTOR=          $(SUPPORT)/motor/6-4-4dls5
+#MOTOR=          /home/mp49/epics/support/motor
 USER=           $(SUPPORT)/userIO/1-10
 UTILITY=        $(SUPPORT)/utility/dls2-8
 AUTOSAVE=       $(SUPPORT)/autosave/4-2-1dls3
-DEVIOCSTATS=	$(SUPPORT)/devIocStats/2-2-1dls3
 
 # EPICS_BASE usually appears last so other apps can override stuff:
 EPICS_BASE=/dls_sw/epics/R3.14.8.2/base
