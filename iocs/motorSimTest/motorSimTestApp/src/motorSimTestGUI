@@ -3,7 +3,7 @@
 #EDIT THIS SECTION
 
 export MOTOR=/home/mp49/epics/support/motor
-export DEVIOCSTATS=/dls_sw/work/R3.14.8.2/support/devIocStats
+#export DEVIOCSTATS=/dls_sw/work/R3.14.8.2/support/devIocStats
 export EPICS_CA_SERVER_PORT=5064
 export EPICS_CA_REPEATER_PORT=5065
 motorPV1=mp49:sim1
@@ -12,12 +12,12 @@ motorPV3=mp49:sim3
 motorPV4=mp49:sim4
 motorPV5=mp49:sim5
 motorPV6=mp49:sim6
-iocname=mp49:sim
+#iocname=mp49:sim
 
 #DO NOT EDIT THIS SECTION
 
 export EDMDATAFILES=${EDMDATAFILES}:${MOTOR}/data/
-export EDMDATAFILES=${EDMDATAFILES}:${DEVIOCSTATS}/data/
+#export EDMDATAFILES=${EDMDATAFILES}:${DEVIOCSTATS}/data/
 export PATH=${PATH}:EDMDATAFILES
 edm -x -m "motor=${motorPV1}" -port ${EPICS_CA_SERVER_PORT} ${MOTOR}/data/motor.edl &
 edm -x -m "motor=${motorPV2}" -port ${EPICS_CA_SERVER_PORT} ${MOTOR}/data/motor.edl &
@@ -25,7 +25,7 @@ edm -x -m "motor=${motorPV3}" -port ${EPICS_CA_SERVER_PORT} ${MOTOR}/data/motor.
 edm -x -m "motor=${motorPV4}" -port ${EPICS_CA_SERVER_PORT} ${MOTOR}/data/motor.edl &
 edm -x -m "motor=${motorPV5}" -port ${EPICS_CA_SERVER_PORT} ${MOTOR}/data/motor.edl &
 edm -x -m "motor=${motorPV6}" -port ${EPICS_CA_SERVER_PORT} ${MOTOR}/data/motor.edl &
-edm -x -m "ioc=${iocname}" -port ${EPICS_CA_SERVER_PORT} ${DEVIOCSTATS}/data/ioc_stats.edl &
+#edm -x -m "ioc=${iocname}" -port ${EPICS_CA_SERVER_PORT} ${DEVIOCSTATS}/data/ioc_stats.edl &
 
 
 
