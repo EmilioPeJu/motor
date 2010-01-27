@@ -113,7 +113,7 @@ class motorCaseMoveSequence(motorCaseBase):
    def runTest(self):
 
       distances = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
-      moves = 1
+      moves = 10
 
       for distance in distances:
          self.diagnostic("Moving distances of " + str(distance), self.getDiag())
