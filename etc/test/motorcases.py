@@ -9,12 +9,12 @@ import re
 class motorCaseBase(TestCase):
    """
    Base class for all motor test cases.
-   This is where the base PV is hardcoded to be 'mp49:sim'
+   This is where the base PV is hardcoded to be 'mp49t:sim'
    """
    
    def __init__(self, A):
       TestCase.__init__(self, A)
-      self.__pv1 = "mp49:sim"
+      self.__pv1 = "mp49t:sim"
       self.__motors = ["1","2","3","4","5","6"]
       self.__diag = 1
       self.__timeout = 1000
