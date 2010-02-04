@@ -17,7 +17,7 @@ dbLoadRecords("db/motorSimTest.db")
 #mySubDebug 1
 
 # Create simulated motors: ( start card , start axis , low limit, high limit, home posn, # cards, # axes to setup)
-motorSimCreate( 0, 0, -1500000, 1500000, 0, 1, 32 )
+motorSimCreate( 0, 0, -150000000, 150000000, 0, 1, 32 )
 # Setup the Asyn layer (portname, low-level driver drvet name, card, number of axes on card)
 drvAsynMotorConfigure("PMAC1", "motorSim", 0, 32)
 
