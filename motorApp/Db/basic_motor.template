@@ -4,6 +4,8 @@
 #% autosave 2 DESC
 #% archiver 0.5 Monitor
 #% archiver 0.5 Monitor RBV
+#% gdatag,template,simpleMotor,$(gda_name),$(gda_desc=$(DESC))
+#% gdatag,motor,rw,$(gda_name),RECORD,Motor
 record(motor, "$(P)$(M)") {
   field(SCAN, "Passive")
   field(MRES, "$(MRES)")
