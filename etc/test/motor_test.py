@@ -27,7 +27,8 @@ class motorTestSuite(TestSuite):
       # Define the targets for this test suite
       Target("simulation", self,
              iocDirectory="iocs/motorSimTest",
-             iocBootCmd="screen -D -m -L bin/linux-x86/stmotorSimTest.boot",
+             #iocBootCmd="screen -D -m -L bin/linux-x86/stmotorSimTest.boot",
+             iocBootCmd="bin/linux-x86/stmotorSimTest.boot",
              epicsDbFiles="db/motorSimTest.db"
              #guiCmds=['edm -m "lakeshore340=mp49:ls340sim" -x data/lakeshore340.edl'])
              )
