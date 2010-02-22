@@ -110,20 +110,109 @@ class motorCaseReadInit(motorCaseBase):
          self.verify(init_movn, self.getPv(pv_movn))
 
 
-class motorCaseMoveSequence(motorCaseBase):
+class motorCaseMoveSequence1(motorCaseBase):
    """
    Class to do a series of moves on each motor record.
    """
 
    def runTest(self):
 
-      distances = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+      distances = [0.001, 0.002, 0.003]
       moves = 10
 
       for distance in distances:
          self.diagnostic("Moving distances of " + str(distance), self.getDiag())
          self.doMoveSequence(distance, moves)
 
+
+class motorCaseMoveSequence2(motorCaseBase):
+   """
+   Class to do a series of moves on each motor record.
+   """
+
+   def runTest(self):
+
+      distances = [0.01, 0.02]
+      moves = 10
+
+      for distance in distances:
+         self.diagnostic("Moving distances of " + str(distance), self.getDiag())
+         self.doMoveSequence(distance, moves)
+
+
+class motorCaseMoveSequence3(motorCaseBase):
+   """
+   Class to do a series of moves on each motor record.
+   """
+
+   def runTest(self):
+
+      distances = [0.1, 0.2]
+      moves = 10
+
+      for distance in distances:
+         self.diagnostic("Moving distances of " + str(distance), self.getDiag())
+         self.doMoveSequence(distance, moves)
+
+
+class motorCaseMoveSequence4(motorCaseBase):
+   """
+   Class to do a series of moves on each motor record.
+   """
+
+   def runTest(self):
+
+      distances = [1.0]
+      moves = 5
+
+      for distance in distances:
+         self.diagnostic("Moving distances of " + str(distance), self.getDiag())
+         self.doMoveSequence(distance, moves)
+
+
+class motorCaseMoveSequence5(motorCaseBase):
+   """
+   Class to do a series of moves on each motor record.
+   """
+
+   def runTest(self):
+
+      distances = [10.0]
+      moves = 5
+
+      for distance in distances:
+         self.diagnostic("Moving distances of " + str(distance), self.getDiag())
+         self.doMoveSequence(distance, moves)
+
+
+class motorCaseMoveSequence6(motorCaseBase):
+   """
+   Class to do a series of moves on each motor record.
+   """
+
+   def runTest(self):
+
+      distances = [100.0]
+      moves = 5
+
+      for distance in distances:
+         self.diagnostic("Moving distances of " + str(distance), self.getDiag())
+         self.doMoveSequence(distance, moves)
+
+
+class motorCaseMoveSequence7(motorCaseBase):
+   """
+   Class to do a series of moves on each motor record.
+   """
+
+   def runTest(self):
+
+      distances = [1.230, 1.567, 4.010, 11.999]
+      moves = 5
+
+      for distance in distances:
+         self.diagnostic("Moving distances of " + str(distance), self.getDiag())
+         self.doMoveSequence(distance, moves)
 
 
    
