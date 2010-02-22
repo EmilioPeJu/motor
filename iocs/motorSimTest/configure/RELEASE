@@ -21,9 +21,7 @@ SUPPORT=/dls_sw/prod/R3.14.8.2/support
 WORK=/dls_sw/work/R3.14.8.2/support
 
 ASYN=           $(SUPPORT)/asyn/4-10
-#MOTOR=          $(SUPPORT)/motor/6-4-4dls5
-MOTOR=		$(WORK)/motor
-#MOTOR=          /home/mp49/epics/support/motor
+MOTOR=          $(SUPPORT)/motor/6-4-4dls5
 USER=           $(SUPPORT)/userIO/1-10
 UTILITY=        $(SUPPORT)/utility/dls2-8
 AUTOSAVE=       $(SUPPORT)/autosave/4-2-1dls3
