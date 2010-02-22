@@ -17,7 +17,7 @@ class motorCaseBase(TestCase):
       self.__pv1 = "mp49t:sim"
       self.__motors = ["1","2","3","4","5","6"]
       self.__diag = 1
-      self.__timeout = 1000
+      self.__timeout = 10000
       
    def getPVBase(self):
       return self.__pv1
@@ -32,49 +32,54 @@ class motorCaseBase(TestCase):
       return self.__timeout
 
 
-   def doMoveSequence(self, distance, moves):
+   def doMoveSequence(self, distance, moves, axes=6):
       """
       Do a series of moves on each motor record. The number of moves
-      and the distance are arguments to the function.
+      and the distance are arguments to the function. The number of axes
+      is also specified (max 6).
 
       The moves are triggered by writing to VAL.
       The start and end positions are checked (to be within RDBD)
       """
 
       move = 0.0
+      axis_count = 0
 
       for motor in self.getMotors():
 
-         self.diagnostic("Moving motor record " + self.getPVBase() + motor, self.getDiag());
+         axis_count = axis_count + 1
+         if axis_count <= axes:
 
-         pv_rbv = self.getPVBase() + motor + ".RBV"
-         pv_rdbd = self.getPVBase() + motor + ".RDBD"
-         pv_val = self.getPVBase() + motor + ".VAL"
+            self.diagnostic("Moving motor record " + self.getPVBase() + motor, self.getDiag());
 
-         rdbd = self.getPv(pv_rdbd)
-         self.diagnostic(pv_rdbd + ": " + str(rdbd),  self.getDiag())
+            pv_rbv = self.getPVBase() + motor + ".RBV"
+            pv_rdbd = self.getPVBase() + motor + ".RDBD"
+            pv_val = self.getPVBase() + motor + ".VAL"
 
-         for i in range(moves):
-
-            move += distance
-
-            self.diagnostic("Moving to " + str(move), self.getDiag()+1)
+            rdbd = self.getPv(pv_rdbd)
+            self.diagnostic(pv_rdbd + ": " + str(rdbd),  self.getDiag())
             
-            #Read RBV
-            rbv = self.getPv(pv_rbv)
-            self.diagnostic(pv_rbv + ": " + str(self.getPv(pv_rbv)), self.getDiag()+1)
-            #Do a move
+            for i in range(moves):
+               
+               move += distance
+               
+               self.diagnostic("Moving to " + str(move), self.getDiag())
+               
+               #Read RBV
+               rbv = self.getPv(pv_rbv)
+               self.diagnostic(pv_rbv + ": " + str(self.getPv(pv_rbv)), self.getDiag()+1)
+               #Do a move
+               self.putPv(pv_val, move, wait=True, timeout=self.getTimeout())
+               #Read back RBV
+               self.diagnostic(pv_rbv + ": " + str(self.getPv(pv_rbv)), self.getDiag()+1)
+
+               #Verify RBV is within range
+               self.verifyPvInRange(pv_rbv, move-rdbd, move+rdbd)
+
+            #Now move back to zero
+            move = 0.0
             self.putPv(pv_val, move, wait=True, timeout=self.getTimeout())
-            #Read back RBV
-            self.diagnostic(pv_rbv + ": " + str(self.getPv(pv_rbv)), self.getDiag()+1)
-
-            #Verify RBV is within range
             self.verifyPvInRange(pv_rbv, move-rdbd, move+rdbd)
-
-         #Now move back to zero
-         move = 0.0
-         self.putPv(pv_val, move, wait=True, timeout=self.getTimeout())
-         self.verifyPvInRange(pv_rbv, move-rdbd, move+rdbd)
 
 
          
