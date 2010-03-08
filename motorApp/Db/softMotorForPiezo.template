@@ -1,0 +1,61 @@
+# AUTOSAVE: level 0 = before record init, level 1 = before AND after record init
+#% autosave 0 DVAL OFF
+#% autosave 1 DIR DHLM DLLM TWV SREV MRES ERES RRES VBAS VELO ACCL BDST BVEL BACC RDBD EGU RTRY UEIP URIP DLY PREC DISA DISP FOFF OFF FRAC OMSL JVEL JAR
+#% autosave 2 DESC
+#% archiver 0.5 Monitor
+#% gdatag,template,simpleMotor,$(gda_name),$(gda_desc)
+#% gdatag,motor,rw,$(gda_name),RECORD,Motor
+#%gda,interface,$(INTERFACE)
+#%gda,subsystem,$(SUBSYSTEM)
+record(motor, "$(P)$(Q)") {
+  field(DTYP, "Soft Channel")
+  field(DIR, "Pos")
+  field(VELO, "1")
+  field(VBAS, "0")
+  field(VMAX, "1")
+  field(BDST, "0")
+  field(BVEL, "0")
+  field(BACC, "0")
+  field(MRES, "1")
+  field(RRES, "1")
+  field(URIP, "Yes")
+  field(PREC, "4")
+  field(EGU, "$(EGU)")
+  field(DHLM, "$(DHLM)")
+  field(DLLM, "$(DLLM)")
+  field(HHSV, "MINOR")
+  field(LLSV, "MINOR")
+  field(DESC, "$(DESC)")
+  field(RDBL, "$(RDBL)")
+  field(RTRY, "0")
+  field(DINP, "$(P)$(Q):DONE")
+  field(NTM, "NO")
+  field(OUT, "$(P)$(Q):DOMOVE PP")
+}
+
+record(ao, "$(P)$(Q):DOMOVE") {
+  field(DESC, "Do move")
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(OMSL, "supervisory")
+  field(DRVH, "$(DHLM)")
+  field(DRVL, "$(DLLM)")
+  field(FLNK, "$(P)$(Q):SEQTIMER PP")
+}
+
+record(seq, "$(P)$(Q):SEQTIMER") {
+  field(DOL1, "0")
+  field(LNK1, "$(P)$(Q):DONE PP")
+  field(DOL2, "$(P)$(Q).RVAL")
+  field(LNK2, "$(OUT) PP")
+  field(DLY3, "$(MOVEDLY)")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(Q):DONE PP")
+}
+
+record(bo, "$(P)$(Q):DONE") {
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Not done")
+  field(ONAM, "Done")
+}
+
