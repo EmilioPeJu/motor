@@ -3,9 +3,9 @@ FILENAME...	motor.h
 USAGE...	Definitions and structures common to all levels of motorRecord
 		support (i.e., record, device and driver).
 
-Version:	$Revision: 1.20.2.1 $
+Version:	$Revision: 1.21 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2009/06/22 17:59:32 $
+Last Modified:	$Date: 2009-04-27 14:28:42 $
 */
 
 /*

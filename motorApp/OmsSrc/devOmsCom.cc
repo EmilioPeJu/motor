@@ -4,7 +4,7 @@ USAGE... Data and functions common to all OMS device level support.
 
 Version:        $Revision: 1.16 $
 Modified By:    $Author: sluiter $
-Last Modified:  $Date: 2008/09/09 18:19:45 $
+Last Modified:  $Date: 2008-09-09 18:19:45 $
 */
 
 /*
@@ -63,6 +63,7 @@ Last Modified:  $Date: 2008/09/09 18:19:45 $
  * .18  05-14-08 rls For MAXv, restore slew acceleration after STOP command.
  * .19  06-11-08 rls For MAXv, fix error on ER command; replace UU1.0 with UF.
  * .20  07-24-08 rls For MAXv, normalize PID values based on 32,767 maximum.
+ * .21  03-01-10 rls Some MR commands still ignored; change fraction to .9.
  *
  */
 
@@ -450,10 +451,7 @@ errorexit:                  errMessage(-1, "Invalid device directive");
                         long relmove;
 
                         relmove = NINT(parms[itera]);
-                        if (relmove == 1 || relmove == -1)
-                            sprintf(buffer, "%ld.5", relmove);
-                        else
-                            sprintf(buffer, "%ld", relmove);
+                        sprintf(buffer, "%ld.9", relmove);
                     }
                     break;
 

@@ -4,7 +4,7 @@ USAGE... This file contains function prototypes for ACS IOC shell commands.
 
 Version:	$Revision: 1.3 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2004/07/16 19:06:58 $
+Last Modified:	$Date: 2004-07-16 19:06:58 $
 */
 
 /*

@@ -4,7 +4,7 @@ USAGE... This file contains information common to all OMS PC68/78 controllers.
 
 Version:	$Revision: 1.2 $
 Modified By:	$Author: dkline $
-Last Modified:	$Date: 2007/02/13 13:02:27 $
+Last Modified:	$Date: 2007-02-13 13:02:27 $
 */
 
 /*

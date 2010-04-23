@@ -4,7 +4,7 @@ USAGE...	Motor record device level support for MX device driver.
 
 Version:	$Revision: 1.6 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/03/14 20:12:06 $
+Last Modified:	$Date: 2008-03-14 20:12:06 $
 */
 
 /*

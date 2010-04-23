@@ -4,7 +4,7 @@ USAGE... Device level support for OMS MAXv model.
 
 Version:	$Revision: 1.3 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/03/14 20:19:06 $
+Last Modified:	$Date: 2008-03-14 20:19:06 $
 */
 
 /*

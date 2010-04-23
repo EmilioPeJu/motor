@@ -6,7 +6,7 @@ USAGE...	This file contains definitions and structures that
 
 Version:	$Revision: 1.18 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/03/14 20:41:02 $
+Last Modified:	$Date: 2008-03-14 20:41:02 $
 */
 
 /*

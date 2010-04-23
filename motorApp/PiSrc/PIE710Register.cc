@@ -4,7 +4,7 @@ USAGE...	Register PI motor device driver shell commands.
 
 Version:	$Revision: 1.1 $
 Modified By:	$Author: sullivan $
-Last Modified:	$Date: 2006/10/06 18:18:21 $
+Last Modified:	$Date: 2006-10-06 18:18:21 $
 */
 
 /*****************************************************************

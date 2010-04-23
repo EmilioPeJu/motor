@@ -4,7 +4,7 @@ USAGE...        Motor record driver level support for OMS PC68 serial device.
 
 Version:	$Revision: 1.8 $
 Modified By:	$Author: dkline $
-Last Modified:	$Date: 2008/02/15 12:38:57 $
+Last Modified:	$Date: 2008-02-15 12:38:57 $
 */
 
 /*

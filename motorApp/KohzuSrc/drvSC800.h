@@ -2,9 +2,10 @@
 FILENAME...	drvSC800.h
 USAGE...    This file contains Kohzu SC800 motorRecord driver information.
 
-Version:	$Revision: 1.1 $
+Version:	    $Revision: 9857 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2007/11/27 18:01:17 $
+Last Modified:	$Date: 2009-12-09 16:21:24 +0000 (Wed, 09 Dec 2009) $
+HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-5/motorApp/KohzuSrc/drvSC800.h $
 */
 
 /*
@@ -36,6 +37,8 @@ Last Modified:	$Date: 2007/11/27 18:01:17 $
  * Modification Log:
  * -----------------
  * .01 11-08-07 rls copied from drvMDT695.h
+ * .02 09-22-09 rls Added support for SC200/400
+ *
  */
 
 #ifndef	INCdrvSC800h
@@ -54,6 +57,13 @@ Last Modified:	$Date: 2007/11/27 18:01:17 $
 #define SC800_OUT_EOS   "\r\n" /* Command */
 #define SC800_IN_EOS    "\r\n"  /* Reply */
 
+enum SC_model
+{
+    SC800,
+    SC400,
+    SC200
+};
+
 /* Motion Master specific data is stored in this structure. */
 struct SC800Controller
 {
@@ -65,6 +75,7 @@ struct SC800Controller
     int base_speed[SC800_MAX_MOTORS]; /* steps/sec. */
     int slew_speed[SC800_MAX_MOTORS]; /* steps/sec. */
     int accl_rate[SC800_MAX_MOTORS];  /* steps/(sec^2) */
+    SC_model model;		/* SC model ID. */
 };
 
 

@@ -5,7 +5,7 @@ USAGE...    This file contains Parker Compumotor driver "include"
 
 Version:	$Revision: 1.3 $
 Modified By:	$Author: sullivan $
-Last Modified:	$Date: 2006/11/02 21:05:56 $
+Last Modified:	$Date: 2006-11-02 21:05:56 $
 */
 
 /*

@@ -4,7 +4,7 @@ USAGE... This file contains driver "include" information for the Faulhaber MCDC 
 
 Version:	$Revision: 1.2 $
 Modified By:	$Author: rivers $
-Last Modified:	$Date: 2005/11/04 23:05:35 $
+Last Modified:	$Date: 2005-11-04 23:05:35 $
 */
 
 /*

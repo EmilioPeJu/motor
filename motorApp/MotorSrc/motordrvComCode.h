@@ -6,7 +6,7 @@ USAGE... This file contains local variables that are allocated
 
 Version:	$Revision: 1.3 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2002/10/31 20:46:17 $
+Last Modified:	$Date: 2002-10-31 20:46:17 $
 */
 
 /*

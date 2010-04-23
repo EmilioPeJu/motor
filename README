@@ -1,4 +1,4 @@
-Motor Record R6-4-4 Release Notice
+Motor Record R6-5 Release Notice
 ===============================================================================
 
 The motor record software in this release is compatible with EPICS base
@@ -37,6 +37,10 @@ commenting out the appropriate line in ./motorApp/Makefile.
         PI - Physik Instrumente (PI) GmbH & Co. controllers; PiSrc
                 directory.
         softMotor - Soft Channel device support; SoftMotorSrc directory.
+
+Valuable device information can be found in the README files located in many of
+the above manufacture specific directories (e.g., motorApp/OmsSrc,
+motorApp/NewportSrc).
 
 
 Configuration
@@ -129,10 +133,54 @@ Known Problems
         retry if retries are enabled.
 
 
-Modification Log from R6-4-3 to R6-4-4
-======================================
+Modification Log from R6-4 to R6-5
+==================================
 
-1) The asynMotor device support would erroneously leave a motor-in-motion
+1) Fixed 64 bit compile problems with PI E816 and Aerotech Ensemble.
+
+        Files modified: devPIE816.cc and devEnsemble.cc
+
+2) Dirk Zimoch (PSI) fixed a bug in the OMS MAXv driver that caused the 
+        set_status() function to overwrite the home switch status in the
+        response string.
+
+        File modified: drvMAXv.cc
+
+3) Matthew Pearson (Diamond) fixed a bug on Newport XPS and MM4000 asyn motor
+        port drives that was causing idle polling to interfere with setting
+        positions and prevented auto save/restore from working.
+
+        Files modified: drvMM4000Asyn.c, drvXPSAsyn.c, drvMotorSim.c and
+                        drvANC150Asyn.cc; added epicsMutex[Lock/Unlock] to
+                        motorAxisSetDouble().
+
+4) A problem was introduced in R6-4 (fixed in R6-4-2) of the old motor record
+        device drive architecture.  If during the move of one or motors the
+        motor task did not issue an OS delay during status updates, it could
+        potentially not respond to any further motor commands.
+
+        Files modified: - MotorSrc/motordrvCom.cc; always check for incoming
+                                                   messages.
+                        - OmsSrc/drvOms58.cc; reduced start_status() delays.
+
+5) Modifications were made to motorRecord.cc:do_work() with R6-4 to limit the
+        ramifications of ORing MIP_MOVE with MIP_RETRY.  Unfortunately, the
+        effect of one of those changes prevented the motor from doing its'
+        backlash move when a motor move was interrupted by "New Target
+        Monitoring".  The user would see a "tdir" message in the iocsh and
+        the motor would move, not to the target position, but to the target
+        minus the backlash distance.
+
+        File modified: do_work() in motorRecord.cc; unconditionally set the
+                       postprocess indicator TRUE so postProcess() can do the
+                       backlash move.
+
+6) Prevent multiple STOP commands.
+
+        File modified: motorRecord.cc:process(); added check for !MIP_STOP to
+                       NTM logic.
+
+7) The asynMotor device support would erroneously leave a motor-in-motion
         indicator on if the motor record issued a LOAD_POS command before the
         2nd pass of device support initialization.  Added logic to
         devMotorAsyn.c:asynCallback() to prevent moveRequestPending from being
@@ -141,96 +189,124 @@ Modification Log from R6-4-3 to R6-4-4
 
         File modified:  devMotorAsyn.c:asynCallback()
 
-
-2) Aerotech Ensemble device driver fixes for incorrect Jog speeds, support for
+8) Aerotech Ensemble device driver fixes for incorrect Jog speeds, support for
         a negative PosScaleFactor parameter and detecting maximum travel limit
         switch faults.
         
         Files modified: devEnsemble.cc, drvEnsemble.h, drvEnsemble.cc
 
-
-3) Moved preprocessor assertions in motor.h to the end of the conditional logic
+9) Moved preprocessor assertions in motor.h to the end of the conditional logic
         to avoid MSVC compiler errors.
-   
+
         File modified: MotorSrc/motor.h
 
-4) Matthew Pearson's (Diamond) fix for the motor simulator getting stuck in
+10) Matthew Pearson's (Diamond) fix for the motor simulator getting stuck in
         the Moving state after multiple LOAD_POS commands to the same position.
         
         File modified: MotorSrc/devMotorAsyn.c; set needUpdate = 1 in
                        asynCallback() before dbProcess() call.
 
-5) A consequence of the fix for item #4 above caused the motor record to see
+11) A consequence of the fix for item #10 above caused the motor record to see
         RA_DONE in the MSTA field True on the 1st status update after a move;
         whether or not the motor was done moving.  Matthew Pearson's fix is to
         set motorAxisDone False in motorAxisDrvSET_t functions that start
         motion (motorAxisHome, motorAxisMove, motorAxisVelocityMove) and force
         a status update with a motorParam->callCallback(pAxis->params) call.
-        
+
         Files modified: - NewportSrc/drvMM4000Asyn.c
                         - AtttoCube/drvANC150.cc
                         - MotorSimSrc/drvMotorSim.c
 
-6) An error was introduced with R5-3 when the STUP field was added (item #4
+12) Removed the OMSL field from the motorx_all.adl medm display to prevent
+        confusion with motor position closed-loop control.
+
+        File modified: motorApp/op/adl/motorx_all.adl
+
+13) An error was introduced with R5-3 when the STUP field was added (item #4
         under R5-3) that resulted in the PACT field being cleared before
         recGblGetTimeStamp(), alarm_sub() and monitor() were called.
 
         File modified: process() in motorRecord.cc
 
+14) Made OMS device driver Setup and Configure shell command error messages
+        more prominent.
 
-Modification Log from R6-4-2 to R6-4-3
-======================================
+        Files modified: <driver>Setup() drvMAXv.cc, drvOms58.cc and drvOms.cc
 
-1) Modifications were made to motorRecord.cc:do_work() with R6-4 to limit the
-        ramifications of ORing MIP_MOVE with MIP_RETRY.  Unfortunately, the
-        effect of one of those changes prevented the motor from doing its'
-        backlash move when a motor move was interrupted by "New Target
-        Monitoring".  The user would see a "tdir" message in the iocsh and
-        the motor would move, not the target position, but to the target minus
-        the backlash distance.
+15) OMS MAXv driver changes from Austen Rose (Diamond) that support backwards
+        compatibility with ver:1.29 and earlier MAXv firmware. OMS changed
+        their line terminator from '<LF><NULL>' to '<LF>' for RA, QA, EA and
+        RL command with ver:1.30 firmware.
 
-        File modified: do_work() in motorRecord.cc; unconditionally set the
-                       postprocess indicator TRUE so postProcess() can do the
-                       backlash move.
+        File modified: recv_mess() in OmsSrc/drvMAXv.cc
 
-2) Prevent multiple STOP commands.
+16) Bug fixes for Newport PM500 driver not initializing the MSTA field
+        correctly.  Added support for CNEN field.
 
-        File modified: motorRecord.cc:process(); added check for !MIP_STOP to
-                       NTM logic.
+        Files modified: devPM500.cc, drvPM500.cc, motorRecord.dbd
 
+17) Mark Rivers made numerous changes to elminate 64-bit compiler warning
+        messages.
 
-Modification Log from R6-4-1 to R6-4-2
-======================================
+18) Applied item #11 above to the Newport XPS driver.
 
-1) Dirk Zimoch (PSI) fixed a bug in the OMS MAXv driver that caused the
-        set_status() function to overwrite the home switch status in the
-        response string.
+        File modified: NewportSrc/drvXPSAsyn.c
 
-        File modified: drvMAXv.cc
+19) attocube ANC150 driver bug fixes for multi-axis applications not reading
+        frequency and 'set position' not setting val/dval/rval.
 
-2) Matthew Pearson (Diamond) fixed a bug on Newport XPS and MM4000 asyn motor
-        port drives that was causing idle polling to interfere with setting
-        positions and prevented auto save/restore from working.
+        File modified: motorApp/AttocubeSrc/drvANC150Asyn.cc
 
-        Files modified: drvMM4000Asyn.c and drvXPSAsyn.c; added
-                        epicsMutex[Lock/Unlock] to motorAxisSetDouble().
+20) Bug fix (reported by Pawel Jalocha) for homing in the wrong direction when
+        MRES < 0.
 
-3) A problem was introduced in R6-4 (fixed in R6-4-2) of the old motor record
-        device drive architecture.  If during the move of one or more motors
-        the motor task did not issue an OS delay during status updates, it
-        could potentially not respond to any further motor commands.
-          
-        Files modified: - MotorSrc/motordrvCom.cc; always check for incoming
-                                                   messages.
-                        - OmsSrc/drvOms58.cc; reduced start_status() delays.
+        File modified: Reverse Home direction commands based on MRES < 0 in
+                       do_work() and postProcess().
 
+21) Bug fix for Newport MM4000 asyn motor support. The IOC would crash if, for
+        any reason, communication was not established at bootup.
 
-Modification Log from R6-4 to R6-4-1
-====================================
+        File modified: null pointer error check added to
+                       drvMM4000Asyn.cc:sendOnly().
 
-1) Fixed 64 bit compile problems with PI E816 and Aerotech Ensemble.
+22) Newport MM4000 controller (old driver architecture) bug fix for controller
+        error check overwriting position buffer.
 
-        Files modified: devPIE816.cc and devEnsemble.cc
+        File modified: motorApp/NewportSrc/drvMM4000.cc
+
+23) Removed support for Highland Technologies model V540
+
+        Directory removed: motorApp/V544Src
+
+24) Bug fix for backlash not being done when MRES<0 and DIR="Neg".
+
+        File modified: motorApp/MotorSrc/motorRecord.cc
+
+25) Removed the depreciated motor resolution field (RES) from the motor record
+        database definition. The RES field has been depreciated by the MRES
+        field since R4-5
+
+        Files modified: motorApp/MotorSrc/motorRecord.cc
+                        motorApp/MotorSrc/motorRecord.dbd
+
+26) Removed unused, and under used, MMAP and NMAP indicators.
+
+        File modified: motorApp/MotorSrc/motorRecord.cc
+
+27) Two new Aerotech device drives were added.  An 'asyn motor' version of the
+        Ensemble and a Soloist under the old driver architecture.
+
+        Files added: devSoloist.cc, drvSoloist.cc, drvSoloist.h
+                     drvEnsembleAsyn.cc, drvEnsembleAsyn.h
+
+28) Matthew Pearson (Diamond) added support for the ADEL and MDEL fields.
+
+        Files modified: motorRecord.cc, motorRecord.dbd
+
+29) Added synchronize field (SYNC) that sets VAL/DVAL/RVAL to RBV/DRBV/RRBV.
+
+        Files modified: motorRecord.cc, motorRecord.dbd
+        
 
 
 Modification Log from R6-3 to R6-4
@@ -247,7 +323,7 @@ Modification Log from R6-3 to R6-4
         previous target and readback positions are read from the controller on
         the next update.  This occurs with the previous release (R6-3) because
         the "stale data delay" was changed to zero for the drvOms58 driver.
-        
+
         With this release the driver searches all VME58 board ID's for either
         2.24-8S or any 2.35 version.  If any board is found, the "stale data
         delay" is set to a non-zero value.
@@ -282,7 +358,7 @@ Modification Log from R6-3 to R6-4
 
 4) Changed the "update delay" for OMS MAXv's from 10ms to zero.
 
-        File modified: - MotorSrc/OmsSrc/drvMAXv.cc; set "update_delay" member
+        File modified: - motorApp/OmsSrc/drvMAXv.cc; set "update_delay" member
                          of "targs" to zero.
 
 5) Major changes have been made to the Access Security Level (ASL) attribute
@@ -419,7 +495,7 @@ Modification Log from R6-3 to R6-4
 
 19) John Hammonds added support of the Physik Instrumente (PI) GmbH & Co. E-816
         motor controller.
-  
+
         Files modified: added devPIE816.cc, drvPIE816 and drvPIE816.h to the
                         PiSrc directory
 

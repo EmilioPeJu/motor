@@ -5,7 +5,7 @@ USAGE...	This file contains definitions and structures that
 
 Version:	$Revision: 1.6 $
 Modified By:	$Author: rivers $
-Last Modified:	$Date: 2005/12/08 00:11:26 $
+Last Modified:	$Date: 2005-12-08 00:11:26 $
 */
 
 /*

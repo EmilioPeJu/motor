@@ -7,43 +7,6 @@ program MM4005_trajectoryScan("P=13IDC:,R=traj1,M1=M1,M2=M2,M3=M3,M4=M4,M5=M5,M6
  *
  *  Mark Rivers
  *  August 12, 2000
- *
- * Modifications:
- *  August 21, 2000 MLR Added +r option, so that the flag is just for this
- *                      module, rather than requiring it to be in Makefile.Vx
- *  Dec. 5, 2001 MLR    Fixed bug in computing following error
- *  Dec. 7, 2001 MLR    Fixed bug in converting from EPICS to MM4000 units when
- *                      building trajectory.
- *  Oct. 28, 2002 MLR   Fixed bug in reporting updated trajectory positions after 
- *                      padding. Was not a problem in executing trajectory, only in 
- *                      values reported to EPICS
- *  Dec. 18, 2003 MLR   Changed flyback (now a misnomer) so it does EPICS move to 
- *                      current motor positions, not start positions.  
- *                      Start position move did not work because motors already 
- *                      thought they were there (if no encoder error) and motor 
- *                      record did nothing.
- *  Feb. 12, 2004 MLR   Added delay after starting trajectory execution.
- *                      This is an attempt to eliminate problem where MM4000 seems 
- *                      to sometimes ignore TP command right after trajectory 
- *                      execution starts.  
- *                      Also, first MS sometimes comes back saying motors are not 
- *                      moving yet, so software thinks trajectory is done.
- *                      Converted to OSI
- *                      Converted to new version of seq which changes call to 
- *                      seq_pvPut
- *  Oct.  1, 2004 MLR   Changed from using asynRecord (previously generic serial 
- *                      record) to using asynOctetSyncIO calls.
- *                      This fixed bugs in I/O due to timing, and is simpler and 
- *                      cleaner.
- *  Feb.  6, 2005 MLR   Changes for last version of asyn; terminators done 
- *                      differently.
- *  Mar. 28, 2005 MLR   Increased number of pulses; added readback during trajectory
- *                      download to prevent buffer overflow.
- *  Apr. 29, 2005 MLR   Changed timeout to 30 seconds - necessary?
- *  Apr. 12, 2006 MLR   Changed from strtok_r to epicsStrtok_r
- *  Jan. 18, 2007 MLR   Use new include file, "trajectoryScan.h" to eliminate 
- *                      duplication with new XPS trajectory scan SNL program.
- *                      Clean up code, assign EPICS motor PVs in init().
 */
 
 %% #include <string.h>
@@ -132,7 +95,6 @@ unsigned long startTime;
 %% static int writeRead(SS_ID ssId, struct UserVar *pVar, char *command);
 %% static int getMotorPositions(SS_ID ssId, struct UserVar *pVar, double *pos);
 %% static int getMotorMoving(SS_ID ssId, struct UserVar *pVar);
-%% static int waitMotors(SS_ID ssId, struct UserVar *pVar);
 %% static int getEpicsMotorMoving(SS_ID ssId, struct UserVar *pVar);
 %% static int waitEpicsMotors(SS_ID ssId, struct UserVar *pVar);
 
@@ -412,9 +374,6 @@ ss trajectoryScan {
                 }
                 %%waitEpicsMotors(ssId, pVar);
             }
-            /* Start the detector */
-            detOn = 1;
-            pvPut(detOn);
             /* Send the execute command, along with simulation mode and time
              * scaling factor */
             sprintf(stringOut, "LS,%dEC%f",simMode,timeScale);
@@ -478,9 +437,6 @@ ss trajectoryScan {
         } state wait_execute
 
         when(execState==EXECUTE_STATE_FLYBACK) {
-            /* Stop the detector */
-            detOff = 1;
-            pvPut(detOff);
             pvPut(execState);
             pvPut(execStatus);
             pvPut(execMessage);
@@ -598,7 +554,7 @@ ss trajectoryAbort {
 static int writeOnly(SS_ID ssId, struct UserVar *pVar, char *command)
 {
     asynStatus status;
-    int nwrite;
+    size_t nwrite;
     char buffer[MAX_MM4000_STRING];
 
     /* Copy command so we can add terminator */
@@ -614,7 +570,7 @@ static int writeOnly(SS_ID ssId, struct UserVar *pVar, char *command)
 static int writeRead(SS_ID ssId, struct UserVar *pVar, char *command)
 {
     asynStatus status;
-    int nwrite, nread;
+    size_t nwrite, nread;
     int eomReason;
     char buffer[MAX_MM4000_STRING];
 
@@ -692,25 +648,6 @@ static int getEpicsMotorMoving(SS_ID ssId, struct UserVar *pVar)
 }
 
 
-/* waitMotors waits for all motors to stop moving.  It reads and posts the
- * motor positions during each loop. */
-static int waitMotors(SS_ID ssId, struct UserVar *pVar)
-{
-    int j;
-
-    /* Logic is that we always want to post position motor positions 
-     * after the end of move is detected. */
-    while(getMotorMoving(ssId, pVar)) {
-        /* Get the current motor positions, post them */
-        getMotorPositions(ssId, pVar, pVar->motorCurrent);
-        for (j=0; j<pVar->numAxes; j++) seq_pvPut(ssId, pVar->motorCurrentIndex[j], 0);
-        epicsThreadSleep(POLL_INTERVAL);
-    }
-    getMotorPositions(ssId, pVar, pVar->motorCurrent);
-    for (j=0; j<pVar->numAxes; j++) seq_pvPut(ssId, pVar->motorCurrentIndex[j], 0);
-    return(0);
-}
-
 /* waitEpicsMotors waits for all motors to stop moving using the EPICS motor
  * records..  It reads and posts the motor positions during each loop. */
 static int waitEpicsMotors(SS_ID ssId, struct UserVar *pVar)

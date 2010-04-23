@@ -5,7 +5,7 @@ USAGE...	Motor record driver level support for Physik Instrumente (PI)
 
 Version:	$Revision: 1.1 $
 Modified By:	$Author: sullivan $
-Last Modified:	$Date: 2006/04/14 20:34:42 $
+Last Modified:	$Date: 2006-04-14 20:34:42 $
 */
 
 /*

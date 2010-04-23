@@ -4,7 +4,7 @@ USAGE...	Register piezosystem jena motor device driver shell commands.
 
 Version:	$Revision: 1.1 $
 Modified By:	$Author: sullivan $
-Last Modified:	$Date: 2007/06/14 15:56:59 $
+Last Modified:	$Date: 2007-06-14 15:56:59 $
 */
 
 /*****************************************************************

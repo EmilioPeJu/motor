@@ -6,7 +6,7 @@ USAGE... 	This file contains OMS device information that is
 
 Version:	$Revision: 1.4 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2003/02/03 17:15:21 $
+Last Modified:	$Date: 2003-02-03 17:15:21 $
 */
 
 /*

@@ -5,7 +5,7 @@ USAGE...	Motor record device level support for Intelligent Motion
 
 Version:	$Revision: 1.5 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/03/14 20:10:01 $
+Last Modified:	$Date: 2008-03-14 20:10:01 $
 */
 
 /*

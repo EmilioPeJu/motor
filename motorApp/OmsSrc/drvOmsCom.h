@@ -5,7 +5,7 @@ USAGE... 	This file contains OMS driver "include" information
 
 Version:	$Revision: 1.4 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/03/14 20:38:02 $
+Last Modified:	$Date: 2008-03-14 20:38:02 $
 */
 
 /*

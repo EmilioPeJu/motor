@@ -2,9 +2,10 @@
 FILENAME...	devSoftAux.cc
 USAGE...	Motor record device level support for Soft channel.
 
-Version:	$Revision: 1.12 $
-Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/03/14 20:23:27 $
+Version:        $Revision: 10365 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2010-03-25 17:12:41 +0000 (Thu, 25 Mar 2010) $
+HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-5/motorApp/SoftMotorSrc/devSoftAux.cc $
 */
 
 /*

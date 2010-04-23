@@ -5,7 +5,7 @@ USAGE... This file contains driver "include" information that is specific to
 
 Version:	$Revision: 1.5 $
 Modified By:	$Author: rivers $
-Last Modified:	$Date: 2004/08/17 21:29:32 $
+Last Modified:	$Date: 2004-08-17 21:29:32 $
 */
 
 /*

@@ -4,7 +4,7 @@ USAGE...	Register ThorLabs  motor device driver shell commands.
 
 Version:	$Revision: 1.1 $
 Modified By:	$Author: sullivan $
-Last Modified:	$Date: 2006/09/27 20:32:37 $
+Last Modified:	$Date: 2006-09-27 20:32:37 $
 */
 
 /*****************************************************************

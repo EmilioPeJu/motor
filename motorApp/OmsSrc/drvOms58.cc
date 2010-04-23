@@ -2,9 +2,10 @@
 FILENAME...	drvOms58.cc
 USAGE...	Motor record driver level support for OMS model VME58.
 
-Version:	$Revision: 1.26.2.1 $
-Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2009/02/05 19:24:11 $
+Version:        $Revision$
+Modified By:    $Author$
+Last Modified:  $Date$
+HeadURL:        $URL$
 */
 
 /*
@@ -106,6 +107,9 @@ Last Modified:	$Date: 2009/02/05 19:24:11 $
  *                      epicsInterruptContextMessage calls.
  * .36  03-14-08 rls - 64-bit compatiability.
  * .37  02-05-09 rls - Have start_status() start ALL updates before waiting.
+ * .38  06-18-09 rls - Make oms58Setup() error messages more prominent.
+ * .39  03-15-10 rls - sprintf() not callable from any OS ISR.
+ *
  */
 
 #include	<string.h>
@@ -213,7 +217,7 @@ struct driver_table oms58_access =
     oms58_axis
 };
 
-struct
+struct drvOms58_drvet
 {
     long number;
     long (*report) (int);
@@ -866,14 +870,25 @@ static int recv_mess(int card, char *com, int amount)
 /* Configuration function for  module_types data     */
 /* areas. omsSetup()                                */
 /*****************************************************/
-int oms58Setup(int num_cards,   /* maximum number of cards in rack */
-               void *addrs,     /* Base Address(0x0-0xb000 on 4K boundary) */
-               unsigned vector, /* noninterrupting(0), valid vectors(64-255) */
-               int int_level,   /* interrupt level (1-6) */
-               int scan_rate)   /* polling rate - 1/60 sec units */
+RTN_STATUS
+oms58Setup(int num_cards,   /* maximum number of cards in rack */
+           void *addrs,     /* Base Address(0x0-0xb000 on 4K boundary) */
+           unsigned vector, /* noninterrupting(0), valid vectors(64-255) */
+           int int_level,   /* interrupt level (1-6) */
+           int scan_rate)   /* polling rate - 1-60 Hz */
 {
+    RTN_STATUS rtncode = OK;
+    char errbase[] = "\noms58Setup: *** invalid ";
+
     if (num_cards < 1 || num_cards > OMS_NUM_CARDS)
+    {
+        char format[] = "%snumber of cards specified = %d ***\n";
         oms58_num_cards = OMS_NUM_CARDS;
+        errlogPrintf(format, errbase, num_cards);
+        errlogPrintf("               *** using maximum number = %d ***\n", OMS_NUM_CARDS);
+        epicsThreadSleep(5.0);
+        rtncode = ERROR;
+    }
     else
         oms58_num_cards = num_cards;
 
@@ -884,8 +899,11 @@ int oms58Setup(int num_cards,   /* maximum number of cards in rack */
     if (addrs > (void *) 0xF000 || ((epicsUInt32) addrs & 0xFFF))
 #endif
     {
-        Debug(1, "omsSetup: invalid base address %p\n", addrs);
+        char format[] = "%sbase address = %p ***\n";
         oms_addrs = (char *) OMS_NUM_ADDRS;
+        errlogPrintf(format, errbase, addrs);
+        epicsThreadSleep(5.0);
+        rtncode = ERROR;
     }
     else
         oms_addrs = (char *) addrs;
@@ -895,15 +913,21 @@ int oms58Setup(int num_cards,   /* maximum number of cards in rack */
     {
         if (vector != 0)
         {
-            Debug(1, "omsSetup: invalid interrupt vector %d\n", vector);
+            char format[] = "%sinterrupt vector = %d ***\n";
             omsInterruptVector = (unsigned) OMS_INT_VECTOR;
+            errlogPrintf(format, errbase, vector);
+            epicsThreadSleep(5.0);
+            rtncode = ERROR;
         }
     }
 
     if (int_level < 1 || int_level > 6)
     {
-        Debug(1, "omsSetup: invalid interrupt level %d\n", int_level);
+        char format[] = "%sinterrupt level = %d ***\n";
         omsInterruptLevel = OMS_INT_LEVEL;
+        errlogPrintf(format, errbase, int_level);
+        epicsThreadSleep(5.0);
+        rtncode = ERROR;
     }
     else
         omsInterruptLevel = int_level;
@@ -912,14 +936,21 @@ int oms58Setup(int num_cards,   /* maximum number of cards in rack */
     if (scan_rate >= 1 && scan_rate <= 60)
         targs.motor_scan_rate = scan_rate;
     else
-        targs.motor_scan_rate = SCAN_RATE;
-    return(0);
+    {
+	char format[] = "%spolling rate = %d Hz ***\n";
+	targs.motor_scan_rate = SCAN_RATE;
+	errlogPrintf(format, errbase, scan_rate);
+        epicsThreadSleep(5.0);
+        rtncode = ERROR;
+    }
+
+    return(rtncode);
 }
 
 
 /*****************************************************/
 /* Interrupt service routine.                        */
-/* motorIsr()		                     */
+/* motorIsr()		                             */
 /*****************************************************/
 static void motorIsr(int card)
 {
@@ -927,13 +958,14 @@ static void motorIsr(int card)
     volatile struct vmex_motor *pmotor;
     STATUS_REG statusBuf;
     epicsUInt8 doneFlags, userIO, slipFlags, limitFlags, cntrlReg;
-    static char errmsg[60];
-    static char cmderrmsg[60];
+    static char errmsg1[] = "\ndrvOms58.cc:motorIsr: Invalid entry - card xx\n";
+    static char errmsg2[] = "\ndrvOms58.cc:motorIsr: command error - card xx\n";
 
     if (card >= total_cards || (pmotorState = motor_state[card]) == NULL)
     {
-        sprintf(errmsg, "%s(%d): Invalid entry-card #%d.\n", __FILE__, __LINE__, card);
-        epicsInterruptContextMessage(errmsg);
+        errmsg1[47-2] = '0' + card%10;
+        errmsg1[47-3] = '0' + (card/10)%10;
+        epicsInterruptContextMessage(errmsg1);
         return;
     }
 
@@ -965,15 +997,6 @@ static void motorIsr(int card)
         pmotor->control.cntrlReg = (epicsUInt8) 0x90;
 /* Questioniable Fix for undefined problem Ends Here. */
 
-#ifdef	DEBUG
-    if (drvOms58debug >= 10)
-    {
-        sprintf(errmsg, "%s(%d): entry card #%d,status=0x%X,done=0x%X\n",
-                __FILE__, __LINE__, card, statusBuf.All, doneFlags);
-        epicsInterruptContextMessage(errmsg);
-    }
-#endif
-
     /* Motion done handling */
     if (statusBuf.Bits.done)
         /* Wake up polling task 'motor_task()' to issue callbacks */
@@ -981,8 +1004,9 @@ static void motorIsr(int card)
 
     if (statusBuf.Bits.cmndError)
     {
-        sprintf(cmderrmsg, "%s(%d): command error on card #%d.\n", __FILE__, __LINE__, card);
-        epicsInterruptContextMessage(cmderrmsg);
+        errmsg2[47-2] = '0' + card%10;
+        errmsg2[47-3] = '0' + (card/10)%10;
+        epicsInterruptContextMessage(errmsg2);
     }
 }
 

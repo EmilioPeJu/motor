@@ -5,7 +5,7 @@ USAGE...    This file contains ACS Tech80 driver "include"
 
 Version:	$Revision: 1.2 $
 Modified By:	$Author: sullivan $
-Last Modified:	$Date: 2008/05/21 21:18:53 $
+Last Modified:	$Date: 2008-05-21 21:18:53 $
 
 */
 

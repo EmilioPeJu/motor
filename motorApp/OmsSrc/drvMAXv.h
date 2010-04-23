@@ -5,7 +5,7 @@ USAGE...	OMS driver level "include" information that is specific to OMS
 
 Version:	$Revision: 1.3 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/06/03 18:58:25 $
+Last Modified:	$Date: 2008-06-03 18:58:25 $
 */
 
 /*
@@ -117,7 +117,7 @@ typedef union
 	unsigned int flash_chksum_err	:1;
 	unsigned int na3		:5;	/* N/A bits 3-7 */
 	unsigned int running		:1;
-	unsigned int initalizing	:1;
+	unsigned int initializing	:1;
 	unsigned int not_downloaded	:1;
     } Bits;
 } FIRMWARE_STATUS;

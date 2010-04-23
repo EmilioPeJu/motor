@@ -4,7 +4,7 @@ USAGE...	Register ACS motor device driver shell commands.
 
 Version:	$Revision: 1.4 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2004/07/16 19:06:58 $
+Last Modified:	$Date: 2004-07-16 19:06:58 $
 */
 
 /*****************************************************************

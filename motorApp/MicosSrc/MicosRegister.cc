@@ -4,7 +4,7 @@ USAGE...    Register Micos MoCo dc motor controller device driver shell commands
 
 Version:	$Revision: 1.2 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2004/07/16 19:22:58 $
+Last Modified:	$Date: 2004-07-16 19:22:58 $
 */
 
 /*****************************************************************

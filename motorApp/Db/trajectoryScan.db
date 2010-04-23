@@ -14,10 +14,6 @@
 #   $(NAXES)    - Number of axes to be used. Typically 6 for diffractometer.
 #   $(NELM)     - Maximum trajectory elements
 #   $(NPULSE)   - Maximum number of output pulses
-#   $(DONPV)    - Name of PV to turn detector on
-#   $(DONV)     - Value to write to PV to turn detector on
-#   $(DOFFPV)   - Name of PV to turn detector off
-#   $(DOFFV)    - Value to write to PV to turn detector off
 
 # %gdatag,template,trajectoryScan,$(gda_name),$(gda_desc)
 
@@ -743,7 +739,6 @@ grecord(longout,"$(P)$(R)M8MAE") {
     field(DESC,"M8 max acceleration element")
 }
 
-
 #
 # PVs for turning the detector on and off.
 #
@@ -757,9 +752,10 @@ grecord(ao,"$(P)$(R)DetOff") {
     field(VAL,"$(DOFFV)")
     field(OUT,"$(DOFFPV) PP MS")
 }
+# Debug level
 grecord(ao,"$(P)$(R)DebugLevel") {
-    field(DESC,"Debugging level")
-    field(VAL,"0")
+   field(DESC,"Debugging level")
+   field(VAL,"0")
 }
 
 # 
@@ -805,3 +801,10 @@ grecord(stringout,"$(P)$(R)M8NAME") {
     field(VAL,"$(P)$(M8)")
     field(DESC,"Motor record pv for M8")
 }
+
+# PV controlling the name of the trajectory file on the XPS
+record(stringin, "$(P)$(R)TrajectoryFile") {
+    field(DESC,"XPS trajectory file")
+    field(VAL, "TrajectoryScan.trj")
+}
+

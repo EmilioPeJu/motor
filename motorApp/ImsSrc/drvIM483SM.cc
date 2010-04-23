@@ -5,7 +5,7 @@ USAGE...    Motor record driver level support for Intelligent Motion
 
 Version:    $Revision: 1.18 $
 Modified By:    $Author: sluiter $
-Last Modified:  $Date: 2006/01/31 22:09:15 $
+Last Modified:  $Date: 2006-01-31 22:09:15 $
 */
 
 /*****************************************************************

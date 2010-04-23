@@ -2,9 +2,10 @@
 FILENAME...	devSoft.cc
 USAGE...	Motor record device level support for Soft channel.
 
-Version:	$Revision: 1.10 $
-Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2005/08/03 15:02:13 $
+Version:        $Revision: 10365 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2010-03-25 17:12:41 +0000 (Thu, 25 Mar 2010) $
+HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-5/motorApp/SoftMotorSrc/devSoft.cc $
 */
 
 /*
@@ -62,6 +63,7 @@ NOTES...
 #include	"devSoft.h"
 
 #include	"epicsExport.h"
+#include	"errlog.h"
 
 /*----------------debugging-----------------*/
 #ifdef __GNUG__
@@ -272,7 +274,7 @@ void soft_rdbl_func(struct motorRecord *mr, double newrdbl)
     newrdbl = newrdbl / mr->mres;
     mr->rmp = NINT(newrdbl);
 
-    Debug(5, "soft_rdbl_func(): updated RMP = %d.\n", mr->rmp);
+    Debug(5, "soft_rdbl_func(): updated RMP = %d for %s.\n", mr->rmp, mr->name);
     
     if (ptr->initialized == false)
     {

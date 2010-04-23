@@ -5,7 +5,7 @@ USAGE... This file contains Newport Motion Master (MM) driver "include"
 
 Version:	$Revision: 1.10 $
 Modified By:	$Author: rivers $
-Last Modified:	$Date: 2004/08/17 21:28:22 $
+Last Modified:	$Date: 2004-08-17 21:28:22 $
 */
 
 /*

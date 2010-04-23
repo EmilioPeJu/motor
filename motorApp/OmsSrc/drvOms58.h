@@ -5,7 +5,7 @@ USAGE...	OMS driver level "include" information that is specific to OMS
 
 Version:	$Revision: 1.4 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2005/03/21 18:14:12 $
+Last Modified:	$Date: 2005-03-21 18:14:12 $
 */
 
 /*

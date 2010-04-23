@@ -5,7 +5,7 @@ USAGE...	Motor record device level support for ThorLabs Piezo Control
 
 Version:	$Revision: 1.2 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/03/14 20:23:45 $
+Last Modified:	$Date: 2008-03-14 20:23:45 $
 */
 
 /*

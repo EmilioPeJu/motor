@@ -4,7 +4,7 @@ USAGE...	Motor record device level support for Newport MM3000.
 
 Version:	$Revision: 1.4 $
 Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008/03/14 20:17:14 $
+Last Modified:	$Date: 2008-03-14 20:17:14 $
 */
 
 /*
