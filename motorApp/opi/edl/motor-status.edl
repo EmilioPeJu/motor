@@ -3,10 +3,10 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 432
-y 89
+x 437
+y 111
 w 551
-h 501
+h 560
 font "arial-medium-r-16.0"
 ctlFont "arial-bold-r-16.0"
 btnFont "arial-medium-r-16.0"
@@ -560,7 +560,7 @@ release 0
 x 240
 y 367
 w 68
-h 18
+h 19
 font "arial-bold-r-16.0"
 fgColor index 18
 bgColor index 0
@@ -583,7 +583,7 @@ release 0
 x 240
 y 367
 w 68
-h 18
+h 19
 font "arial-bold-r-16.0"
 fgColor index 18
 bgColor index 0
@@ -936,8 +936,8 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 380
-y 468
+x 379
+y 528
 w 165
 h 28
 fgColor index 46
@@ -1047,5 +1047,85 @@ value {
   "Unused"
 }
 autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 507
+w 211
+h 17
+font "arial-medium-r-16.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Following Error (RMP-REP)"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 536
+w 154
+h 17
+font "arial-medium-r-16.0"
+fgColor index 14
+bgColor index 0
+useDisplayBg
+value {
+  "Max Following Error"
+}
+autoSize
+endObjectProperties
+
+# (Textupdate)
+object TextupdateClass
+beginObjectProperties
+major 10
+minor 0
+release 0
+x 239
+y 501
+w 120
+h 25
+controlPv "$(motor):FERROR"
+displayMode "decimal"
+fgColor index 16
+fgAlarm
+bgColor index 12
+fill
+font "arial-bold-r-16.0"
+lineWidth 2
+endObjectProperties
+
+# (Textupdate)
+object TextupdateClass
+beginObjectProperties
+major 10
+minor 0
+release 0
+x 239
+y 532
+w 120
+h 25
+controlPv "$(motor):FERRORMAX"
+displayMode "decimal"
+fgColor index 16
+fgAlarm
+bgColor index 12
+fill
+font "arial-bold-r-16.0"
+lineWidth 2
 endObjectProperties
 

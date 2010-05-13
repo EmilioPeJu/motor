@@ -104,3 +104,31 @@ record(ai, "$(P)$(M):ELOSS") {
 # dummy record that looks like an eloss reset
 record(calcout, "$(P)$(M):ELOSSRC") {
 }
+
+
+#Record to calculate the following error
+record(calc, "$(P)$(M):FERROR")
+{
+	field(DESC,"Following Error")
+	field(INPA,"$(P)$(M).RMP CP")
+	field(INPB,"$(P)$(M).REP NPP")
+	field(CALC,"ABS(A-B)")
+	field(FLNK,"$(P)$(M):FERRORMAX")
+}
+
+
+#Record to store the maximum following error
+#% archiver 10 Monitor VAL
+#% alh $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M):FERRORMAX
+record(calc, "$(P)$(M):FERRORMAX")
+{
+	field(DESC,"Following Error Max")
+	field(INPA,"$(P)$(M):FERROR.VAL")
+	field(INPB,"$(P)$(M):FERRORMAX.VAL")
+	field(CALC,"(A>B)?A:B")
+	field(HIGH,"$(FEHIGH=0)")
+	field(HIHI,"$(FEHIHI=0)")
+	field(HHSV,"$(FEHHSV=NO_ALARM)")
+	field(HSV, "$(FEHSV=NO_ALARM)")
+}	
+
