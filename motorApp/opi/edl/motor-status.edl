@@ -1100,7 +1100,6 @@ y 501
 w 120
 h 25
 controlPv "$(motor):FERROR"
-displayMode "decimal"
 fgColor index 16
 fgAlarm
 bgColor index 12
@@ -1120,7 +1119,6 @@ y 532
 w 120
 h 25
 controlPv "$(motor):FERRORMAX"
-displayMode "decimal"
 fgColor index 16
 fgAlarm
 bgColor index 12

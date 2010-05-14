@@ -116,8 +116,12 @@ record(calc, "$(P)$(M):FERROR")
 	field(DESC,"Following Error")
 	field(INPA,"$(P)$(M).RMP CP")
 	field(INPB,"$(P)$(M).REP NPP")
-	field(CALC,"ABS(A-B)")
+	field(INPC,"$(P)$(M).MRES NPP")
+	field(INPD,"$(P)$(M).ERES NPP")
+	field(CALC,"ABS((A*C)-(B*D))")
 	field(FLNK,"$(P)$(M):FERRORMAX")
+	field(PREC,"$(PREC)")
+	field(EGU, "$(EGU)")
 }
 
 
@@ -135,6 +139,8 @@ record(calc, "$(P)$(M):FERRORMAX")
 	field(HIHI,"$(FEHIHI=0)")
 	field(HHSV,"$(FEHHSV=NO_ALARM)")
 	field(HSV, "$(FEHSV=NO_ALARM)")
+	field(PREC,"$(PREC)")
+	field(EGU, "$(EGU)")
 }	
 
 #Record to reset the maximum following error
