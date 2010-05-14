@@ -3,10 +3,10 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 437
-y 111
+x 442
+y 133
 w 551
-h 560
+h 595
 font "arial-medium-r-16.0"
 ctlFont "arial-bold-r-16.0"
 btnFont "arial-medium-r-16.0"
@@ -936,8 +936,8 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 379
-y 528
+x 371
+y 558
 w 165
 h 28
 fgColor index 46
@@ -1127,5 +1127,28 @@ bgColor index 12
 fill
 font "arial-bold-r-16.0"
 lineWidth 2
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 239
+y 559
+w 119
+h 29
+fgColor index 14
+onColor index 3
+offColor index 3
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):FEMAXRESET.PROC"
+pressValue "1"
+onLabel "Reset Max"
+offLabel "Reset Max"
+3d
+font "arial-medium-r-16.0"
 endObjectProperties
 

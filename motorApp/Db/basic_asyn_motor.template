@@ -31,6 +31,10 @@
 #% macro, FOFF   , Freeze Offset, 0=variable, 1=frozen
 #% macro, ADEL   , Alarm monitor deadband (EGU)
 #% macro, NTM    , New Target Monitor, only set to 0 for soft motors
+#% macro, FEHIGH , HIGH limit for following error
+#% macro, FEHIHI , HIHI limit for following error
+#% macro, FEHHSV , HIHI alarm severity for following error
+#% macro, FEHSV  , HIGH alarm severity for following error 
 #% macro, name   , Object name and gui association name
 #% macro, gda_name, Name to export this as to GDA
 #% macro, gda_desc, Description to export this as to GDA
@@ -119,6 +123,7 @@ record(calc, "$(P)$(M):FERROR")
 
 #Record to store the maximum following error
 #% archiver 10 Monitor VAL
+#% autosave 1 VAL
 #% alh $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M):FERRORMAX
 record(calc, "$(P)$(M):FERRORMAX")
 {
@@ -132,3 +137,11 @@ record(calc, "$(P)$(M):FERRORMAX")
 	field(HSV, "$(FEHSV=NO_ALARM)")
 }	
 
+#Record to reset the maximum following error
+record(bo, "$(P)$(M):FEMAXRESET")
+{
+	field(DESC,"Reset max following error")
+	field(DTYP,"Soft Channel")
+	field(OUT, "$(P)$(M):FERRORMAX.VAL")
+	field(VAL, "0")
+}	
