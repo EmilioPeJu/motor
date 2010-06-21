@@ -26,5 +26,5 @@ class motorUtil(AutoSubstitution, Device):
     # Substitution attributes
     TemplateFile = 'motorUtil.template'
 
-    def Initialise(self):
+    def PostIocInitialise(self):
         print 'motorUtilInit("%(P)s")' % self.args
