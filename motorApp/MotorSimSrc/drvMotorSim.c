@@ -415,13 +415,13 @@ static int motorAxisSetInteger( AXIS_HDL pAxis, motorAxisParam_t function, int v
                 break;
             }
 
-            if (status != MOTOR_AXIS_ERROR )
+            if (status != MOTOR_AXIS_ERROR ) {
                 status = motorParam->setInteger( pAxis->params, function, value );
 	        motorParam->callCallback(pAxis->params);
-        }
-
-	epicsMutexUnlock(pAxis->axisMutex);
-
+	    }
+        
+	    epicsMutexUnlock(pAxis->axisMutex);
+	}
         return (status);
     }
 }
