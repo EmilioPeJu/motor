@@ -15,7 +15,7 @@ pattern { P, M, DESC, DTYP, DIR, VELO, VBAS, ACCL, BDST, BVEL, BACC, PORT, ADDR,
 file bo.template
 {
 pattern {P, R, DTYP, OUT, ZNAM, ONAM, SCAN }
-        {mp49t:, defer, asynUInt32Digital, "@asynMask(PMAC1,1,1)DEFER", "OFF", "ON", Passive }
+        {mp49t:, defer, asynUInt32Digital, "@asynMask(PMAC1,1,1)MOTOR_DEFER_MOVES", "OFF", "ON", Passive }
 }
 
 
