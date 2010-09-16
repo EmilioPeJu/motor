@@ -3,10 +3,10 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 267
-y 382
+x 272
+y 404
 w 390
-h 355
+h 330
 font "arial-medium-r-16.0"
 ctlFont "arial-bold-r-16.0"
 btnFont "arial-medium-r-16.0"
@@ -67,8 +67,8 @@ minor 1
 release 0
 x 10
 y 67
-w 183
-h 19
+w 191
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -87,8 +87,8 @@ minor 1
 release 0
 x 10
 y 104
-w 214
-h 19
+w 225
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -107,8 +107,8 @@ minor 1
 release 0
 x 10
 y 141
-w 215
-h 19
+w 228
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -127,8 +127,8 @@ minor 1
 release 0
 x 10
 y 178
-w 202
-h 19
+w 209
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -145,8 +145,8 @@ beginObjectProperties
 major 4
 minor 0
 release 0
-x 250
-y 279
+x 249
+y 247
 w 130
 h 31
 fgColor index 25
@@ -183,30 +183,10 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 10
+x 5
 y 252
-w 124
-h 19
-font "arial-medium-r-16.0"
-fgColor index 14
-bgColor index 0
-useDisplayBg
-value {
-  ".RES - Step Size"
-}
-autoSize
-endObjectProperties
-
-# (Static Text)
-object activeXTextClass
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 10
-y 286
-w 230
-h 19
+w 240
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -225,8 +205,8 @@ minor 1
 release 0
 x 10
 y 215
-w 213
-h 19
+w 223
+h 17
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -274,25 +254,6 @@ fill
 font "arial-bold-r-16.0"
 endObjectProperties
 
-# (Textupdate)
-object TextupdateClass
-beginObjectProperties
-major 10
-minor 0
-release 0
-x 250
-y 244
-w 130
-h 30
-controlPv "$(motor).RES"
-fgColor index 16
-fgAlarm
-bgColor index 12
-fill
-font "arial-bold-r-16.0"
-lineWidth 2
-endObjectProperties
-
 # (Textentry)
 object TextentryClass
 beginObjectProperties
@@ -335,8 +296,8 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 250
-y 313
+x 249
+y 286
 w 130
 h 28
 fgColor index 46
