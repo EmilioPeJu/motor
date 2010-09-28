@@ -3,8 +3,8 @@
 # Test suite to use with pyUnit
 
 from pkg_resources import require
-require('dls.autotestframework')
-from dls.autotestframework import *
+require('dls_autotestframework')
+from dls_autotestframework import *
 
 from motorcases import *
 import pyclbr

@@ -1,8 +1,8 @@
 #!/dls_sw/tools/bin/python2.4
 
 from pkg_resources import require
-require('dls.autotestframework')
-from dls.autotestframework import TestCase
+require('dls_autotestframework')
+from dls_autotestframework import TestCase
 
 from motorcases import *
 
