@@ -61,7 +61,9 @@ enum SC_model
 {
     SC800,
     SC400,
-    SC200
+    SC200,
+    SC410,
+    SC210
 };
 
 /* Motion Master specific data is stored in this structure. */

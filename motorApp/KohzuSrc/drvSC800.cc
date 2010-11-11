@@ -561,16 +561,23 @@ static int motor_init()
                 if (status > 0)
                 {
                     int convert_800_cnt, convert_400_cnt, convert_200_cnt;
+                    int convert_410_cnt, convert_210_cnt;
 
                     convert_800_cnt = sscanf(buff, "C\tIDN0\t800\t%d", &version);
                     convert_400_cnt = sscanf(buff, "C\tIDN0\t400\t%d", &version);
+                    convert_410_cnt = sscanf(buff, "C\tIDN0\t410\t%d", &version);
                     convert_200_cnt = sscanf(buff, "C\tIDN0\t200\t%d", &version);
+                    convert_210_cnt = sscanf(buff, "C\tIDN0\t210\t%d", &version);
                     if (convert_800_cnt == 1)
                         cntrl->model = SC800;
                     else if (convert_400_cnt == 1)
                         cntrl->model = SC400;
+                    else if (convert_410_cnt == 1)
+                        cntrl->model = SC410;
                     else if (convert_200_cnt == 1)
                         cntrl->model = SC200;
+                    else if (convert_210_cnt == 1)
+                        cntrl->model = SC210;
                     else
                         status = 0;
                 }
@@ -591,9 +598,19 @@ static int motor_init()
                 sprintf(brdptr->ident, "SC-400 Ver%d", version);
                 total_axis = 4;
             }
+            else if (cntrl->model == SC410)
+            {
+                sprintf(brdptr->ident, "SC-410 Ver%d", version);
+                total_axis = 4;
+            }
             else if (cntrl->model == SC200)
             {
                 sprintf(brdptr->ident, "SC-200 Ver%d", version);
+                total_axis = 2;
+            }
+            else if (cntrl->model == SC210)
+            {
+                sprintf(brdptr->ident, "SC-210 Ver%d", version);
                 total_axis = 2;
             }
             brdptr->total_axis = total_axis;

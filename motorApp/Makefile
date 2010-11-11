@@ -31,7 +31,7 @@ DIRS += NewFocusSrc
 #DIRS += ThorLabsSrc
 #DIRS += SmartMotorSrc
 DIRS += PiJenaSrc
-#DIRS += KohzuSrc
+DIRS += KohzuSrc
 DIRS += AerotechSrc
 endif
 
