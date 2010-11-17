@@ -1,3 +1,18 @@
+#% macro, P      , Device Prefix
+#% macro, Q      , Device Suffix
+#% macro, DESC   , Description, displayed on EDM screen
+#% macro, MRES   , Motor Step Size (EGU)
+#% macro, RRES   , Readback Step Size (EGU)
+#% macro, RDBD   , Retry deadband (EGU)
+#% macro, RDBL   , Readback link
+#% macro, OUT    , Output link
+#% macro, MOVEDLY, Approximate move time (seconds)
+#% macro, EGU    , Engineering Units
+#% macro, DHLM   , Dial High Limit
+#% macro, DLLM   , Dial Low Limit
+#% macro, gda_name, Name to export this as to GDA
+#% macro, gda_desc, Description to export this as to GDA
+
 # AUTOSAVE: level 0 = before record init, level 1 = before AND after record init
 #% autosave 0 DVAL OFF
 #% autosave 1 DIR DHLM DLLM TWV SREV MRES ERES RRES VBAS VELO ACCL BDST BVEL BACC RDBD EGU RTRY UEIP URIP DLY PREC DISA DISP FOFF OFF FRAC OMSL JVEL JAR
@@ -5,8 +20,7 @@
 #% archiver 0.5 Monitor
 #% gdatag,template,simpleMotor,$(gda_name),$(gda_desc)
 #% gdatag,motor,rw,$(gda_name),RECORD,Motor
-#%gda,interface,$(INTERFACE)
-#%gda,subsystem,$(SUBSYSTEM)
+
 record(motor, "$(P)$(Q)") {
   field(DTYP, "Soft Channel")
   field(DIR, "Pos")
@@ -16,8 +30,9 @@ record(motor, "$(P)$(Q)") {
   field(BDST, "0")
   field(BVEL, "0")
   field(BACC, "0")
-  field(MRES, "1")
-  field(RRES, "1")
+  field(MRES, "$(MRES=1)")
+  field(RDBD, "$(RDBD=1)")
+  field(RRES, "$(RRES=1)")
   field(URIP, "Yes")
   field(PREC, "4")
   field(EGU, "$(EGU)")
@@ -46,7 +61,7 @@ record(ao, "$(P)$(Q):DOMOVE") {
 record(seq, "$(P)$(Q):SEQTIMER") {
   field(DOL1, "0")
   field(LNK1, "$(P)$(Q):DONE PP")
-  field(DOL2, "$(P)$(Q).RVAL")
+  field(DOL2, "$(P)$(Q):DOMOVE")
   field(LNK2, "$(OUT) PP")
   field(DLY3, "$(MOVEDLY)")
   field(DOL3, "1")
