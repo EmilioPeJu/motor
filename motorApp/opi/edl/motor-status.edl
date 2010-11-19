@@ -329,7 +329,7 @@ x 240
 y 168
 w 120
 h 40
-controlPv "$(motor).ACCL"
+controlPv "$(motor).DLY"
 fgColor index 25
 fgAlarm
 bgColor index 3
