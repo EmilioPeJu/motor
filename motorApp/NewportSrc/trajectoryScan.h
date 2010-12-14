@@ -83,7 +83,7 @@ string  readMessage; assign readMessage  to "{P}{R}ReadMessage.VAL";
 double  timeTrajectory[MAX_ELEMENTS];
 assign  timeTrajectory to  "{P}{R}TimeTraj.VAL"; 
 monitor timeTrajectory;
-string  trajectoryFile; assign trajectoryFile to "{P}{R}TrajectoryFile.VAL";
+string  trajectoryFile; assign trajectoryFile to "{P}{R}TrajectoryFile";
 monitor trajectoryFile;
 
 int     moveAxis[MAX_AXES]; 
