@@ -28,6 +28,7 @@ typedef enum {
     motorSetClosedLoop = motorAxisClosedLoop,
     motorEncoderPosition = motorAxisEncoderPosn,
     motorDeferMoves = motorAxisDeferMoves,
+    motorMoveToHome = motorAxisMoveToHome,
     /* Not exposed by the driver */
     motorVelocity=100, motorVelBase, motorAccel, 
     /* Commands */
