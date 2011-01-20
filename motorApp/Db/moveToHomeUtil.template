@@ -1,0 +1,27 @@
+##########################################
+# Template to help with move to home position
+# function in asyn drivers.
+#
+# References the saveRestoreLimits template from motor.
+#
+##########################################
+
+record(seq, "$(motor):MOVETOHOME") {
+  field(DESC, "Move to home")
+  field(LNK1, "$(motor):STOREANDWIDENLIM.PROC")
+  field(DLY2, "1.0")
+  field(DOL2, "1")
+  field(LNK2, "$(motor):MOVE_HOME PP")
+}
+
+record(bo, "$(motor):MOVE_HOME") {
+  field(DESC, "Move to home command")
+  field(DTYP, "asynUInt32Digital")
+  field(OUT, "@asynMask($(port),$(addr),1)MOTOR_MOVE_HOME")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Done")
+  field(ONAM, "Done")
+  field(PINI, "YES")
+}
+
+

@@ -25,6 +25,10 @@ DB += motorReadback.template
 DB += motorTranslate.template
 DB += trajectoryScan.db
 DB += softMotorForPiezo.template
+DB += saveRestoreLimits.template
+DB += limitsMonitor.template
+DB += moveToHomeUtil.template
+DB += scaledMotorPositions.template
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB

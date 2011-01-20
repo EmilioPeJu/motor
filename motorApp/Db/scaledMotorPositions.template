@@ -1,0 +1,27 @@
+###############################################
+# Template to calculate the scaled position and 
+# encoder position from a motor record. This is
+# useful when displaying both positions at the
+# same time.
+###############################################
+
+record(calc, "$(motor):POSITION")
+{
+        field(DESC,"Motor Position")
+        field(INPA,"$(motor).RMP CP")
+        field(INPB,"$(motor).MRES NPP")
+        field(CALC,"(A*B)")
+        field(PREC,"$(prec)")
+        field(EGU, "$(egu)")
+}
+
+record(calc, "$(motor):ENCODER_POSITION")
+{
+        field(DESC,"Encoder Position")
+        field(INPA,"$(motor).REP CP")
+        field(INPB,"$(motor).ERES NPP")
+        field(CALC,"(A*B)")
+        field(PREC,"$(prec)")
+        field(EGU, "$(egu)")
+}
+

@@ -1,0 +1,56 @@
+################################################
+# Template to monitor the software limits as 
+# reported by the driver, and then set the motor
+# record software limits on a change.
+# This is needed if software limits can change
+# on the controller (not via the motor record).
+#
+# The asyn driver needs to monitor the controller
+# software limits in its polling task.
+#
+# Macros:
+# motor - the motor record PV
+# port - the asyn port used to talk to the driver
+# addr - the asyn address (ie. the axis. zero based).
+#
+###############################################
+
+
+record(ai, "$(motor):HIGHLIM_MON") {
+  field(DESC, "Monitor high lim")
+  field(SCAN, "I/O Intr")
+  field(DTYP, asynFloat64)
+  field(INP, "@asyn($(port),$(addr),1)MOTOR_HIGH_LIMIT")
+  field(FLNK, "$(motor):HIGHLIM_SET")
+}
+
+record(ai, "$(motor):LOWLIM_MON") {
+  field(DESC, "Monitor low lim")
+  field(SCAN, "I/O Intr")
+  field(DTYP, asynFloat64)
+  field(INP, "@asyn($(port),$(addr),1)MOTOR_LOW_LIMIT")
+  field(FLNK, "$(motor):LOWLIM_SET")	
+}
+
+record(calcout, "$(motor):HIGHLIM_SET") {
+  field(DESC, "Set hlim on change")
+  field(SCAN, "Passive")
+  field(OOPT, "On Change")
+  field(DOPT, "Use CALC")
+  field(INPA, "$(motor):HIGHLIM_MON.VAL NPP")
+  field(INPB, "$(motor).MRES")
+  field(CALC, "A*B")
+  field(OUT, "$(motor).DHLM")
+}
+
+record(calcout, "$(motor):LOWLIM_SET") {
+  field(DESC, "Set llim on change")
+  field(SCAN, "Passive")
+  field(OOPT, "On Change")
+  field(DOPT, "Use CALC")
+  field(INPA, "$(motor):LOWLIM_MON.VAL NPP")
+  field(INPB, "$(motor).MRES")
+  field(CALC, "A*B")
+  field(OUT, "$(motor).DLLM")
+}
+
