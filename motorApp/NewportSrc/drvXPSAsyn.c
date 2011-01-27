@@ -2060,20 +2060,27 @@ static int movePositionerToHome(AXIS_HDL pAxis)
 
   defaultDistance = (double) pAxis->referencing_mode_move;
   
+  /*NOTE: the XPS has some race conditions in its firmware. That's why I placed some
+    epicsThreadSleep calls between the XPS functions below.*/
+
   /* The XPS won't allow a home command if the group is in the Ready state
      * If the group is Ready, then make it not Ready  */
   status = GroupStatusGet(pAxis->pollSocket, pAxis->groupName, &groupStatus);
   if (groupStatus >= 10 && groupStatus <= 18) {
     status = GroupKill(pAxis->moveSocket, pAxis->groupName);
   }
-  status = GroupInitialize(pAxis->moveSocket, pAxis->groupName);
+  epicsThreadSleep(0.05);
+  status = GroupInitialize(pAxis->pollSocket, pAxis->groupName);
   if (status) {
     PRINT(pAxis->logParam, MOTOR_ERROR, "movePositionerToHome[%d,%d]: error calling GroupInitialize\n",
 	  pAxis->card, pAxis->axis);
     return MOTOR_AXIS_ERROR;
   }
+  epicsThreadSleep(0.05);
   status = GroupReferencingStart(pAxis->moveSocket, pAxis->groupName);
+  epicsThreadSleep(0.05);
   status = GroupReferencingStop(pAxis->moveSocket, pAxis->groupName);
+  epicsThreadSleep(0.05);
 
   status = GroupStatusGet(pAxis->pollSocket, pAxis->groupName, &groupStatus);
   if (groupStatus != 11) {
@@ -2117,9 +2124,13 @@ static int movePositionerToHome(AXIS_HDL pAxis)
   if (status != 0) {
     PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing GroupMoveRelative axis=%s status=%d\n", \
 	  pAxis->positionerName, status);
+    /*Issue a kill here if we have failed to move.*/
+    status = GroupKill(pAxis->moveSocket, pAxis->groupName);
     return MOTOR_AXIS_ERROR;
   }
   
+  epicsThreadSleep(0.1);
+
   status = GroupStatusGet(pAxis->pollSocket, pAxis->groupName, &groupStatus);
   
   if (groupStatus == 44) {
@@ -2134,16 +2145,20 @@ static int movePositionerToHome(AXIS_HDL pAxis)
 	/* move finished for some other reason.*/
 	PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing GroupMoveRelative axis=%s status=%d\n", \
 	      pAxis->positionerName, status);
+        /*Issue a kill here if we have failed to move.*/
+	status = GroupKill(pAxis->moveSocket, pAxis->groupName);
 	return MOTOR_AXIS_ERROR;
       }
     }
   } else {
     PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing GroupMoveRelative axis=%s status=%d\n", \
 	  pAxis->positionerName, status);
+    /*Issue a kill here if we have failed to move.*/
+    status = GroupKill(pAxis->moveSocket, pAxis->groupName);
     return MOTOR_AXIS_ERROR;
   }
 
-  status = GroupMoveAbort(pAxis->moveSocket, pAxis->groupName);
+  status = GroupMoveAbort(pAxis->pollSocket, pAxis->groupName);
   if (status != 0) {
     PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing GroupMoveAbort axis=%s status=%d\n",	\
 	  pAxis->positionerName, status);
