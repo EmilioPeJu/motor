@@ -17,8 +17,8 @@
 
 record(calc, "$(motor):STORELIM") {
   field(DESC, "Store limits")
-  field(INPA, "$(motor).HLM")
-  field(INPB, "$(motor).LLM")
+  field(INPA, "$(motor).DHLM")
+  field(INPB, "$(motor).DLLM")
   field(SCAN, "Passive")
   field(SDIS, "$(motor):STOREANDWIDEN_DONE")
 }
@@ -26,9 +26,9 @@ record(calc, "$(motor):STORELIM") {
 record(seq, "$(motor):WIDENLIM") {
   field(DESC, "Widen limits")
   field(DOL1, "-$(widelim)")
-  field(LNK1, "$(motor).LLM")
+  field(LNK1, "$(motor).DLLM")
   field(DOL2, "$(widelim)")
-  field(LNK2, "$(motor).HLM")
+  field(LNK2, "$(motor).DHLM")
 }
 
 record(fanout, "$(motor):STOREANDWIDENLIM") {
@@ -41,9 +41,9 @@ record(fanout, "$(motor):STOREANDWIDENLIM") {
 record(seq, "$(motor):RESTORELIM") {
   field(DESC, "Restore limits")
   field(DOL1, "$(motor):STORELIM.A")
-  field(LNK1, "$(motor).HLM")
+  field(LNK1, "$(motor).DHLM")
   field(DOL2, "$(motor):STORELIM.B")
-  field(LNK2, "$(motor).LLM")
+  field(LNK2, "$(motor).DLLM")
   field(FLNK, "$(motor):STOREANDWIDEN_RESET")
 }
 
