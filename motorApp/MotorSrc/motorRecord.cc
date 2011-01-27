@@ -2,10 +2,10 @@
 FILENAME...     motorRecord.cc
 USAGE...        Motor Record Support.
 
-Version:        $Revision: 10799 $
+Version:        $Revision: 11726 $
 Modified By:    $Author: sluiter $
-Last Modified:  $Date: 2010-04-21 19:24:59 +0100 (Wed, 21 Apr 2010) $
-HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-5/motorApp/MotorSrc/motorRecord.cc $
+Last Modified:  $Date: 2010-10-06 20:19:58 +0100 (Wed, 06 Oct 2010) $
+HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-5-2/motorApp/MotorSrc/motorRecord.cc $
 */
 
 /*
@@ -140,10 +140,11 @@ HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-5
  *                    the same as before when MDEL and ADEL are zero.
  * .58 04-15-10 rls - Added SYNC field to synchronize VAL/DVAL/RVAL with
  *                    RBV/DRBV/RRBV
+ * .59 09-08-10 rls - clean-up RCNT change value posting in do_work().
  *
- */                                                        
+ */
 
-#define VERSION 6.5
+#define VERSION 6.52
 
 #include    <stdlib.h>
 #include    <string.h>
@@ -2181,8 +2182,9 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             /* reset retry counter if this is not a retry */
             if ((pmr->mip & MIP_RETRY) == 0)
             {
+                if (pmr->rcnt != 0)
+                    MARK(M_RCNT);
                 pmr->rcnt = 0;
-                MARK(M_RCNT);
             }
             else if (pmr->rmod == motorRMOD_A) /* Do arthmetic sequence retries. */
             {
