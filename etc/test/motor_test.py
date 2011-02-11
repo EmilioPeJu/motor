@@ -25,17 +25,28 @@ class motorTestSuite(TestSuite):
 
    def createTests(self):
       # Define the targets for this test suite
-      Target("simulation", self,
-             iocDirectory="iocs/motorSimTest",
-             #iocBootCmd="screen -D -m -L bin/linux-x86/stmotorSimTest.boot",
-             iocBootCmd="bin/linux-x86/stmotorSimTest.boot",
-             epicsDbFiles="db/motorSimTest.db"
-             #guiCmds=['edm -m "lakeshore340=mp49:ls340sim" -x data/lakeshore340.edl'])
-             )
-
-      self.loadCasePlugins()
+      Target("simulation", self, [
+            BuildEntity('motor'),
+            IocEntity('ioc', directory='iocs/motorSimTest', bootCmd='bin/linux-x86/stmotorSimTest.boot'),
+            EpicsDbEntity('db', directory='iocs/motorSimTest', fileName="db/motorSimTest.db")])
       
-     
+
+      motorCaseReadInit(self)
+      motorCaseMoveSequence1(self) #do a few moves before the autosave test
+      motorCaseAutosaveRestoreCheck(self)
+      motorCaseMoveSequence1(self)
+      motorCaseMoveSequence2(self)
+      motorCaseMoveSequence3(self)
+      motorCaseMoveSequence4(self)
+      motorCaseMoveSequence5(self)
+      motorCaseMoveSequence6(self)
+      motorCaseMoveCheckStatus(self)
+      motorCaseCheckOffset(self)
+      motorCaseSetPosition(self)
+
+#      self.loadCasePlugins()
+      
+       
 
 
 ################################################
