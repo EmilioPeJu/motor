@@ -326,40 +326,10 @@ release 0
 x 610
 y 50
 w 335
-h 285
+h 255
 lineColor index 14
 fill
 fillColor index 5
-endObjectProperties
-
-# (Rectangle)
-object activeRectangleClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 615
-y 95
-w 325
-h 75
-lineColor index 3
-fill
-fillColor index 3
-endObjectProperties
-
-# (Rectangle)
-object activeRectangleClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 615
-y 255
-w 325
-h 75
-lineColor index 3
-fill
-fillColor index 3
 endObjectProperties
 
 # (Group)
@@ -912,32 +882,6 @@ fill
 font "arial-bold-r-14.0"
 endObjectProperties
 
-# (Related Display)
-object relatedDisplayClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 780
-y 60
-w 160
-h 30
-fgColor index 43
-bgColor index 4
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "Axis Debug"
-numPvs 4
-numDsps 1
-displayFileName {
-  0 "trajectoryScanDebug"
-}
-symbols {
-  0 "M1=$(M1),M2=$(M2),M3=$(M3),M4=$(M4),M5=$(M5),M6=$(M6),M7=$(M7),M8=$(M8)"
-}
-endObjectProperties
-
 # (Static Text)
 object activeXTextClass
 beginObjectProperties
@@ -1340,27 +1284,6 @@ autoSize
 border
 endObjectProperties
 
-# (Static Text)
-object activeXTextClass
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 555
-y 40
-w 40
-h 14
-font "arial-medium-r-12.0"
-fontAlign "center"
-fgColor index 14
-bgColor index 8
-value {
-  "  Plots  "
-}
-autoSize
-border
-endObjectProperties
-
 # (Menu Button)
 object activeMenuButtonClass
 beginObjectProperties
@@ -1369,8 +1292,8 @@ minor 0
 release 0
 x 475
 y 105
-w 75
-h 28
+w 115
+h 30
 fgColor index 25
 bgColor index 3
 inconsistentColor index 0
@@ -1541,8 +1464,8 @@ minor 0
 release 0
 x 475
 y 145
-w 75
-h 28
+w 115
+h 30
 fgColor index 25
 bgColor index 3
 inconsistentColor index 0
@@ -1561,8 +1484,8 @@ minor 0
 release 0
 x 475
 y 185
-w 75
-h 28
+w 115
+h 30
 fgColor index 25
 bgColor index 3
 inconsistentColor index 0
@@ -1581,8 +1504,8 @@ minor 0
 release 0
 x 475
 y 225
-w 75
-h 28
+w 115
+h 30
 fgColor index 25
 bgColor index 3
 inconsistentColor index 0
@@ -1601,8 +1524,8 @@ minor 0
 release 0
 x 475
 y 265
-w 75
-h 28
+w 115
+h 30
 fgColor index 25
 bgColor index 3
 inconsistentColor index 0
@@ -1621,8 +1544,8 @@ minor 0
 release 0
 x 475
 y 305
-w 75
-h 28
+w 115
+h 30
 fgColor index 25
 bgColor index 3
 inconsistentColor index 0
@@ -1641,8 +1564,8 @@ minor 0
 release 0
 x 475
 y 345
-w 75
-h 28
+w 115
+h 30
 fgColor index 25
 bgColor index 3
 inconsistentColor index 0
@@ -1661,8 +1584,8 @@ minor 0
 release 0
 x 475
 y 65
-w 75
-h 28
+w 115
+h 30
 fgColor index 25
 bgColor index 3
 inconsistentColor index 0
@@ -1671,75 +1594,6 @@ botShadowColor index 11
 controlPv "$(P)$(R)M1Move"
 indicatorPv "$(P)$(R)M1Move"
 font "arial-bold-r-14.0"
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 615
-y 135
-w 325
-h 30
-controlPv "$(P)$(R)BuildMessage"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 705
-y 100
-w 110
-h 30
-controlPv "$(P)$(R)BuildState"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 820
-y 100
-w 120
-h 30
-controlPv "$(P)$(R)BuildStatus"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
 endObjectProperties
 
 # (Static Text)
@@ -1805,144 +1659,6 @@ autoSize
 border
 endObjectProperties
 
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 615
-y 215
-w 325
-h 30
-controlPv "$(P)$(R)ExecMessage"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 820
-y 180
-w 120
-h 30
-controlPv "$(P)$(R)ExecStatus"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 705
-y 180
-w 110
-h 30
-controlPv "$(P)$(R)ExecState"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 615
-y 295
-w 325
-h 30
-controlPv "$(P)$(R)ReadMessage"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 820
-y 260
-w 120
-h 30
-controlPv "$(P)$(R)ReadStatus"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 705
-y 260
-w 110
-h 30
-controlPv "$(P)$(R)ReadState"
-format "decimal"
-font "arial-bold-r-12.0"
-fgColor index 16
-bgColor index 10
-precision 4
-nullColor index 0
-useHexPrefix
-newPos
-objType "monitors"
-noExecuteClipMask
-endObjectProperties
-
 # (Shell Command)
 object shellCmdClass
 beginObjectProperties
@@ -1958,208 +1674,10 @@ bgColor index 3
 topShadowColor index 1
 botShadowColor index 11
 font "arial-bold-r-14.0"
-buttonLabel "Generate Trajectories..."
+buttonLabel "Generate Test Trajectories"
 numCmds 1
 command {
   0 "xterm -e \"/dls_sw/tools/bin/python2.4 -i $(which trajectoryGenerate.py) $(P)$(R)\""
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 615
-y 60
-w 160
-h 30
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "Plot Time"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) Time"
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 555
-y 65
-w 40
-h 28
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "M1"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) M1"
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 555
-y 105
-w 40
-h 28
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "M2"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) M2"
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 555
-y 145
-w 40
-h 28
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "M3"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) M3"
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 555
-y 185
-w 40
-h 28
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "M4"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) M4"
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 555
-y 225
-w 40
-h 28
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "M5"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) M5"
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 555
-y 265
-w 40
-h 28
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "M6"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) M6"
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 555
-y 305
-w 40
-h 28
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "M7"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) M7"
-}
-endObjectProperties
-
-# (Shell Command)
-object shellCmdClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 555
-y 345
-w 40
-h 28
-fgColor index 43
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-bold-r-14.0"
-buttonLabel "M8"
-numCmds 1
-command {
-  0 "trajectoryPlot.py $(P)$(R) M8"
 }
 endObjectProperties
 
@@ -2328,26 +1846,6 @@ lineWidth 2
 numBits 1
 endObjectProperties
 
-# (Static Text)
-object activeXTextClass
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 615
-y 260
-w 85
-h 30
-font "arial-bold-r-14.0"
-fontAlign "center"
-fgColor index 11
-bgColor index 4
-value {
-  "Readback"
-}
-border
-endObjectProperties
-
 # (Menu Mux PV)
 object menuMuxPVClass
 beginObjectProperties
@@ -2444,8 +1942,304 @@ beginObjectProperties
 major 4
 minor 0
 release 0
+x 610
+y 345
+w 230
+h 35
+fgColor index 20
+onColor index 4
+offColor index 3
+inconsistentColor index 14
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(P)$(R)Abort"
+indicatorPv "$(P)$(R)Abort"
+onLabel "Aborting..."
+offLabel "Abort"
+labelType "literal"
+3d
+font "arial-bold-r-18.0"
+objType "controls"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 615
+y 60
+w 325
+h 235
+
+beginGroup
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 615
+y 60
+w 325
+h 75
+lineColor index 3
+fill
+fillColor index 3
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 615
+y 220
+w 325
+h 75
+lineColor index 3
+fill
+fillColor index 3
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
 x 615
 y 100
+w 325
+h 30
+controlPv "$(P)$(R)BuildMessage"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 705
+y 65
+w 110
+h 30
+controlPv "$(P)$(R)BuildState"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 820
+y 65
+w 120
+h 30
+controlPv "$(P)$(R)BuildStatus"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 615
+y 180
+w 325
+h 30
+controlPv "$(P)$(R)ExecMessage"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 820
+y 145
+w 120
+h 30
+controlPv "$(P)$(R)ExecStatus"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 705
+y 145
+w 110
+h 30
+controlPv "$(P)$(R)ExecState"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 615
+y 260
+w 325
+h 30
+controlPv "$(P)$(R)ReadMessage"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 820
+y 225
+w 120
+h 30
+controlPv "$(P)$(R)ReadStatus"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 4
+release 0
+x 705
+y 225
+w 110
+h 30
+controlPv "$(P)$(R)ReadState"
+format "decimal"
+font "arial-bold-r-12.0"
+fgColor index 16
+bgColor index 10
+precision 4
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 615
+y 225
+w 85
+h 30
+font "arial-bold-r-14.0"
+fontAlign "center"
+fgColor index 11
+bgColor index 4
+value {
+  "Readback"
+}
+border
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 615
+y 65
 w 85
 h 30
 fgColor index 25
@@ -2471,7 +2265,7 @@ major 4
 minor 0
 release 0
 x 615
-y 180
+y 145
 w 85
 h 30
 fgColor index 25
@@ -2497,7 +2291,7 @@ major 4
 minor 0
 release 0
 x 615
-y 260
+y 225
 w 85
 h 30
 fgColor index 25
@@ -2520,29 +2314,7 @@ visMin "1"
 visMax "2"
 endObjectProperties
 
-# (Button)
-object activeButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 610
-y 345
-w 230
-h 35
-fgColor index 20
-onColor index 4
-offColor index 3
-inconsistentColor index 14
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(P)$(R)Abort"
-indicatorPv "$(P)$(R)Abort"
-onLabel "Aborting..."
-offLabel "Abort"
-labelType "literal"
-3d
-font "arial-bold-r-18.0"
-objType "controls"
+endGroup
+
 endObjectProperties
 
