@@ -1142,11 +1142,12 @@ static int motorAxisStop(AXIS_HDL pAxis, double acceleration)
         }
     }
     
-    if (pAxis->axisStatus == 44) {
+    if ((pAxis->axisStatus == 44) || (pAxis->axisStatus == 45)) {
         status = GroupMoveAbort(pAxis->moveSocket, pAxis->groupName);
         if (status != 0) {
-            PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing GroupMoveAbort axis=%s status=%d\n",\
+            PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing GroupMoveAbort axis=%s status=%d. Trying again.\n",\
                   pAxis->positionerName, status);
+	    GroupMoveAbort(pAxis->moveSocket, pAxis->groupName);
             return MOTOR_AXIS_ERROR;
         }
     }
@@ -2047,6 +2048,10 @@ static int movePositionerToHome(AXIS_HDL pAxis)
   int initialHardwareStatus = 0;
   int hardwareStatus = 0;
   double defaultDistance = 0;
+  double vel=0;
+  double accel=0;
+  double minJerk=0;
+  double maxJerk=0;
 
   XPSController *pController = NULL;
   AXIS_HDL pTempAxis = NULL;
@@ -2117,6 +2122,29 @@ static int movePositionerToHome(AXIS_HDL pAxis)
   if (!(XPSC8_ZM_HIGH_LEVEL & initialHardwareStatus)) {
     defaultDistance = defaultDistance * -1.0;
   }
+
+  /*I want to set a slow speed here, so as not to move at default (max) speed. The user must have chance to
+    stop things if it looks like it has past the home switch and is not stopping. First I need to read what is currently
+    set for velocity, and then I divide it by 5.*/
+  status = PositionerSGammaParametersGet(pAxis->pollSocket,
+					 pAxis->positionerName, 
+					 &vel, &accel, &minJerk, &maxJerk);
+  if (status != 0) {
+    PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing PositionerSGammaParametersGet[%d,%d].\n",
+	  pAxis->card, pAxis->axis);
+    GroupKill(pAxis->moveSocket, pAxis->groupName);
+    return MOTOR_AXIS_ERROR;
+  }
+  status = PositionerSGammaParametersSet(pAxis->pollSocket,
+					 pAxis->positionerName, 
+					 (vel/5), accel, minJerk, maxJerk);
+  if (status != 0) {
+    PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing PositionerSGammaParametersSet[%d,%d].\n",
+	  pAxis->card, pAxis->axis);
+    GroupKill(pAxis->moveSocket, pAxis->groupName);
+    return MOTOR_AXIS_ERROR;
+  }
+  epicsThreadSleep(0.05);
   
   /*Move in direction of home switch.*/
   status = GroupMoveRelative(pAxis->moveSocket, pAxis->positionerName, 1,
