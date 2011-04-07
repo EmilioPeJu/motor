@@ -2128,7 +2128,7 @@ static int movePositionerToHome(AXIS_HDL pAxis)
 
   /*I want to set a slow speed here, so as not to move at default (max) speed. The user must have chance to
     stop things if it looks like it has past the home switch and is not stopping. First I need to read what is currently
-    set for velocity, and then I divide it by 5.*/
+    set for velocity, and then I divide it by 2.*/
   status = PositionerSGammaParametersGet(pAxis->pollSocket,
 					 pAxis->positionerName, 
 					 &vel, &accel, &minJerk, &maxJerk);
@@ -2140,7 +2140,7 @@ static int movePositionerToHome(AXIS_HDL pAxis)
   }
   status = PositionerSGammaParametersSet(pAxis->pollSocket,
 					 pAxis->positionerName, 
-					 (vel/5), accel, minJerk, maxJerk);
+					 (vel/2), accel, minJerk, maxJerk);
   if (status != 0) {
     PRINT(pAxis->logParam, MOTOR_ERROR, " Error performing PositionerSGammaParametersSet[%d,%d].\n",
 	  pAxis->card, pAxis->axis);
