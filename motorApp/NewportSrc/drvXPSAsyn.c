@@ -185,6 +185,7 @@ typedef struct motorAxisHandle
     PARAMS params;
     double currentPosition;
     double currentVelocity;
+    double theoryPosition;
     double velocity;
     double accel;
     double minJerkTime; /* for the SGamma function */
@@ -504,7 +505,7 @@ static int processDeferredMovesInGroup(const XPSController * pController, char *
 	    pAxis->deferred_relative ? (pAxis->currentPosition + pAxis->deferred_position) : pAxis->deferred_position;
 	} else {
 	  positions[positions_index] = 
-	    pAxis->deferred_relative ? 0 : pAxis->currentPosition;
+	    pAxis->deferred_relative ? 0 : pAxis->theoryPosition;
 	}
 
 	/*Reset deferred flag.*/
@@ -1334,6 +1335,8 @@ static void XPSPoller(XPSController *pController)
 					      pAxis->positionerName,
 					      1,
 					      &theoryPosition);
+
+	    pAxis->theoryPosition = theoryPosition;
 
             status = GroupPositionCurrentGet(pAxis->pollSocket,
                                              pAxis->positionerName,
