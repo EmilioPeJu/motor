@@ -26,6 +26,10 @@
 #% macro, ERES   , Encoder Step Size (EGU)
 #% macro, JAR    , Jog Acceleration (EGU/s^2)
 #% macro, UEIP   , Use Encoder If Present
+#% macro, URIP   , Use RDBL If Present
+#% macro, RDBL   , Readback Location, set URIP = 1 if you specify this
+#% macro, RTRY   , Max retry count
+#% macro, DLY    , Readback settle time (s)
 #% macro, OFF    , User Offset (EGU)
 #% macro, RDBD   , Retry Deadband (EGU)
 #% macro, FOFF   , Freeze Offset, 0=variable, 1=frozen
@@ -34,8 +38,11 @@
 #% macro, FEHIGH , HIGH limit for following error
 #% macro, FEHIHI , HIHI limit for following error
 #% macro, FEHHSV , HIHI alarm severity for following error
-#% macro, FEHSV  , HIGH alarm severity for following error 
+#% macro, FEHSV  , HIGH alarm severity for following error
+#% macro, SCALE  , Scale factor, if pmacSetAxisScale is used this should be set
 #% macro, name   , Object name and gui association name
+#% macro, alh    , Set this to alh to add the motor to alarm handler (default), 
+#                  set to '#' to comment out alh lines
 #% macro, gda_name, Name to export this as to GDA
 #% macro, gda_desc, Description to export this as to GDA
 
@@ -58,7 +65,6 @@
 # % gui, $(name), status, <pv>.MOVN
 # % gui, $(name), sevr
 
-
 record(motor,"$(P)$(M)")
 {
 	field(DESC,"$(DESC)")
@@ -78,7 +84,8 @@ record(motor,"$(P)$(M)")
 	field(DLLM,"$(DLLM)")
 	field(HLSV,"$(HLSV=MAJOR)")
 	field(INIT,"$(INIT=)")
-	field(RTRY,"0")
+	field(RTRY,"$(RTRY=0)")
+	field(DLY,"$(DLY=0)")	
 	field(HVEL,"0")
 	field(SREV, "$(SREV=1000)")
 	field(RRES, "$(RRES=)")
@@ -87,12 +94,41 @@ record(motor,"$(P)$(M)")
 	field(JVEL, "$(VELO)")
 	field(JAR, "$(JAR=)")
 	field(UEIP, "$(UEIP=0)")
+	field(URIP, "$(URIP=0)")	
+	field(RDBL, "$(RDBL=)")		
 	field(VMAX, "$(VMAX=$(VELO))")
 	field(OFF, "$(OFF=0)")
 	field(RDBD, "$(RDBD=)")
 	field(FOFF, "$(FOFF=0)")
 	field(ADEL, "$(ADEL=0)")
 	field(NTM, "$(NTM=1)")
+	field(SDIS, "$(P)$(M):SDIS.VAL")	
+}
+
+# record that holds the ADDR
+record(ao, "$(P)$(M):ADDR") {
+    field(PINI, "YES")
+    field(VAL, "$(ADDR)")
+}
+
+# record that holds the PORT
+record(stringout, "$(P)$(M):PORT") {
+    field(PINI, "YES")
+    field(VAL, "$(PORT)")
+}
+
+# record that holds the SCALE
+record(stringout, "$(P)$(M):SCALE") {
+    field(PINI, "YES")
+    field(VAL, "$(SCALE=1)")
+}
+
+# record that will disable and re-enable record if any of its inputs are non-zero
+record(calcout, "$(P)$(M):SDIS") {
+  field(DESC, "Disable on non-zero input")
+  field(VAL, "0")
+  field(CALC, "(A|B|C|D|E|F|G|H|I|J|K|L)>0")
+  field(OUT, "$(P)$(M).DISP PP")
 }
 
 # dummy record that looks like a kill command
@@ -101,14 +137,28 @@ record(ao, "$(P)$(M):KILL") {
 }
 
 # dummy record that looks like eloss status
+#% alh $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M):ELOSS
 record(ai, "$(P)$(M):ELOSS") {
     field(PINI, "YES")
+    field(HIHI, "1")
+    field(HHSV, "MAJOR")    
 }
 
 # dummy record that looks like an eloss reset
 record(calcout, "$(P)$(M):ELOSSRC") {
 }
 
+# check if SYNC has been pressed
+record(calcout, "$(P)$(M):CHECK_SYNC") {
+  field(INPA, "$(P)$(M).SYNC CP")  
+  field(CALC, "A>0")
+  field(OOPT, "When Non-zero")
+  field(OUT, "$(P)$(M):MR_MOVE_WRITE.PROC PP")
+}
+
+# dummy record that looks like a record to notify a CS about a raw motor move
+record(longout, "$(P)$(M):MR_MOVE_WRITE") {
+}
 
 #Record to calculate the following error
 record(calc, "$(P)$(M):FERROR")
@@ -123,7 +173,6 @@ record(calc, "$(P)$(M):FERROR")
 	field(PREC,"$(PREC)")
 	field(EGU, "$(EGU)")
 }
-
 
 #Record to store the maximum following error
 #% archiver 10 Monitor VAL

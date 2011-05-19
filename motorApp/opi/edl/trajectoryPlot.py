@@ -1,7 +1,7 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/env dls-python2.6
 
 from pkg_resources import require
-require("matplotlib==0.91.1")
+require("matplotlib==0.99.1.1")
 require("dls.ca2==2.16")
 require("dls.thread==1.12")
 

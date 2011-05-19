@@ -1,6 +1,6 @@
 from iocbuilder import AutoSubstitution, Device, ModuleBase
 from iocbuilder.arginfo import *
-from iocbuilder.modules.asyn import Asyn
+from iocbuilder.modules.asyn import Asyn, AsynPort
 
 __all__ = ['basic_asyn_motor', 'MotorLib', 'MotorSimLib', 'MotorRecord']
 
@@ -20,7 +20,9 @@ class MotorRecord(ModuleBase):
     pass
 
 class basic_asyn_motor(AutoSubstitution, MotorRecord):    
-    TemplateFile = 'basic_asyn_motor.template'                        
+    TemplateFile = 'basic_asyn_motor.template' 
+basic_asyn_motor.ArgInfo.descriptions["PORT"] = Ident(
+	"Asyn port for motor record", AsynPort)
 
 class motorUtil(AutoSubstitution, Device):
     # Substitution attributes

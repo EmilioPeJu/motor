@@ -3,7 +3,7 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 858
+x 1032
 y 486
 w 411
 h 503
@@ -1474,19 +1474,19 @@ bgColor index 3
 topShadowColor index 1
 botShadowColor index 11
 font "arial-medium-r-16.0"
-xPosOffset -225
-yPosOffset -25
+xPosOffset -220
+yPosOffset -5
 buttonLabel "Reverse"
 numPvs 4
 numDsps 1
 displayFileName {
-  0 "motor-home-confirm.edl"
+  0 "motor-cmd-confirm.edl"
 }
 setPosition {
   0 "button"
 }
 symbols {
-  0 "homepv=$(motor).HOMR"
+  0 "cmdpv=$(motor).HOMR"
 }
 endObjectProperties
 
@@ -1505,19 +1505,19 @@ bgColor index 3
 topShadowColor index 1
 botShadowColor index 11
 font "arial-medium-r-16.0"
-xPosOffset -225
-yPosOffset -25
+xPosOffset -220
+yPosOffset -5
 buttonLabel "Forward"
 numPvs 4
 numDsps 1
 displayFileName {
-  0 "motor-home-confirm.edl"
+  0 "motor-cmd-confirm.edl"
 }
 setPosition {
   0 "button"
 }
 symbols {
-  0 "homepv=$(motor).HOMF"
+  0 "cmdpv=$(motor).HOMF"
 }
 endObjectProperties
 
@@ -1643,5 +1643,73 @@ endGroup
 visPv "$(motor):KILL"
 visMin "0"
 visMax "1"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 105
+y 310
+w 200
+h 25
+fgColor index 25
+onColor index 4
+offColor index 3
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor).SYNC"
+pressValue "1"
+onLabel "Sync VAL = RBV"
+offLabel "Sync VAL = RBV"
+3d
+useEnumNumeric
+font "arial-medium-r-16.0"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 150
+w 98
+h 28
+
+beginGroup
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 150
+w 98
+h 28
+fgColor index 14
+onColor index 21
+offColor index 20
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):ELOSSRC.A"
+pressValue "0"
+onLabel "Amplifier Loss Reset"
+offLabel "Amplifier Loss Reset"
+3d
+font "arial-medium-r-10.0"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):ELOSS"
+visInvert
+visMin "0"
+visMax "2"
 endObjectProperties
 

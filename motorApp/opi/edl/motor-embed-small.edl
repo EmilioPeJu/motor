@@ -210,7 +210,7 @@ endObjectProperties
 object activeXTextDspClass
 beginObjectProperties
 major 4
-minor 4
+minor 5
 release 0
 x 65
 y 85
@@ -424,5 +424,49 @@ endGroup
 visPv "$(motor):KILL"
 visMin "0"
 visMax "1"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 158
+y 56
+w 28
+h 21
+
+beginGroup
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 158
+y 56
+w 28
+h 21
+fgColor index 14
+onColor index 21
+offColor index 20
+topShadowColor index 1
+botShadowColor index 11
+controlPv "$(motor):ELOSSRC.A"
+pressValue "0"
+onLabel "ALoss"
+offLabel "Aloss"
+3d
+font "helvetica-medium-r-8.0"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):ELOSS"
+visInvert
+visMin "0"
+visMax "2"
 endObjectProperties
 
