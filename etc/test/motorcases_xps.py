@@ -9,6 +9,8 @@ require('cothread')
 import re
 import cothread
 
+from XPS_C8_drivers import XPS
+
 class motorCaseBase(TestCase):
    """
    Base class for all motor test cases.
@@ -21,6 +23,10 @@ class motorCaseBase(TestCase):
       self.__motors = [":motor1",":motor2"]
       self.__diag = 1
       self.__timeout = 10000
+      self.__xpsHostname = "172.23.243.157"
+      self.__xpsPort = 5001
+      self.__xpsSocketTimeout = 2.0
+      self.__xpsGroupName = "M"
       
    def getPVBase(self):
       return self.__pv1
@@ -33,6 +39,18 @@ class motorCaseBase(TestCase):
 
    def getTimeout(self):
       return self.__timeout
+
+   def getXPSHostname(self):
+      return self.__xpsHostname
+
+   def getXPSPort(self):
+      return self.__xpsPort
+
+   def getXPSSocketTimeout(self):
+      return self.__xpsSocketTimeout
+
+   def getXPSGroupName(self):
+      return self.__xpsGroupName
 
 
    def doMoveSequence(self, distance, moves, axes=2):
@@ -90,7 +108,7 @@ class motorCaseBase(TestCase):
 class motorCaseReadInit(motorCaseBase):
    """
    Test case to read motor record initial startup.
-   It reads DMOV, MOVN, DVAl and OFF.
+   It reads DMOV, MOVN, DVAL, OFF and MSTA.
    DVAL and OFF should have been set by autosave, so I want to move
    all to zero to start from a well defined state.
    """
@@ -100,6 +118,7 @@ class motorCaseReadInit(motorCaseBase):
       init_dmov = 1
       init_movn = 0
       init_set = 0
+      init_msta = 2 #Only check the 'done' bit.
 
       for motor in self.getMotors():
 
@@ -110,14 +129,19 @@ class motorCaseReadInit(motorCaseBase):
          pv_set = self.getPVBase() + motor + ".SET"
          pv_val = self.getPVBase() + motor + ".VAL"
          pv_off = self.getPVBase() + motor + ".OFF"
+         pv_msta = self.getPVBase() + motor + ".MSTA"
 
          self.diagnostic(pv_dmov + ": " + str(self.getPv(pv_dmov)), self.getDiag())
          self.diagnostic(pv_movn + ": " + str(self.getPv(pv_movn)), self.getDiag())
          self.diagnostic(pv_set + ": " + str(self.getPv(pv_set)), self.getDiag())
+         self.diagnostic(pv_msta + ": " + str(self.getPv(pv_msta)), self.getDiag())
          
          self.verify(init_dmov, self.getPv(pv_dmov))
          self.verify(init_movn, self.getPv(pv_movn))
          self.verify(init_set, self.getPv(pv_set))
+
+         self.diagnostic("Check that MSTA is not zero and at least in position is set...", self.getDiag())
+         self.verify(init_msta, (0x2 & int(self.getPv(pv_msta))))
 
          #Move to zero, and set offsets to zero.
          self.putPv(pv_off, 0.0, wait=True, timeout=self.getTimeout())
@@ -466,3 +490,65 @@ class motorCaseSetPosition(motorCaseBase):
          self.putPv(pv_val, 0.0, wait=True, timeout=self.getTimeout()) 
 
          
+class motorCaseTestAlarm(motorCaseBase):
+   """
+   Class to check the behaviour of the motor record
+   in the event that axes on the XPS are disabled.
+   This is achived by directly communicating with the XPS
+   using the python library XPS_C8_drivers from Newport.
+   """
+
+   def runTest(self):
+
+      #Open socket to XPS.
+      xps = XPS()
+      socket = xps.TCP_ConnectToServer(self.getXPSHostname(), self.getXPSPort(), self.getXPSSocketTimeout())
+
+      for motor in self.getMotors():
+
+         self.diagnostic("motorCaseTestAlarm for motor " + str(motor) + " before disabling axes...", self.getDiag())
+
+         pv_stat = self.getPVBase() + motor + ".STAT"
+         pv_sevr = self.getPVBase() + motor + ".SEVR"
+
+         stat = self.getPv(pv_stat)
+         sevr = self.getPv(pv_sevr)
+
+         self.diagnostic("  STAT= " + str(stat), self.getDiag())
+         self.diagnostic("  SEVR= " + str(stat), self.getDiag())
+         try:
+            self.verify(0, stat)
+            self.verify(0, sevr)
+         except:
+            self.diagnostic("motorCaseTestAlarm. Caught exception from verify. Closing XPS socket and re-throwing.")
+            xps.TCP_CloseSocket(socket)
+            raise
+
+      self.diagnostic("Disabling XPS group " + self.getXPSGroupName() + "...", self.getDiag())
+
+      #Disable group
+      xps.GroupMotionDisable(socket, self.getXPSGroupName())
+      cothread.Sleep(2.0)
+
+      for motor in self.getMotors():
+
+         self.diagnostic("motorCaseTestAlarm for motor " + str(motor) + " after disabling axes...", self.getDiag())
+
+         stat = self.getPv(pv_stat)
+         sevr = self.getPv(pv_sevr)
+
+         self.diagnostic("  STAT= " + str(stat), self.getDiag())
+         self.diagnostic("  SEVR= " + str(sevr), self.getDiag())
+         try:
+            self.verify(7, stat)
+            self.verify(2, sevr)
+         except:
+            self.diagnostic("motorCaseTestAlarm. Caught exception from verify. Enabling axes, closing XPS socket and re-throwing.")
+            xps.GroupMotionEnable(socket, self.getXPSGroupName())
+            xps.TCP_CloseSocket(socket)
+            raise
+
+      #Enable group again and close socket
+      xps.GroupMotionEnable(socket, self.getXPSGroupName())
+      xps.TCP_CloseSocket(socket)
+      cothread.Sleep(2.0)

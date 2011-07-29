@@ -25,10 +25,10 @@ class motorTestSuite(TestSuite):
 
    def createTests(self):
       # Define the targets for this test suite
-      Target("xps", self, [
+      Target("xps_model3", self, [
             BuildEntity('motor'),
-            IocEntity('ioc', directory='iocs/xpsTest', bootCmd='bin/linux-x86/stxpsTest.boot'),
-            EpicsDbEntity('db', directory='iocs/xpsTest', fileName="db/xpsTest.db")])
+            IocEntity('ioc', directory='iocs/xpsTestModel3', bootCmd='bin/linux-x86/stxpsTest.boot'),
+            EpicsDbEntity('db', directory='iocs/xpsTestModel3', fileName="db/xpsTest.db")])
       
 
       motorCaseReadInit(self)
@@ -43,6 +43,7 @@ class motorTestSuite(TestSuite):
       motorCaseCheckOffset(self)
       motorCaseSetPosition(self)
       motorCaseTestAlarm(self)
+
 
 #      self.loadCasePlugins()
       

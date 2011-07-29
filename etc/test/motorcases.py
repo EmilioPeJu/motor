@@ -90,7 +90,7 @@ class motorCaseBase(TestCase):
 class motorCaseReadInit(motorCaseBase):
    """
    Test case to read motor record initial startup.
-   It reads DMOV, MOVN, DVAl and OFF.
+   It reads DMOV, MOVN, DVAL, OFF and MSTA.
    DVAL and OFF should have been set by autosave, so I want to move
    all to zero to start from a well defined state.
    """
@@ -100,6 +100,7 @@ class motorCaseReadInit(motorCaseBase):
       init_dmov = 1
       init_movn = 0
       init_set = 0
+      init_msta = 2 #Only check the 'done' bit.
 
       for motor in self.getMotors():
 
@@ -110,14 +111,19 @@ class motorCaseReadInit(motorCaseBase):
          pv_set = self.getPVBase() + motor + ".SET"
          pv_val = self.getPVBase() + motor + ".VAL"
          pv_off = self.getPVBase() + motor + ".OFF"
+         pv_msta = self.getPVBase() + motor + ".MSTA"
 
          self.diagnostic(pv_dmov + ": " + str(self.getPv(pv_dmov)), self.getDiag())
          self.diagnostic(pv_movn + ": " + str(self.getPv(pv_movn)), self.getDiag())
          self.diagnostic(pv_set + ": " + str(self.getPv(pv_set)), self.getDiag())
+         self.diagnostic(pv_msta + ": " + str(self.getPv(pv_msta)), self.getDiag())
          
          self.verify(init_dmov, self.getPv(pv_dmov))
          self.verify(init_movn, self.getPv(pv_movn))
          self.verify(init_set, self.getPv(pv_set))
+
+         self.diagnostic("Check that MSTA is not zero and at least in position is set...", self.getDiag())
+         self.verify(init_msta, (0x2 & int(self.getPv(pv_msta))))
 
          #Move to zero, and set offsets to zero.
          self.putPv(pv_off, 0.0, wait=True, timeout=self.getTimeout())
