@@ -1,10 +1,7 @@
-#!/dls_sw/tools/bin/python2.4
-
 from pkg_resources import require
 require('dls_autotestframework')
 from dls_autotestframework import TestCase
 
-require('cothread') 
 
 import re
 import cothread
@@ -19,6 +16,7 @@ class motorCaseBase(TestCase):
       TestCase.__init__(self, A)
       self.__pv1 = "mp49t:sim"
       self.__motors = ["1","2","3","4","5","6"]
+      self.__pvDefer = "mp49t:defer"
       self.__diag = 1
       self.__timeout = 10000
       
@@ -33,6 +31,9 @@ class motorCaseBase(TestCase):
 
    def getTimeout(self):
       return self.__timeout
+
+   def getPVDefer(self):
+      return self.__pvDefer
 
 
    def doMoveSequence(self, distance, moves, axes=6):
@@ -501,3 +502,156 @@ class motorCaseSetPosition(motorCaseBase):
          self.putPv(pv_val, 0.0, wait=True, timeout=self.getTimeout()) 
 
          
+
+
+class motorCaseDeferredMoves(motorCaseBase):
+   """
+   Class to test deferred moves operation.
+
+   Currently the cothread library does not support user supplied callback functions.
+   When using ca_put_callback the caput function simply blocks. In a future release it
+   will support it, and we tested it (see the commented out sections below).
+
+   But for now, I am simply doing the deferred move in a single thread, and polling the
+   DMOV fields to check that all the motors have finished. The ca_put to the motor
+   record is without a callback.
+
+   Using multiple threads here won't work, because in a thread we have no way of knowing
+   when (or in which order) the ca_put_callback happens. So deferred moves logic only
+   works in a single thread context.
+
+   Using camonitor (on the DMOV) fields might be better way to do it, but I have not tried this.
+   """
+
+#Make use of a callback function when we have a cothread caput that supports user callbacks
+#   def mycallback(self, result):
+#      print "Callback"
+#      print result
+
+#Don't need this function when we have support for user defined callbacks in caput
+   def pollDMOVs(self):
+      for motor in self.getMotors():
+         dmov = 0
+         pv_dmov = self.getPVBase() + motor + ".DMOV"
+         while (dmov==0):
+            cothread.Sleep(0.1)
+            dmov = self.getPv(pv_dmov)
+            if dmov:
+               self.diagnostic("Motor " + str(motor) + " has finished.")
+
+      self.diagnostic("All motors finished.")
+
+
+   def runTest(self):
+
+      pv_defer = self.getPVDefer()
+      self.diagnostic("Testing deferred moves...")
+      self.diagnostic("Defer moves PV: " + str(pv_defer))
+
+      #Turn off deferred moves (need to send a stop to all axes to cancel deferred moves for those axes)
+      self.putPv(pv_defer, 0, wait=True, timeout=self.getTimeout())
+      for motor in self.getMotors():
+         pv_stop = self.getPVBase() + motor + ".STOP"
+         self.putPv(pv_stop, 1, wait=True, timeout=self.getTimeout())
+
+      #Move all axes to zero
+      for motor in self.getMotors():
+         pv_val = self.getPVBase() + motor + ".VAL"
+         self.putPv(pv_val, 0.0, wait=True, timeout=self.getTimeout())
+
+      #Set the velocity lower (so we can see the deferred moves in action)
+      pv_velo = self.getPVBase() + "1.VELO"
+      velo = self.getPv(pv_velo)
+      for motor in self.getMotors():
+         pv_velo = self.getPVBase() + motor + ".VELO"
+         self.putPv(pv_velo, velo/2, wait=True, timeout=self.getTimeout())
+
+      #Turn on deferred moves
+      self.diagnostic("Turning on deferred moves...")
+      self.putPv(pv_defer, 1, wait=True, timeout=self.getTimeout())
+
+      #Multi threaded won't work, due to not being able to know when a
+      #thread has called ca_put_callback or not. So it needs to be single
+      #threaded, with the use of callbacks in the caput. Now, cothread
+      #does not support callback in caput (yet), so we need to use camonitor
+      #instead (and monitor DMOV) or poll DMOV manually.
+      #The GDA caput does support callbacks, so that's what they use.
+
+#Do this when cothread is released that supports use of a callback function     
+#      for motor in self.getMotors():
+#         pv_val = self.getPVBase() + motor + ".VAL"
+#         self.putPv(pv_val, 2.0, callback=self.mycallback)
+#         cothread.catools.caput(pv_val, 2.0, wait=False, callback=self.mycallback)
+
+      for motor in self.getMotors():
+         pv_val = self.getPVBase() + motor + ".VAL"
+         self.putPv(pv_val, 5.0, wait=False, timeout=self.getTimeout())
+
+      #Turn off deferred moves
+      self.diagnostic("Turning off deferred moves...")
+      self.putPv(pv_defer, 0, wait=True, timeout=self.getTimeout())
+
+      #Now poll DMOVs
+      self.pollDMOVs()
+
+      #Reset the velocity
+      for motor in self.getMotors():
+         pv_velo = self.getPVBase() + motor + ".VELO"
+         self.putPv(pv_velo, velo, wait=True, timeout=self.getTimeout())
+
+      #Now do it again, faster this time
+
+      #Turn on deferred moves
+      self.diagnostic("Turning on deferred moves...")
+      self.putPv(pv_defer, 1, wait=True, timeout=self.getTimeout())
+      
+      for motor in self.getMotors():
+         pv_val = self.getPVBase() + motor + ".VAL"
+         self.putPv(pv_val, 0.0, wait=False, timeout=self.getTimeout())
+
+      #Turn off deferred moves
+      self.diagnostic("Turning off deferred moves...")
+      self.putPv(pv_defer, 0, wait=True, timeout=self.getTimeout())
+
+      #Now poll DMOVs
+      self.pollDMOVs()
+
+      #Now test if we can cancle deferred moves
+
+      #Turn on deferred moves
+      self.diagnostic("Turning on deferred moves...")
+      self.putPv(pv_defer, 1, wait=True, timeout=self.getTimeout())
+
+      for motor in self.getMotors():
+         pv_val = self.getPVBase() + motor + ".VAL"
+         self.putPv(pv_val, 5.0, wait=False, timeout=self.getTimeout())
+
+      #Turn off deferred moves (need to send a stop to all axes to cancel deferred moves for those axes)
+      self.diagnostic("Cancelling deferred moves...")
+      for motor in self.getMotors():
+         pv_stop = self.getPVBase() + motor + ".STOP"
+         self.putPv(pv_stop, 1, wait=True, timeout=self.getTimeout())
+      self.putPv(pv_defer, 0, wait=True, timeout=self.getTimeout())
+
+      #Now test if we can move axes normally.
+      self.diagnostic("Testing a normal move...")
+      for motor in self.getMotors():
+         pv_val = self.getPVBase() + motor + ".VAL"
+         self.putPv(pv_val, 7.0, wait=True, timeout=self.getTimeout())
+
+      #Finally, test a deferred move back to zero
+
+      #Turn on deferred moves
+      self.diagnostic("Turning on deferred moves...")
+      self.putPv(pv_defer, 1, wait=True, timeout=self.getTimeout())
+      
+      for motor in self.getMotors():
+         pv_val = self.getPVBase() + motor + ".VAL"
+         self.putPv(pv_val, 0.0, wait=False, timeout=self.getTimeout())
+
+      #Turn off deferred moves
+      self.diagnostic("Turning off deferred moves...")
+      self.putPv(pv_defer, 0, wait=True, timeout=self.getTimeout())
+
+      #Now poll DMOVs
+      self.pollDMOVs()

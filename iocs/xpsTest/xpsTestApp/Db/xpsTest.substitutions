@@ -89,3 +89,10 @@ pattern {P,M,PORT,ADDR,DTYP,DESC,
 	0}
 
 }
+
+
+file bo.template
+{
+pattern {P,         R,     DTYP, OUT, SCAN, ZNAM, ONAM}
+        {mp49t:xps:, defer, asynUInt32Digital, "@asynMask(XPS1,0,1)MOTOR_DEFER_MOVES", Passive, OFF, ON} 
+}

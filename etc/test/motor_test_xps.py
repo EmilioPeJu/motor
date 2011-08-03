@@ -34,15 +34,17 @@ class motorTestSuite(TestSuite):
       motorCaseReadInit(self)
       motorCaseMoveSequence1(self) #do a few moves before the autosave test
       motorCaseAutosaveRestoreCheck(self)
-      motorCaseMoveSequence1(self)
-      motorCaseMoveSequence2(self)
-      motorCaseMoveSequence3(self)
-      motorCaseMoveSequence4(self)
-      motorCaseMoveSequence5(self)
-      motorCaseMoveCheckStatus(self)
-      motorCaseCheckOffset(self)
-      motorCaseSetPosition(self)
-      motorCaseTestAlarm(self)
+#      motorCaseMoveSequence1(self)
+#      motorCaseMoveSequence2(self)
+#      motorCaseMoveSequence3(self)
+#      motorCaseMoveSequence4(self)
+#      motorCaseMoveSequence5(self)
+#      motorCaseMoveCheckStatus(self)
+#      motorCaseCheckOffset(self)
+#      motorCaseSetPosition(self)
+#      motorCaseDeferredMoves(self)
+#      motorCaseTestAlarm(self)
+
 
 #      self.loadCasePlugins()
       

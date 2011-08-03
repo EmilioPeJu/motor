@@ -43,6 +43,7 @@ class motorTestSuite(TestSuite):
       motorCaseMoveCheckStatus(self)
       motorCaseCheckOffset(self)
       motorCaseSetPosition(self)
+      motorCaseDeferredMoves(self)
 
 #      self.loadCasePlugins()
       
