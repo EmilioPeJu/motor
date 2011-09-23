@@ -34,7 +34,7 @@ directoryWait("/tmp", 10)
 save_restoreSet_Debug(0)
 
 ### status-PV prefix, so save_restore can find its status PV's.
-save_restoreSet_status_prefix("motorSimTest:SR")
+save_restoreSet_status_prefix("motorSimTestLocal:SR")
 
 ### ok to restore a save set that had missing values (no CA connection to PV)?
 ### ok to save a file if some CA connections are bad?
@@ -47,13 +47,12 @@ save_restoreSet_IncompleteSetsOk(1)
 save_restoreSet_DatedBackupFiles(1)
 
 ### specify where save files should go
-set_savefile_path("/tmp")
+set_savefile_path("/tmp/")
 
 set_requestfile_path("$(INSTALL)/data")
 
 ### restore positions before record init, settings before and after
 set_pass0_restoreFile("motorSimTestLocal.sav")
-set_pass1_restoreFile("motorSimTestLocal.sav")
 
 ### Number of sequenced backup files (e.g., 'auto_settings.sav0') to write
 save_restoreSet_NumSeqFiles(3)
@@ -68,4 +67,4 @@ iocInit()
 
 
 # save positions every 5 seconds
-create_monitor_set("motorSimTest.req",5)
+create_monitor_set("motorSimTestLocal.req",5)

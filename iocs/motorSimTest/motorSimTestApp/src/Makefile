@@ -47,6 +47,6 @@ motorSimTest_LIBS += autosave
 motorSimTest_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 DATA+=motorSimTestGUI
-DATA+=motorSimTest.req
+DATA+=motorSimTestLocal.req
 
 include $(TOP)/configure/RULES
