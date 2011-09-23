@@ -54,11 +54,12 @@ class OmsMAXv(OmsVme):
             '%(Vector)d, %(intlevel)d, %(pollrate)d)' % self.CardSetDict()
 
     def Initialise(self):
-        print 'MAXvConfig(%d, "%s")' % (
+        print 'MAXvConfig(%d, "%s", %d)' % (
             self.CardId(),
             '; '.join([
                 'A%s L%s %s' % (name, limit, servo) for
-                name, (limit, servo) in self.Axes.items()]))
+                name, (limit, servo) in self.Axes.items()]), 
+                0)
         
 
 class _OmsMAXvChannel:

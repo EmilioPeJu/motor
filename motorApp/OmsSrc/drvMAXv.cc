@@ -81,6 +81,7 @@ HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-5
  *                    Counter. If Counter is nonzero, print error message and
  *                    clear Counter.
  * 19  06-07-10 rls - Disable board if WDT CTR is nonzero; don't clear CTR.
+ * 19  06-07-10 ajr - Added configuration word MAXvConfig.
  *
  */
 
@@ -137,7 +138,7 @@ volatile int drvMAXvdebug = 0;
 extern "C" {epicsExportAddress(int, drvMAXvdebug);}
 
 #define pack2x16(p)      ((epicsUInt32)(((p[0])<<16)|(p[1])))
-#define INITSTR_SIZE    150     /* 150 byte intialization string. */
+#define INITSTR_SIZE    800     /* 800 byte intialization string. */
 
 /* Global data. */
 int MAXv_num_cards = 0;
@@ -155,6 +156,10 @@ static char *MAXv_axis[] = {"X", "Y", "Z", "T", "U", "V", "R", "S"};
 static double quantum;
 static char **initstring = 0;
 static epicsUInt32 MAXv_brd_size;  /* card address boundary */
+
+/* First 8-bits [0..7] used to indicate absolute or */
+/* incremental position registers to be read */
+static int configurationFlags[MAXv_NUM_CARDS] = {0};
 
 /*----------------functions-----------------*/
 
@@ -316,6 +321,8 @@ static int set_status(int card, int signal)
     bool got_encoder;
     msta_field status;
 
+		int absoluteAxis = (configurationFlags[card] & (1 << signal));
+
     int rtn_state;
 
     motor_info = &(motor_state[card]->motor_info[signal]);
@@ -433,7 +440,10 @@ static int set_status(int card, int signal)
     motor_info->velocity = atoi(q_buf);
 
     /* Get encoder position */
-    motorData = pmotor->encPos[signal];
+    if (absoluteAxis)
+    	motorData = pmotor->absPos[signal];
+    else
+    	motorData = pmotor->encPos[signal];
 
     motor_info->encoder_position = motorData;
 
@@ -896,7 +906,8 @@ MAXvSetup(int num_cards,        /* maximum number of cards in rack */
 }
 
 RTN_VALUES MAXvConfig(int card,                 /* number of card being configured */
-                      const char *initstr)      /* initialization string */
+                      const char *initstr,      /* initialization string */
+                      int config)								/* initialization configuration */
 {
     if (card < 0 || card >= MAXv_num_cards)
     {
@@ -904,14 +915,18 @@ RTN_VALUES MAXvConfig(int card,                 /* number of card being configur
         epicsThreadSleep(5.0);
         return(ERROR);
     }
+    
     if (strlen(initstr) > INITSTR_SIZE)
     {
         errlogPrintf("MAXvConfig: initialization string > %d bytes.\n", INITSTR_SIZE);
         epicsThreadSleep(5.0);
         return(ERROR);
     }
-
     strcpy(initstring[card], initstr);
+    
+    /* get the configuation flags */
+    configurationFlags[card] = config;
+    
     return(OK);
 }
 
@@ -1298,7 +1313,7 @@ extern "C"
 
     static void configMAXvCallFunc(const iocshArgBuf *args)
     {
-        MAXvConfig(args[0].ival, args[1].sval);
+        MAXvConfig(args[0].ival, args[1].sval, args[2].ival);
     }
 
     static void OmsMAXvRegister(void)
