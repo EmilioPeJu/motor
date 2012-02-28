@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 1032
-y 486
+x 551
+y 86
 w 411
 h 503
 font "arial-medium-r-16.0"
@@ -1459,68 +1459,6 @@ endGroup
 
 endObjectProperties
 
-# (Related Display)
-object relatedDisplayClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 105
-y 181
-w 98
-h 28
-fgColor index 25
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-medium-r-16.0"
-xPosOffset -220
-yPosOffset -5
-buttonLabel "Reverse"
-numPvs 4
-numDsps 1
-displayFileName {
-  0 "motor-cmd-confirm.edl"
-}
-setPosition {
-  0 "button"
-}
-symbols {
-  0 "cmdpv=$(motor).HOMR"
-}
-endObjectProperties
-
-# (Related Display)
-object relatedDisplayClass
-beginObjectProperties
-major 4
-minor 2
-release 0
-x 205
-y 181
-w 98
-h 28
-fgColor index 25
-bgColor index 3
-topShadowColor index 1
-botShadowColor index 11
-font "arial-medium-r-16.0"
-xPosOffset -220
-yPosOffset -5
-buttonLabel "Forward"
-numPvs 4
-numDsps 1
-displayFileName {
-  0 "motor-cmd-confirm.edl"
-}
-setPosition {
-  0 "button"
-}
-symbols {
-  0 "cmdpv=$(motor).HOMF"
-}
-endObjectProperties
-
 # (Group)
 object activeGroupClass
 beginObjectProperties
@@ -1711,5 +1649,131 @@ visPv "$(motor):ELOSS"
 visInvert
 visMin "0"
 visMax "2"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 105
+y 181
+w 198
+h 28
+
+beginGroup
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 105
+y 181
+w 98
+h 28
+fgColor index 25
+bgColor index 3
+topShadowColor index 1
+botShadowColor index 11
+font "arial-medium-r-16.0"
+xPosOffset -220
+yPosOffset -5
+buttonLabel "Reverse"
+numPvs 4
+numDsps 1
+displayFileName {
+  0 "motor-cmd-confirm.edl"
+}
+setPosition {
+  0 "button"
+}
+symbols {
+  0 "cmdpv=$(motor).HOMR"
+}
+endObjectProperties
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 205
+y 181
+w 98
+h 28
+fgColor index 25
+bgColor index 3
+topShadowColor index 1
+botShadowColor index 11
+font "arial-medium-r-16.0"
+xPosOffset -220
+yPosOffset -5
+buttonLabel "Forward"
+numPvs 4
+numDsps 1
+displayFileName {
+  0 "motor-cmd-confirm.edl"
+}
+setPosition {
+  0 "button"
+}
+symbols {
+  0 "cmdpv=$(motor).HOMF"
+}
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):HOMEVIS"
+visInvert
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 105
+y 190
+w 195
+h 14
+
+beginGroup
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 105
+y 190
+w 195
+h 14
+controlPv "$(motor):HOMEVISSTR"
+font "arial-medium-r-12.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+autoHeight
+limitsFromDb
+nullColor index 18
+useHexPrefix
+newPos
+objType "monitors"
+endObjectProperties
+
+endGroup
+
+visPv "$(motor):HOMEVIS"
+visMin "0"
+visMax "1"
 endObjectProperties
 
