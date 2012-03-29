@@ -40,6 +40,8 @@
 #% macro, FEHHSV , HIHI alarm severity for following error
 #% macro, FEHSV  , HIGH alarm severity for following error
 #% macro, SCALE  , Scale factor, if pmacSetAxisScale is used this should be set
+#% macro, HOMEVIS, If 1 then home is visible on the gui
+#% macro, HOMEVISSTR, If HOMEVIS=0, then display this text on the gui instead
 #% macro, name   , Object name and gui association name
 #% macro, alh    , Set this to alh to add the motor to alarm handler (default), 
 #                  set to '#' to comment out alh lines

@@ -19,7 +19,7 @@ WORK=/dls_sw/work/R3.14.11/support
 ASYN=$(SUPPORT)/asyn/4-17
 
 # Need the sequencer for the MM4005 and XPS trajectory scanning
-SNCSEQ=$(SUPPORT)/seq/2-0-12dls2
+SNCSEQ=$(SUPPORT)/seq/2-1-2dls2
 
 # Recommended EPICS release: R3.14.11
 EPICS_BASE=/dls_sw/epics/R3.14.11/base
