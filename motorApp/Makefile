@@ -21,7 +21,7 @@ DIRS += NewportSrc
 #DIRS += AcsSrc
 #DIRS += MclennanSrc
 DIRS += PiSrc
-#DIRS += MicroMoSrc
+DIRS += MicroMoSrc
 #DIRS += MicosSrc
 #DIRS += FaulhaberSrc
 #DIRS += PC6KSrc
@@ -31,8 +31,14 @@ DIRS += NewFocusSrc
 #DIRS += ThorLabsSrc
 #DIRS += SmartMotorSrc
 DIRS += PiJenaSrc
-DIRS += KohzuSrc
+#DIRS += KohzuSrc
 DIRS += AerotechSrc
+#DIRS += HytecSrc
+#HytecSrc_DEPEND_DIRS = MotorSrc
+
+#DIRS += ACRSrc
+#ACRSrc_DEPEND_DIRS = MotorSrc
+
 endif
 
 # Install the edl files

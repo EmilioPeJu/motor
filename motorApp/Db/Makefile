@@ -15,28 +15,34 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------------------
 # Create and install (or just install)
 # databases, templates, substitutions like this
-DB += motor.template
-DB += basic_motor.template
+DB += motor.db
+DB += basic_motor.db
 DB += basic_asyn_motor.template
+DB += basic_asyn_motor.db
+DB += XPSAuxAi.db
+DB += XPSAuxAo.db
+DB += XPSAuxBi.db
+DB += XPSAuxBo.db
+DB += XPSAuxLi.db
+DB += XPSAuxLo.db
 DB += XPS_extra.db
-DB += TransPos.template
-DB += motorUtil.template
-DB += motorReadback.template
-DB += motorTranslate.template
-DB += trajectoryScan.db
-DB += softMotorForPiezo.template
-DB += saveRestoreLimits.template
-DB += limitsMonitor.template
-DB += moveToHomeUtil.template
-DB += scaledMotorPositions.template
+DB += ACRAux.template
+DB += ACRAuxRead.template
+DB += ACRAuxLi.template
+DB += ACRAuxBi.template
+DB += ACRAuxBo.template
+DB += ACRAuxBoRBV.template
+DB += TransPos.db
+DB += motorUtil.db
+DB += asyn_motor.db
+DB += profileMoveController.template
+DB += profileMoveAxis.template
+DB += profileMoveControllerXPS.template
+DB += profileMoveAxisXPS.template
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB
 #USES_TEMPLATE += motor.template
-DATA += basic_motor_settings.req
-DATA += motor_positions.req
-DATA += motor_settings.req
-DATA += pseudoMotor_settings.req
 
 include $(TOP)/configure/RULES
 #----------------------------------------

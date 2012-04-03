@@ -3,9 +3,10 @@ FILENAME...	drvMAXv.h
 USAGE...	OMS driver level "include" information that is specific to OMS
 		model MAXv.
 
-Version:	$Revision: 1.3 $
-Modified By:	$Author: sluiter $
-Last Modified:	$Date: 2008-06-03 18:58:25 $
+Version:        $Revision: 13925 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2011-11-04 18:20:09 +0000 (Fri, 04 Nov 2011) $
+HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-7-1/motorApp/OmsSrc/drvMAXv.h $
 */
 
 /*
@@ -37,6 +38,8 @@ Last Modified:	$Date: 2008-06-03 18:58:25 $
  * Modification Log:
  * -----------------
  * 01  04-05-04 rls Copied for drvOms58.h
+ * 02  10-26-11 rls motor_init() sets motor typeID as boot-up. Used by device
+ *                  support to allow MRES and ERES to be opposite sign.
  *  
  */
 
@@ -52,6 +55,17 @@ Last Modified:	$Date: 2008-06-03 18:58:25 $
 #define MAXv_NUM_CARDS           15
 
 #define BUFFER_SIZE	1024
+
+
+enum MotorTypes {PSO,  // Stepper; w/o  encoder
+                 PSE,  // Stepper; with encoder
+                 PSM}; // Servo
+
+struct MAXvController
+{
+    MotorTypes typeID[8];
+};
+
 
 /* MAXv DUAL-PORT MEMORY MAP */
 

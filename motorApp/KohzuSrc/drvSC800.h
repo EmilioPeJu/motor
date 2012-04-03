@@ -5,7 +5,7 @@ USAGE...    This file contains Kohzu SC800 motorRecord driver information.
 Version:	    $Revision: 9857 $
 Modified By:	$Author: sluiter $
 Last Modified:	$Date: 2009-12-09 16:21:24 +0000 (Wed, 09 Dec 2009) $
-HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-5-2/motorApp/KohzuSrc/drvSC800.h $
+HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-7-1/motorApp/KohzuSrc/drvSC800.h $
 */
 
 /*
