@@ -57,7 +57,7 @@
 #% archiver 10 Monitor MRES
 #% gdatag,template,simpleMotor,$(gda_name=),$(gda_desc=$(DESC))
 #% gdatag,motor,rw,$(gda_name=),RECORD,Motor
-#% $(alh=alh) $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M)
+#% $(alh=None) $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M)
 
 # This associates an edm screen with the template
 # % gui, $(name=), edm, motor.edl, motor=$(P)$(M)
@@ -139,7 +139,8 @@ record(ao, "$(P)$(M):KILL") {
 }
 
 # dummy record that looks like eloss status
-#% alh $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M):ELOSS
+#% archiver 10 Monitor VAL
+#% $(alh=None) $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M):ELOSS
 record(ai, "$(P)$(M):ELOSS") {
     field(PINI, "YES")
     field(HIHI, "1")
@@ -179,7 +180,7 @@ record(calc, "$(P)$(M):FERROR")
 #Record to store the maximum following error
 #% archiver 10 Monitor VAL
 #% autosave 1 VAL
-#% $(alh=alh) $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M):FERRORMAX
+#% $(alh=None) $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P)$(M):FERRORMAX
 record(calc, "$(P)$(M):FERRORMAX")
 {
 	field(DESC,"Following Error Max")

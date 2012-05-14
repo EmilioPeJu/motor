@@ -16,7 +16,9 @@ include $(TOP)/configure/CONFIG
 # Create and install (or just install)
 # databases, templates, substitutions like this
 DB += motor.db
+DB += motor.template
 DB += basic_motor.db
+DB += basic_motor.template
 DB += basic_asyn_motor.template
 DB += basic_asyn_motor.db
 DB += XPSAuxAi.db
@@ -34,6 +36,7 @@ DB += ACRAuxBo.template
 DB += ACRAuxBoRBV.template
 DB += TransPos.db
 DB += motorUtil.db
+DB += motorUtil.template
 DB += asyn_motor.db
 DB += profileMoveController.template
 DB += profileMoveAxis.template
