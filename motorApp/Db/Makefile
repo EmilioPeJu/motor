@@ -42,6 +42,15 @@ DB += profileMoveController.template
 DB += profileMoveAxis.template
 DB += profileMoveControllerXPS.template
 DB += profileMoveAxisXPS.template
+DB += softMotorForPiezo.template
+DB += trajectoryScan.db
+DB += scaledMotorPositions.template
+DB += limitsMonitor.template
+DB += motorReadback.template
+DB += motorTranslate.template
+DB += moveToHomeUtil.template
+DB += saveRestoreLimits.template
+
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB
