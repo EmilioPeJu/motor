@@ -4,8 +4,6 @@ from pkg_resources import require
 require('dls_autotestframework')
 from dls_autotestframework import TestCase
 
-require('cothread') 
-
 import re
 import cothread
 
