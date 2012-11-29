@@ -267,7 +267,10 @@ static int motorXPSLogMsg(void * param, const motorAxisLogMask_t logMask, const 
 #define XPSC8_END_OF_RUN_PLUS   0x80000200
 #define XPSC8_ZM_HIGH_LEVEL     0x00000004
 
-#define TCP_TIMEOUT 2.0
+// TCP Timeout increased for compatibility with XPS-C8 Firmware V5.5.0 Precision Platform
+// which takes over 5 secs to perform GroupInitialize
+#define TCP_TIMEOUT 10.0
+
 static motorXPS_t drv={ NULL, NULL, motorXPSLogMsg, 0, { 0, 0 } };
 static int numXPSControllers;
 /* Pointer to array of controller strutures */
@@ -2088,6 +2091,9 @@ static int movePositionerToHome(AXIS_HDL pAxis)
     status = GroupKill(pAxis->moveSocket, pAxis->groupName);
   }
   epicsThreadSleep(0.05);
+
+  PRINT(pAxis->logParam, MOTOR_ERROR, "Calling GroupInitialize with timeout %f\n", TCP_TIMEOUT);
+
   status = GroupInitialize(pAxis->pollSocket, pAxis->groupName);
   if (status) {
     PRINT(pAxis->logParam, MOTOR_ERROR, "movePositionerToHome[%d,%d]: error calling GroupInitialize\n",

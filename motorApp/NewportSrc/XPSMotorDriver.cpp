@@ -254,7 +254,10 @@ static int motorXPSLogMsg(void * param, const motorAxisLogMask_t logMask, const 
 #define XPSC8_END_OF_RUN_MINUS  0x80000100
 #define XPSC8_END_OF_RUN_PLUS   0x80000200
 
-#define TCP_TIMEOUT 2.0
+// TCP Timeout increased for compatibility with XPS-C8 Firmware V5.5.0 Precision Platform
+// which takes over 5 secs to perform GroupInitialize
+#define TCP_TIMEOUT 10.0
+
 static motorXPS_t drv={ NULL, NULL, motorXPSLogMsg, 0, { 0, 0 } };
 static int numXPSControllers;
 /* Pointer to array of controller strutures */
