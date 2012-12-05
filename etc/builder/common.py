@@ -30,3 +30,7 @@ class motorUtil(AutoSubstitution, Device):
 
     def PostIocInitialise(self):
         print 'motorUtilInit("%(P)s")' % self.args
+
+class softMotorForPiezo(AutoSubstitution, MotorLib):
+    TemplateFile = 'softMotorForPiezo.template'
+    
