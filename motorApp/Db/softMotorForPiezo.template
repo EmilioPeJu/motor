@@ -10,6 +10,7 @@
 #% macro, EGU    , Engineering Units
 #% macro, DHLM   , Dial High Limit
 #% macro, DLLM   , Dial Low Limit
+#% macro, name   , Object name and gui association name
 #% macro, gda_name, Name to export this as to GDA
 #% macro, gda_desc, Description to export this as to GDA
 
@@ -20,6 +21,8 @@
 #% archiver 0.5 Monitor
 #% gdatag,template,simpleMotor,$(gda_name=),$(gda_desc=)
 #% gdatag,motor,rw,$(gda_name=),RECORD,Motor
+# % gui, $(name=), edm, motor.edl, motor=$(P)$(Q)
+# % gui, $(name=), edmembed, motor-embed-small.edl, motor=$(P)$(Q),filename=motor.edl,box-label=$(DESC)
 
 record(motor, "$(P)$(Q)") {
   field(DTYP, "Soft Channel")
