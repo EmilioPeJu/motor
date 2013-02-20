@@ -158,9 +158,9 @@ XPSAxis::XPSAxis(XPSController *pC, int axisNo, const char *positionerName, doub
 
   setIntegerParam(pC_->motorStatusGainSupport_, 1);
   setIntegerParam(pC_->motorStatusHasEncoder_, 1);
-  setDoubleParam(pC_->motorPgain_, xpsCorrectorInfo_.KP);
-  setDoubleParam(pC_->motorIgain_, xpsCorrectorInfo_.KI);
-  setDoubleParam(pC_->motorDgain_, xpsCorrectorInfo_.KD);
+  setDoubleParam(pC_->motorPGain_, xpsCorrectorInfo_.KP);
+  setDoubleParam(pC_->motorIGain_, xpsCorrectorInfo_.KI);
+  setDoubleParam(pC_->motorDGain_, xpsCorrectorInfo_.KD);
   callParamCallbacks();
   /* Initialise deferred move flags. */
   deferredRelative_ = 0;

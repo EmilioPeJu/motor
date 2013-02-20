@@ -31,4 +31,9 @@ pattern {device, file}
         { mp49t:sim:SR, 0}
 }
 
+file limit_alarm.template
+{
+pattern {P, name}
+ 	{ mp49t:sim1:alarm, mp49t:sim1.RBV}
+}
 

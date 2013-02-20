@@ -60,10 +60,10 @@ asynMotorController::asynMotorController(const char *portName, int numAxes, int 
   createParam(motorDeferMovesString,             asynParamInt32,      &motorDeferMoves_);
   createParam(motorMoveToHomeString,             asynParamInt32,      &motorMoveToHome_);
   createParam(motorResolutionString,             asynParamFloat64,    &motorResolution_);
-  createParam(motorEncRatioString,               asynParamFloat64,    &motorEncRatio_);
-  createParam(motorPgainString,                  asynParamFloat64,    &motorPgain_);
-  createParam(motorIgainString,                  asynParamFloat64,    &motorIgain_);
-  createParam(motorDgainString,                  asynParamFloat64,    &motorDgain_);
+  createParam(motorEncRatioString,               asynParamFloat64,    &motorEncoderRatio_);
+  createParam(motorPgainString,                  asynParamFloat64,    &motorPGain_);
+  createParam(motorIgainString,                  asynParamFloat64,    &motorIGain_);
+  createParam(motorDgainString,                  asynParamFloat64,    &motorDGain_);
   createParam(motorHighLimitString,              asynParamFloat64,    &motorHighLimit_);
   createParam(motorLowLimitString,               asynParamFloat64,    &motorLowLimit_);
   createParam(motorSetClosedLoopString,          asynParamInt32,      &motorSetClosedLoop_);

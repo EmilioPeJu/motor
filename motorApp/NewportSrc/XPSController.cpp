@@ -447,13 +447,13 @@ asynStatus XPSController::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
               "%s:%s: Set XPS %s, axis %d high limit to %f\n", 
               driverName, functionName, portName, pAxis->axisNo_, deviceValue);
     status = asynSuccess;
-  } else if (function == motorPgain_)
+  } else if (function == motorPGain_)
   {
     status = pAxis->setPID(&value, 0);
-  } else if (function == motorIgain_)
+  } else if (function == motorIGain_)
   {
     status = pAxis->setPID(&value, 1);
-  } else if (function == motorDgain_)
+  } else if (function == motorDGain_)
   {
     status = pAxis->setPID(&value, 2);
   } else {

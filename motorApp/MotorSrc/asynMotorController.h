@@ -192,10 +192,10 @@ class epicsShareFunc asynMotorController : public asynPortDriver {
   int motorDeferMoves_;
   int motorMoveToHome_;
   int motorResolution_;
-  int motorEncRatio_;
-  int motorPgain_;
-  int motorIgain_;
-  int motorDgain_;
+  int motorEncoderRatio_;
+  int motorPGain_;
+  int motorIGain_;
+  int motorDGain_;
   int motorHighLimit_;
   int motorLowLimit_;
   int motorSetClosedLoop_;

@@ -9,6 +9,8 @@ include $(TOP)/configure/CONFIG
 #
 DB += motorSimTest.db
 
+DB += limit_alarm.template
+
 #USES_TEMPLATE += $(MOTOR)/db/motor.template
 #USES_TEMPLATE += $(MOTOR)/db/basic_motor.template
 
