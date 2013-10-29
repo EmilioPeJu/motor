@@ -18,6 +18,8 @@
 #% macro, EGU    , Engineering Units
 #% macro, DHLM   , Dial High Limit
 #% macro, DLLM   , Dial Low Limit
+#% macro, HLM    , User High Limit
+#% macro, LLM    , User Low Limit
 #% macro, HLSV   , HW Lim. Violation Svr
 #% macro, INIT   , Startup commands
 #% macro, SREV   , Steps per Revolution
@@ -83,8 +85,10 @@ record(motor,"$(P)$(M)")
 	field(MRES,"$(MRES)")
 	field(PREC,"$(PREC)")
 	field(EGU,"$(EGU)")
-	field(DHLM,"$(DHLM)")
-	field(DLLM,"$(DLLM)")
+	field(DHLM,"$(DHLM=)")
+	field(DLLM,"$(DLLM=)")
+	field(HLM,"$(HLM=)")
+	field(LLM,"$(LLM=)")	
 	field(HLSV,"$(HLSV=MAJOR)")
 	field(INIT,"$(INIT=)")
 	field(RTRY,"$(RTRY=0)")
