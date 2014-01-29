@@ -558,11 +558,12 @@ errorexit:      errMessage(-1, "Invalid device directive");
 /* send a message to the OMS board                   */
 /* send_mess()                       */
 /*****************************************************/
+char outbuf[MAX_MSG_SIZE], *p;
 static RTN_STATUS send_mess(int card, char const *com, char *name)
 {
     volatile struct MAXv_motor *pmotor;
     epicsInt16 putIndex;
-    char outbuf[MAX_MSG_SIZE], *p;
+    char /*outbuf[MAX_MSG_SIZE],*/ *p;
     RTN_STATUS return_code;
     int count;
 
@@ -1004,6 +1005,7 @@ static void motorIsr(int card)
         errmsg2[46-2] = '0' + card%10;
         errmsg2[46-3] = '0' + (card/10)%10;
         epicsInterruptContextMessage(errmsg2);
+        epicsInterruptContextMessage(outbuf);
     }
 
     if (status1_flag.Bits.text_response != 0)   /* Don't clear this. */

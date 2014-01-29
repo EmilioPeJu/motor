@@ -449,7 +449,7 @@ errorexit:                  errMessage(-1, "Invalid device directive");
                 case SET_IGAIN:
                 case SET_DGAIN:
                     if (MAXv == true)
-                        sprintf(buffer, "%.1f", (parms[itera] * 32767.0));
+                        sprintf(buffer, "%.1f;", (parms[itera] * 32767.0));
                     else
                         sprintf(buffer, "%.1f", (parms[itera] * 1999.9));
                     break;
