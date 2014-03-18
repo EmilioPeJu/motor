@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 551
-y 86
+x 553
+y 111
 w 411
 h 503
 font "arial-medium-r-16.0"
@@ -812,7 +812,7 @@ release 0
 x 10
 y 345
 w 68
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -852,7 +852,7 @@ release 0
 x 210
 y 345
 w 61
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -874,13 +874,14 @@ y 340
 w 98
 h 28
 fgColor index 25
-bgColor index 3
+bgColor index 84
 inconsistentColor index 0
 topShadowColor index 1
 botShadowColor index 11
 controlPv "$(motor).SET"
 indicatorPv "$(motor).SET"
 font "arial-medium-r-16.0"
+colorPv "$(motor).SET"
 endObjectProperties
 
 # (Static Text)
@@ -892,7 +893,7 @@ release 0
 x 205
 y 380
 w 101
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -932,7 +933,7 @@ release 0
 x 10
 y 187
 w 46
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -952,7 +953,7 @@ release 0
 x 10
 y 217
 w 28
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -972,7 +973,7 @@ release 0
 x 10
 y 247
 w 49
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -992,7 +993,7 @@ release 0
 x 10
 y 125
 w 61
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1067,7 +1068,7 @@ release 0
 x 10
 y 283
 w 88
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1115,7 +1116,7 @@ release 0
 x 10
 y 380
 w 44
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
