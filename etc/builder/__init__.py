@@ -1,3 +1,3 @@
 from iocbuilder.support import ExportModules
 
-__all__ = ExportModules(globals(), 'Oms', 'MAXv', 'common')
+__all__ = ExportModules(globals(), 'Oms', 'MAXv', 'XPS', 'common')
