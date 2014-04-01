@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 912
-y 535
+x 552
+y 650
 w 190
 h 110
 font "helvetica-medium-r-14.0"
@@ -29,7 +29,7 @@ endScreenProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 0
 y 0
@@ -77,7 +77,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 133
 y 83
@@ -164,7 +164,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 5
 y 83
@@ -191,11 +191,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 0
 y 0
 w 79
-h 14
+h 13
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 8
@@ -210,7 +210,7 @@ endObjectProperties
 object activeXTextDspClass
 beginObjectProperties
 major 4
-minor 5
+minor 6
 release 0
 x 65
 y 85
@@ -235,7 +235,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 5
 y 21
@@ -280,7 +280,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 141
 y 21
@@ -321,49 +321,6 @@ indicatorPv "$(motor).SPMG"
 font "helvetica-medium-r-8.0"
 endObjectProperties
 
-# (Group)
-object activeGroupClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 158
-y 56
-w 28
-h 21
-
-beginGroup
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 158
-y 56
-w 28
-h 21
-fgColor index 14
-onColor index 21
-offColor index 20
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(motor):ELOSSRC.A"
-pressValue "0"
-onLabel "ELoss"
-offLabel "Eloss"
-3d
-font "helvetica-medium-r-8.0"
-endObjectProperties
-
-endGroup
-
-visPv "$(motor):ELOSS"
-visMin "1"
-visMax "2"
-endObjectProperties
-
 # (Textupdate)
 object TextupdateClass
 beginObjectProperties
@@ -400,7 +357,7 @@ beginGroup
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 121
 y 6
@@ -439,11 +396,89 @@ h 21
 
 beginGroup
 
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 158
+y 56
+w 28
+h 21
+font "helvetica-medium-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 21
+value {
+  "ALoss"
+}
+endObjectProperties
+
+endGroup
+
+visPv "CALC\\\{A&2\}($(motor):ELOSS)"
+visMin "2"
+visMax "3"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 158
+y 56
+w 28
+h 21
+
+beginGroup
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 158
+y 56
+w 28
+h 21
+font "helvetica-medium-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 21
+value {
+  "SFail"
+}
+endObjectProperties
+
+endGroup
+
+visPv "CALC\\\{A&4\}($(motor):ELOSS)"
+visMin "4"
+visMax "5"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 158
+y 56
+w 28
+h 21
+
+beginGroup
+
 # (Message Button)
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 158
 y 56
@@ -456,8 +491,8 @@ topShadowColor index 1
 botShadowColor index 11
 controlPv "$(motor):ELOSSRC.A"
 pressValue "0"
-onLabel "ALoss"
-offLabel "Aloss"
+onLabel "ELoss"
+offLabel "Eloss"
 3d
 font "helvetica-medium-r-8.0"
 endObjectProperties
@@ -465,8 +500,7 @@ endObjectProperties
 endGroup
 
 visPv "$(motor):ELOSS"
-visInvert
-visMin "0"
+visMin "1"
 visMax "2"
 endObjectProperties
 

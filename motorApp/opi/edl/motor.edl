@@ -31,6 +31,84 @@ beginObjectProperties
 major 4
 minor 0
 release 0
+x 5
+y 150
+w 98
+h 28
+
+beginGroup
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 5
+y 150
+w 98
+h 28
+font "arial-medium-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 21
+value {
+  "Amplifier Loss"
+}
+endObjectProperties
+
+endGroup
+
+visPv "CALC\\\{A&2\}($(motor):ELOSS)"
+visMin "2"
+visMax "3"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 5
+y 150
+w 98
+h 28
+
+beginGroup
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 5
+y 150
+w 98
+h 28
+font "arial-medium-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 21
+value {
+  "Safety Check Fail"
+}
+endObjectProperties
+
+endGroup
+
+visPv "CALC\\\{A&4\}($(motor):ELOSS)"
+visMin "4"
+visMax "5"
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+major 4
+minor 0
+release 0
 x 30
 y 0
 w 360
@@ -130,7 +208,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 205
 y 470
@@ -159,7 +237,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 5
 y 410
@@ -188,7 +266,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 105
 y 410
@@ -217,7 +295,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 205
 y 410
@@ -246,7 +324,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 305
 y 410
@@ -275,7 +353,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 5
 y 440
@@ -304,7 +382,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 105
 y 440
@@ -333,7 +411,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 205
 y 440
@@ -362,7 +440,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 305
 y 440
@@ -391,7 +469,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 5
 y 470
@@ -420,7 +498,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 105
 y 470
@@ -496,7 +574,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 105
 y 151
@@ -520,7 +598,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 205
 y 211
@@ -544,7 +622,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 205
 y 241
@@ -567,7 +645,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 105
 y 211
@@ -591,7 +669,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 105
 y 241
@@ -615,7 +693,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 300
 y 149
 w 70
@@ -653,7 +731,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 300
 y 172
 w 70
@@ -691,7 +769,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 300
 y 195
 w 70
@@ -711,7 +789,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 300
 y 218
 w 70
@@ -750,7 +828,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 300
 y 310
 w 70
@@ -808,7 +886,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 345
 w 68
@@ -848,7 +926,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 210
 y 345
 w 61
@@ -889,7 +967,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 205
 y 380
 w 101
@@ -929,7 +1007,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 187
 w 46
@@ -949,7 +1027,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 217
 w 28
@@ -969,7 +1047,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 247
 w 49
@@ -989,7 +1067,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 125
 w 61
@@ -1064,7 +1142,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 283
 w 88
@@ -1112,7 +1190,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 380
 w 44
@@ -1150,7 +1228,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 300
 y 241
 w 70
@@ -1206,7 +1284,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 300
 y 264
 w 70
@@ -1238,7 +1316,7 @@ beginGroup
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 364
 y 4
@@ -1441,7 +1519,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 0
 y 0
 w 50
@@ -1467,7 +1545,7 @@ major 4
 minor 0
 release 0
 x 5
-y 151
+y 150
 w 98
 h 28
 
@@ -1477,10 +1555,10 @@ beginGroup
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 5
-y 151
+y 150
 w 98
 h 28
 fgColor index 14
@@ -1498,7 +1576,7 @@ endObjectProperties
 
 endGroup
 
-visPv "$(motor):ELOSS"
+visPv "CALC\\\{A&1\}($(motor):ELOSS)"
 visMin "1"
 visMax "2"
 endObjectProperties
@@ -1508,7 +1586,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 302
 y 289
 w 70
@@ -1558,7 +1636,7 @@ beginGroup
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 5
 y 310
@@ -1588,7 +1666,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 105
 y 310
@@ -1614,50 +1692,6 @@ beginObjectProperties
 major 4
 minor 0
 release 0
-x 5
-y 150
-w 98
-h 28
-
-beginGroup
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 5
-y 150
-w 98
-h 28
-fgColor index 14
-onColor index 21
-offColor index 20
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(motor):ELOSSRC.A"
-pressValue "0"
-onLabel "Amplifier Loss Reset"
-offLabel "Amplifier Loss Reset"
-3d
-font "arial-medium-r-10.0"
-endObjectProperties
-
-endGroup
-
-visPv "$(motor):ELOSS"
-visInvert
-visMin "0"
-visMax "2"
-endObjectProperties
-
-# (Group)
-object activeGroupClass
-beginObjectProperties
-major 4
-minor 0
-release 0
 x 105
 y 181
 w 198
@@ -1669,7 +1703,7 @@ beginGroup
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 105
 y 181
@@ -1700,7 +1734,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 205
 y 181
@@ -1752,7 +1786,7 @@ beginGroup
 object activeXTextDspClass:noedit
 beginObjectProperties
 major 4
-minor 5
+minor 6
 release 0
 x 105
 y 190

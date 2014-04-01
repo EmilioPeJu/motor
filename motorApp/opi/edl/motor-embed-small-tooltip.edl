@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 449
-y 447
+x 451
+y 473
 w 390
 h 310
 font "helvetica-medium-r-14.0"
@@ -96,7 +96,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 233
 y 183
@@ -183,7 +183,7 @@ endObjectProperties
 object relatedDisplayClass
 beginObjectProperties
 major 4
-minor 2
+minor 4
 release 0
 x 105
 y 183
@@ -210,11 +210,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 100
 y 100
 w 79
-h 14
+h 13
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 8
@@ -229,7 +229,7 @@ endObjectProperties
 object activeXTextDspClass:noedit
 beginObjectProperties
 major 4
-minor 5
+minor 6
 release 0
 x 138
 y 157
@@ -282,7 +282,7 @@ endObjectProperties
 object activeXTextDspClass
 beginObjectProperties
 major 4
-minor 5
+minor 6
 release 0
 x 165
 y 185
@@ -307,7 +307,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 105
 y 121
@@ -353,7 +353,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 241
 y 121
@@ -379,7 +379,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 145
 y 5
 w 100
@@ -398,11 +398,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 145
 y 50
 w 97
-h 14
+h 13
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 5
@@ -418,11 +418,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 251
 y 6
 w 86
-h 14
+h 13
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 5
@@ -438,11 +438,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 295
 y 83
 w 83
-h 28
+h 26
 font "arial-medium-r-12.0"
 fontAlign "center"
 fgColor index 14
@@ -460,11 +460,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 25
 y 20
 w 83
-h 28
+h 26
 font "arial-medium-r-12.0"
 fontAlign "center"
 fgColor index 14
@@ -482,11 +482,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 190
 y 230
 w 96
-h 42
+h 39
 font "arial-medium-r-12.0"
 fontAlign "center"
 fgColor index 14
@@ -505,11 +505,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 260
 y 270
 w 117
-h 28
+h 26
 font "arial-medium-r-12.0"
 fontAlign "center"
 fgColor index 14
@@ -527,11 +527,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 80
 y 235
 w 104
-h 42
+h 39
 font "arial-medium-r-12.0"
 fontAlign "center"
 fgColor index 14
@@ -550,11 +550,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 300
 y 165
 w 80
-h 84
+h 78
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 5
@@ -575,11 +575,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 80
 w 66
-h 140
+h 130
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 5
@@ -880,11 +880,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 315
 y 125
 w 60
-h 28
+h 26
 font "arial-medium-r-12.0"
 fontAlign "center"
 fgColor index 14
@@ -998,11 +998,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 270
 w 57
-h 14
+h 13
 font "arial-bold-r-12.0"
 fgColor index 14
 bgColor index 5
@@ -1017,7 +1017,7 @@ endObjectProperties
 object activeXTextDspClass:noedit
 beginObjectProperties
 major 4
-minor 5
+minor 6
 release 0
 x 5
 y 285
@@ -1097,49 +1097,6 @@ fgColor index 14
 bgColor index 3
 endObjectProperties
 
-# (Group)
-object activeGroupClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 258
-y 156
-w 28
-h 21
-
-beginGroup
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 258
-y 156
-w 28
-h 21
-fgColor index 14
-onColor index 21
-offColor index 20
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(motor):ELOSSRC.A"
-pressValue "0"
-onLabel "ELoss"
-offLabel "Eloss"
-3d
-font "helvetica-medium-r-8.0"
-endObjectProperties
-
-endGroup
-
-visPv "$(motor):ELOSS"
-visMin "1"
-visMax "2"
-endObjectProperties
-
 # (Menu Button)
 object activeMenuButtonClass
 beginObjectProperties
@@ -1177,7 +1134,7 @@ beginGroup
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 221
 y 106
@@ -1232,11 +1189,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 295
 y 53
 w 86
-h 28
+h 26
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 5
@@ -1277,11 +1234,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 276
 y 23
 w 98
-h 28
+h 26
 font "arial-medium-r-12.0"
 fgColor index 14
 bgColor index 5
@@ -1291,49 +1248,5 @@ value {
   "the motor"
 }
 autoSize
-endObjectProperties
-
-# (Group)
-object activeGroupClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 258
-y 156
-w 28
-h 21
-
-beginGroup
-
-# (Message Button)
-object activeMessageButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 258
-y 156
-w 28
-h 21
-fgColor index 14
-onColor index 21
-offColor index 20
-topShadowColor index 1
-botShadowColor index 11
-controlPv "$(motor):ELOSSRC.A"
-pressValue "0"
-onLabel "ALoss"
-offLabel "Aloss"
-3d
-font "helvetica-medium-r-8.0"
-endObjectProperties
-
-endGroup
-
-visPv "$(motor):ELOSS"
-visInvert
-visMin "0"
-visMax "2"
 endObjectProperties
 
