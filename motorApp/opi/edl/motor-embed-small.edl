@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 552
-y 650
+x 554
+y 676
 w 190
 h 110
 font "helvetica-medium-r-14.0"
@@ -499,7 +499,7 @@ endObjectProperties
 
 endGroup
 
-visPv "$(motor):ELOSS"
+visPv "CALC\\\{A&1\}($(motor):ELOSS)"
 visMin "1"
 visMax "2"
 endObjectProperties
