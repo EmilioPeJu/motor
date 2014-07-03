@@ -1,6 +1,6 @@
 from pkg_resources import require
-require("dls.ca2==2.14")
-from dls.ca2.catools import caput
+require("cothread==2.9")
+from cothread.catools import caput
 import math
 import sys
 
