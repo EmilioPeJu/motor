@@ -108,7 +108,7 @@ x 220
 y 55
 w 130
 h 40
-controlPv "$(motor).VAL"
+controlPv "$(motor)"
 fgColor index 25
 fgAlarm
 bgColor index 3

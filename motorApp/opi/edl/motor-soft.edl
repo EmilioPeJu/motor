@@ -191,7 +191,7 @@ controlColor index 25
 indicatorColor index 19
 indicatorAlarm 1
 font "arial-medium-r-10.0"
-controlPv "$(motor).VAL"
+controlPv "$(motor)"
 indicatorPv "$(motor).RBV"
 controlLabel "Desired Value"
 controlLabelType "pvLabel"
@@ -561,7 +561,7 @@ x 100
 y 110
 w 155
 h 40
-controlPv "$(motor).VAL"
+controlPv "$(motor)"
 fgColor index 25
 fgAlarm
 bgColor index 3

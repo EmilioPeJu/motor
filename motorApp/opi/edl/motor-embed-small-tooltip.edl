@@ -338,7 +338,7 @@ x 153
 y 119
 w 83
 h 33
-controlPv "$(motor).VAL"
+controlPv "$(motor)"
 displayMode "decimal"
 precision 4
 fgColor index 25
