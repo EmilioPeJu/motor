@@ -66,6 +66,13 @@
 # % gui, $(name=), edm, motor.edl, motor=$(P)$(M)
 # % gui, $(name=), edmembed, motor-embed-small.edl, motor=$(P)$(M),filename=motor.edl,box-label=$(DESC)
 
+# This associates a BOY screen with the template
+# % gui, $(name=), boydetail, motorApp_opi/motor_detail.opi, P=$(P),M=$(M)
+# % gui, $(name=), boyembed, motorApp_opi/motor_embed_box.opi, P=$(P),M=$(M),desc=$(DESC)
+# % gui, $(name=), boyembed, motorApp_opi/motor_embed.opi, P=$(P),M=$(M)
+# FIXME: this should be in pmacUtil or tpmac
+# % gui, $(name=), boyembed, motorApp_opi/motor_homed_embed.opi, P=$(P),M=$(M)
+
 # This makes the component icon reflect the status and severity
 # % gui, $(name=), status, <pv>.MOVN
 # % gui, $(name=), sevr
