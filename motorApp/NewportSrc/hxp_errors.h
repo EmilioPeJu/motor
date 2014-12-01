@@ -1,14 +1,15 @@
-/*///////////////////////////////////////////////////////////////////
- * Created header file XPS_C8_errors.h for XPS function errors
- */
+////////////////////////////////////////////////////////////////////
+// Created header file hxp_errors.h for XPS function errors
+// 
 
-/* TCL interpretor error */
+// TCL interpretor error
 #define ERR_TCL_INTERPRETOR_ERROR 1
 
-/* No error */
+// No error
 #define SUCCESS 0
 
-/* XPS errors */
+// XPS errors
+#define ERR_TCL_INTERPRETOR_ERROR 1 
 #define ERR_BUSY_SOCKET -1
 #define ERR_TCP_TIMEOUT -2
 #define ERR_STRING_TOO_LONG -3
@@ -57,12 +58,9 @@
 #define ERR_BASE_VELOCITY -48
 #define ERR_GROUP_HOME_SEARCH_ZM_ERROR -49
 #define ERR_MOTOR_INITIALIZATION_ERROR -50
-#define ERR_SPIN_OUT_OF_RANGE -51
 #define ERR_WRITE_FILE -60
 #define ERR_READ_FILE -61
 #define ERR_TRAJ_ELEM_TYPE -62
-#define ERR_TRAJ_ELEM_RADIUS -63
-#define ERR_TRAJ_ELEM_SWEEP -64
 #define ERR_TRAJ_ELEM_LINE -65
 #define ERR_TRAJ_EMPTY -66
 #define ERR_TRAJ_VEL_LIMIT -68
@@ -78,8 +76,6 @@
 #define ERR_EVENT_BUFFER_FULL -82
 #define ERR_EVENT_ID_UNDEFINED -83
 #define ERR_HOME_SEARCH_GANTRY_TOLERANCE_ERROR -85
-#define ERR_FOCUS_RESERVED_SOCKET -90
-#define ERR_FOCUS_BUSY_EVENT_SCHEDULER -91
 #define ERR_OPTIONAL_EXTERNAL_MODULE_FILE -94
 #define ERR_OPTIONAL_EXTERNAL_MODULE_EXECUTE -95
 #define ERR_OPTIONAL_EXTERNAL_MODULE_KILL -96
@@ -98,10 +94,5 @@
 #define ERR_NEED_TO_BE_HOMED_AT_LEAST_ONCE -109
 #define ERR_NOT_ALLOWED_FOR_GANTRY -110
 #define ERR_GATHERING_BUFFER_FULL -111
-#define ERR_EXCITATION_SIGNAL_INITIALIZATION -112
 #define ERR_BOTH_ENDS_OF_RUNS_ACTIVATED -113
-#define ERR_GROUP_CLAMPING_TIMEOUT -114
 #define ERR_HARDWARE_FUNCTION_NOT_SUPPORTED -115
-#define ERR_EXTERNAL_DRIVER_INIT -116
-#define ERR_FUNCTION_ONLY_ALLOWED_IN_DISABLED_STATE -117
-#define ERR_NOT_ALLOWED_DRIVER_NOT_INITIALIZED -118
