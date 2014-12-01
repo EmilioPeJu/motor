@@ -21,6 +21,7 @@ DB += basic_motor.db
 DB += basic_motor.template
 DB += basic_asyn_motor.template
 DB += basic_asyn_motor.db
+DB += IMS_extra.db
 DB += XPSAuxAi.db
 DB += XPSAuxAo.db
 DB += XPSAuxBi.db
@@ -28,6 +29,8 @@ DB += XPSAuxBo.db
 DB += XPSAuxLi.db
 DB += XPSAuxLo.db
 DB += XPS_extra.db
+DB += HXP_extra.db
+DB += HXP_coords.db
 DB += ACRAux.template
 DB += ACRAuxRead.template
 DB += ACRAuxLi.template
@@ -50,7 +53,8 @@ DB += motorReadback.template
 DB += motorTranslate.template
 DB += moveToHomeUtil.template
 DB += saveRestoreLimits.template
-
+DB += PI_Support.db
+DB += PI_SupportCtrl.db
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB

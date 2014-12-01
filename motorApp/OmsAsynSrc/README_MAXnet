@@ -1,5 +1,4 @@
 
-
 Please note:
 
 - The MAXnet IP-stack is very basic. You cannot ping the card and it doesn't know 
@@ -23,12 +22,3 @@ add this to st.cmd if using the serial port:
   asynSetOption("MAXNET",0,"parity","none")
   asynSetOption("MAXNET",0,"crtscts","Y")
 
-add this to Makefile
-	# The following is required for the OMS MAXnet device driver.
-	SRCS += drvMAXnetAsyn
-
-add this to devOms.dbd
-	# Oregon Micro Systems MAXnet Asyn driver support.
-	driver(motorMAXnet)
-	registrar(OmsMAXnetRegister)
-	variable(motorMAXnetdebug)

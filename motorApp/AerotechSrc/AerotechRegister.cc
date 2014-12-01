@@ -4,8 +4,8 @@ USAGE...	Register Aerotech motor device driver shell commands.
 
 Version:        $Revision: 11729 $
 Modified By:    $Author: sluiter $
-Last Modified:  $Date: 2010-10-06 20:43:18 +0100 (Wed, 06 Oct 2010) $
-HeadURL:        $URL: https://subversion.xor.aps.anl.gov/synApps/motor/tags/R6-7-1/motorApp/AerotechSrc/AerotechRegister.cc $
+Last Modified:  $Date: 2010-10-06 14:43:18 -0500 (Wed, 06 Oct 2010) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-8-1/motorApp/AerotechSrc/AerotechRegister.cc $
 */
 
 /*****************************************************************

@@ -14,7 +14,6 @@ LIBRARY_IOC_DEFAULT += oms
 # The following is required for the OMS PC68/78 (i.e., devOmsPC68) device driver.
 ifdef ASYN
 SRCS += devOmsPC68.cc drvOmsPC68.cc
-SRCS += drvMAXnetAsyn.cc
 endif
 
 # The following is required for the OMS VME8/44 (i.e., devOMS) device driver.
@@ -25,16 +24,12 @@ SRCS += devOms58.cc drvOms58.cc
 #!SRCS_vxWorks += drvOms58Asyn.cc
 
 # OMS MAXv device driver support.
-# Choose one; either "standard" or "trajectory".
-
-# Standard MAXv
 SRCS += devMAXv.cc drvMAXv.cc
 
 # Trajectory support for MAXV controller
 ifdef SNCSEQ
-#!SRCS += MAX_trajectoryScan.st
+SRCS += MAX_trajectoryScan.st
 endif
-#!SRCS_vxWorks += devMAXv.cc drvMAXv_trajectory.cc
 
 # The following is required for all OMS device drivers.
 SRCS += devOmsCom.cc
