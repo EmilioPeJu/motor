@@ -1268,12 +1268,6 @@ static long process(dbCommon *arg)
                 MARK(M_DMOV);
             }
 
-	    /* Set dmov to false if we have a delayed callback in process.*/
-	    if (pmr->mip & MIP_DELAY_REQ) 
-	    {
-	      pmr->dmov = FALSE;
-	    }
-
             /* Do another update after LS error. */
             if (pmr->mip != MIP_DONE && (pmr->rhls || pmr->rlls))
             {
@@ -1313,15 +1307,13 @@ static long process(dbCommon *arg)
                 {
                     if (pmr->mip & MIP_DELAY_ACK && !(pmr->mip & MIP_DELAY_REQ))
                     {
-		        pmr->mip = MIP_DONE;
-		        MARK(M_MIP);
+                        pmr->mip |= MIP_DELAY;
                         INIT_MSG();
                         WRITE_MSG(GET_INFO, NULL);
                         SEND_MSG();
-                        /* Mark DMOV and process forward links after a MIP_DELAY_ACK.*/
-                        pmr->dmov = TRUE;
-                        MARK(M_DMOV);
-			recGblFwdLink(pmr);
+                        /* Restore DMOV to false and UNMARK it so it is not posted. */
+                        pmr->dmov = FALSE;
+                        UNMARK(M_DMOV);
                         goto process_exit;
                     }
                     else if (pmr->stup != motorSTUP_ON && pmr->mip != MIP_DONE)
