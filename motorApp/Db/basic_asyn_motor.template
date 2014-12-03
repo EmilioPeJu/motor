@@ -137,10 +137,15 @@ record(stringout, "$(P)$(M):SCALE") {
     field(VAL, "$(SCALE=1)")
 }
 
+record(ai, "$(P)$(M):SDIS") {
+    field(VAL, "0")
+    field(FLNK, "$(P)$(M):SDIS:CALCOUT")
+}
+
 # record that will disable and re-enable record if any of its inputs are non-zero
-record(calcout, "$(P)$(M):SDIS") {
+record(calcout, "$(P)$(M):SDIS:CALCOUT") {
   field(DESC, "Disable on non-zero input")
-  field(VAL, "0")
+  field(INPA, "$(P)$(M):SDIS")
   field(CALC, "(A|B|C|D|E|F|G|H|I|J|K|L)>0")
   field(OUT, "$(P)$(M).DISP PP")
 }
