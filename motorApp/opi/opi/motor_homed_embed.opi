@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <display typeId="org.csstudio.opibuilder.Display" version="1.0.0">
   <auto_zoom_to_fit_all>false</auto_zoom_to_fit_all>
   <macros>
     <include_parent_macros>true</include_parent_macros>
   </macros>
   <wuid>766db807:145d5b2af77:-7e28</wuid>
-  <boy_version>4.0.102.201410210839</boy_version>
+  <boy_version>4.0.102.201411041858</boy_version>
   <scripts />
   <show_ruler>true</show_ruler>
   <height>200</height>
-  <name></name>
+  <name />
   <snap_to_geometry>false</snap_to_geometry>
   <show_grid>true</show_grid>
   <background_color>
-    <color red="240" green="240" blue="240" />
+    <color blue="240" green="240" red="240" />
   </background_color>
   <foreground_color>
-    <color red="192" green="192" blue="192" />
+    <color blue="192" green="192" red="192" />
   </foreground_color>
   <widget_type>Display</widget_type>
   <show_close_button>true</show_close_button>
@@ -41,7 +41,7 @@
     <auto_size>false</auto_size>
     <rotation_angle>0.0</rotation_angle>
     <scripts />
-    <height>19</height>
+    <height>20</height>
     <name>Readback</name>
     <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
     <scale_options>
@@ -54,10 +54,10 @@
     <transparent>false</transparent>
     <pv_name>$(P)$(M).RBV</pv_name>
     <background_color>
-      <color red="77" green="77" blue="77" />
+      <color blue="77" green="77" red="77" />
     </background_color>
     <foreground_color>
-      <color red="0" green="255" blue="0" />
+      <color blue="0" green="255" red="0" />
     </foreground_color>
     <widget_type>Text Update</widget_type>
     <enabled>true</enabled>
@@ -67,13 +67,13 @@
     <font>
       <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
     </font>
-    <width>139</width>
+    <width>117</width>
     <border_style>0</border_style>
     <rules />
     <pv_value />
     <border_width>1</border_width>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>false</alarm_pulsing>
     <horizontal_alignment>1</horizontal_alignment>
@@ -93,7 +93,7 @@ $(pv_value)</tooltip>
     <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
     <show_boolean_label>false</show_boolean_label>
     <background_color>
-      <color red="240" green="240" blue="240" />
+      <color blue="240" green="240" red="240" />
     </background_color>
     <widget_type>Multistate Symbol Monitor</widget_type>
     <enabled>true</enabled>
@@ -126,7 +126,7 @@ $(pv_value)</tooltip>
     <align_to_nearest_second>false</align_to_nearest_second>
     <boolean_label_position>0</boolean_label_position>
     <on_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </on_color>
     <name>V1</name>
     <stretch_to_fit>true</stretch_to_fit>
@@ -136,11 +136,11 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
     <off_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </off_color>
     <pv_name>$(P)$(M).DMOV</pv_name>
     <foreground_color>
-      <color red="192" green="192" blue="192" />
+      <color blue="192" green="192" red="192" />
     </foreground_color>
     <backcolor_alarm_sensitive>true</backcolor_alarm_sensitive>
     <flip_horizontal>false</flip_horizontal>
@@ -148,7 +148,7 @@ $(pv_value)</tooltip>
     <rules />
     <degree>0</degree>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <alarm_pulsing>true</alarm_pulsing>
     <actions hook="false" hook_all="true">
@@ -166,5 +166,59 @@ $(pv_value)</tooltip>
     <tooltip>$(pv_name)
 $(pv_value)</tooltip>
     <x>0</x>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <border_alarm_sensitive>true</border_alarm_sensitive>
+    <visible>true</visible>
+    <square_led>false</square_led>
+    <scripts />
+    <height>20</height>
+    <data_type>0</data_type>
+    <show_boolean_label>false</show_boolean_label>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <off_label>OFF</off_label>
+    <background_color>
+      <color blue="240" green="240" red="240" />
+    </background_color>
+    <enabled>true</enabled>
+    <widget_type>LED</widget_type>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>20</width>
+    <border_style>0</border_style>
+    <effect_3d>true</effect_3d>
+    <pv_value />
+    <bit>14</bit>
+    <on_label>ON</on_label>
+    <border_width>1</border_width>
+    <wuid>57dbea6f:149f0d3c4df:-7e86</wuid>
+    <on_color>
+      <color blue="0" green="255" red="0" />
+    </on_color>
+    <name>LED</name>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <off_color>
+      <color blue="0" green="100" red="0" />
+    </off_color>
+    <pv_name>$(P)$(M).MSTA</pv_name>
+    <foreground_color>
+      <color blue="192" green="192" red="192" />
+    </foreground_color>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <rules />
+    <alarm_pulsing>false</alarm_pulsing>
+    <border_color>
+      <color blue="255" green="128" red="0" />
+    </border_color>
+    <y>0</y>
+    <actions hook="false" hook_all="false" />
+    <x>160</x>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
   </widget>
 </display>
