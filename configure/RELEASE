@@ -15,14 +15,16 @@ SUPPORT=/dls_sw/prod/R3.14.12.3/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-ASYN=$(SUPPORT)/asyn/4-21
-BUSY=$(SUPPORT)/busy/1-4dls1
 #ASYN=$(AJFWORK)/asyn
 #BUSY=$(AJFWORK)/busy
+#ASYN=$(SUPPORT)/asyn/4-21
+#BUSY=$(SUPPORT)/busy/1-4dls1
+ASYN=$(SUPPORT)/asyn/4-22
+BUSY=$(SUPPORT)/busy/1-6
 
 # Need the sequencer and busy for the MM4005 and XPS trajectory scanning
-SNCSEQ=$(SUPPORT)/seq/2-1-15dls2
 #SNCSEQ=$(AJFWORK)/seq
+SNCSEQ=$(SUPPORT)/seq/2-1-15dls2
 
 # Recommended EPICS release: R3.14.12.3
 EPICS_BASE=/dls_sw/epics/R3.14.12.3/base
