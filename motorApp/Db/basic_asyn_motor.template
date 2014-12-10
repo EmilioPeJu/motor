@@ -208,11 +208,15 @@ record(stringout, "$(P)$(M):SCALE") {
     field(VAL, "$(SCALE=1)")
 }
 
+# Write a 1 to this record over Channel Access to disable the motor record and prevent CA writes to any field
+# including the demand field.
 record(ai, "$(P)$(M):USER:SDIS") {
     field(VAL, "0")
     field(FLNK, "$(P)$(M):SDIS")
 }
 
+# Note: This record forms part of the interface to auto-homing, which uses the "A" field to disable the motor record
+# when homing.
 # record that will disable and re-enable record if any of its inputs are non-zero
 record(calcout, "$(P)$(M):SDIS") {
   field(DESC, "Disable on non-zero input")
