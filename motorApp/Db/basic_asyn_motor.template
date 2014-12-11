@@ -78,74 +78,58 @@
 # % gui, $(name=), sevr
 
 # These define what PVs a motor detail screen should contain
+# % gui, $(name=), statusbits, Status, low, <pv>.MSTA, Direction Positive, Done, High Limit, Home Limit, Unused, Closed Loop, Following Error, At Home, Encoder Present, Problem, Moving, Gain Support, Comms Error, Low Limit, Homed
+# % gui, $(name=), statusbits, ELoss, low, <pv>:ELOSS, Encoder Loss, Amplifier Loss, Sys Fail
+# % gui, $(name=), statusbits, Limit Violation, low, <pv>.LVIO, Lim
+# % gui, $(name=), statusbits, At High Limit, low, <pv>.HLS, High
+# % gui, $(name=), statusbits, At Low Limit, low, <pv>.LLS, Low
+# % gui, $(name=), demand, User High Limit, low, <pv>.HLM
+# % gui, $(name=), demand, User Low Limit, low, <pv>.LLM
+# % gui, $(name=), demand, Dial High Limit, high, <pv>.DHLM
+# % gui, $(name=), demand, Dial Low Limit, high, <pv>.DLLM
+
 # % gui, $(name=), demand, Motor demand, low, <pv>.VAL
 # % gui, $(name=), readback, Motor readback, low, <pv>.RBV
-# % gui, $(name=), statusbits, Status, low, <pv>.MSTA, Direction Positive, Done, High Limit, Home Limit, Unused, Closed Loop, Following Error, At Home, Encoder Present, Problem, Moving, Gain Support, Comms Error, Low Limit, Homed
-
-
 # % gui, $(name=), command, Stop, low, <pv>.STOP
 # % gui, $(name=), command, Home Forward, low, <pv>.HOMF
 # % gui, $(name=), command, Home Reverse, low, <pv>.HOMR
-# % gui, $(name=), command, Jog Forward, low, <pv>.JOGF
-# % gui, $(name=), command, Jog Reverse, low, <pv>.JOGR
+# % gui, $(name=), command, Jog Forward, high, <pv>.JOGF
+# % gui, $(name=), command, Jog Reverse, high, <pv>.JOGR
 # % gui, $(name=), command, Tweak Forward, low, <pv>.TWF
 # % gui, $(name=), command, Tweak Reverse, low, <pv>.TWR
 # % gui, $(name=), demand, Tweak Step, low, <pv>.TWV
 # % gui, $(name=), command, Kill, low, <pv>:KILL.PROC, Kill
 # % gui, $(name=), command, Sync VAL=RBV, low, <pv>.SYNC
 
-# % gui, $(name=), statusbits, Limit Violation, low, <pv>.LVIO, Lim
-# % gui, $(name=), statusbits, At High Limit, low, <pv>.HLS, Low
-# % gui, $(name=), statusbits, At Low Limit, low, <pv>.LLS, High
-# % gui, $(name=), demand, User High Limit, low, <pv>.HLM
-# % gui, $(name=), demand, User Low Limit, low, <pv>.LLM
-
-# % gui, $(name=), enum, Direction, low,  <pv>.DIR
+# % gui, $(name=), enum, Direction, high,  <pv>.DIR
 # % gui, $(name=), demand, User Offset, low, <pv>.OFF
 # % gui, $(name=), enum, Set/Use, low,  <pv>.SET
 # % gui, $(name=), enum, Offset, low,  <pv>.FOFF
 # % gui, $(name=), enum, Use Encoder, low,  <pv>.UEIP
 
 # % gui, $(name=), demand, Motor Step Size, low, <pv>.MRES
+# % gui, $(name=), readback, Steps per Rev, high,  <pv>.SREV
+# % gui, $(name=), readback, EGUs per Rev, high,  <pv>.UREV
 # % gui, $(name=), demand, Encoder Step Size, low, <pv>.ERES
+# % gui, $(name=), readback, Readback Step Size, low,  <pv>.RRES
+# % gui, $(name=), readback, Use Encoder if Present, low,  <pv>.UEIP
 
 # % gui, $(name=), demand, Max Velocity, low, <pv>.VMAX
-# % gui, $(name=), command, Velocity, low, <pv>.VELO
-# % gui, $(name=), command, Secs to Velocity, low, <pv>.ACCL
+# % gui, $(name=), demand, Base Velocity, high,  <pv>.VBAS
+# % gui, $(name=), demand, Velocity, low, <pv>.VELO
+# % gui, $(name=), demand, Secs to Velocity, low, <pv>.ACCL
+# % gui, $(name=), demand, JVEL, high,  <pv>.JVEL
+# % gui, $(name=), demand, Jog Acceleration, high,  <pv>.JAR
+# % gui, $(name=), demand, Backlash Distance, high,  <pv>.BDST
+# % gui, $(name=), demand, Backlash Velocity, high,  <pv>.BVEL
+# % gui, $(name=), demand, Backlash Secs to Vel, high,  <pv>.BACC
+# % gui, $(name=), demand, Move Fraction, high,  <pv>.FRAC
+# % gui, $(name=), demand, Retry Deadband, high,  <pv>.RDBD
+# % gui, $(name=), demand, Max Retrys, high,  <pv>.RTRY
 
-#    # % gui, $(name=), enum, Base Velocity, high,  <pv>.VBAS
-#    # % gui, $(name=), enum, Acceleration, medium,  <pv>.ACCL
-#    # % gui, $(name=), demand, Backlash Distance, high,  <pv>.BDST
-#    # % gui, $(name=), demand, Backlash Velocity, high,  <pv>.BVEL
-#    # % gui, $(name=), readback, Backlash Secs to Vel, high,  <pv>.BACC
-#    # % gui, $(name=), readback, OUT, low,  <pv>.OUT
-#    # % gui, $(name=), readback, MRES, low,  <pv>.MRES
-#    # % gui, $(name=), readback, PREC, low,  <pv>.PREC
-#    # % gui, $(name=), readback, EGU, low,  <pv>.EGU
-#    # % gui, $(name=), readback, DHLM, low,  <pv>.DHLM
-#    # % gui, $(name=), readback, DLLM, low,  <pv>.DLLM
-#    # % gui, $(name=), readback, HLM, low,  <pv>.HLM
-#    # % gui, $(name=), readback, LLM, low,  <pv>.LLM
-#    # % gui, $(name=), readback, HLSV, low,  <pv>.HLSV
-#    # % gui, $(name=), readback, INIT, low,  <pv>.INIT
-#    # % gui, $(name=), readback, RTRY, low,  <pv>.RTRY
-#    # % gui, $(name=), readback, DLY, low,  <pv>.DLY
-#    # % gui, $(name=), readback, HVEL, low,  <pv>.HVEL
-#    # % gui, $(name=), readback, SREV, low,  <pv>.SREV
-#    # % gui, $(name=), readback, RRES, low,  <pv>.RRES
-#    # % gui, $(name=), readback, TWV, low,  <pv>.TWV
-#    # % gui, $(name=), readback, ERES, low,  <pv>.ERES
-#    # % gui, $(name=), readback, JVEL, low,  <pv>.JVEL
-#    # % gui, $(name=), demand, Jog Acceleration, medium,  <pv>.JAR
-#    # % gui, $(name=), readback, UEIP, low,  <pv>.UEIP
-#    # % gui, $(name=), readback, URIP, low,  <pv>.URIP
-#    # % gui, $(name=), readback, RDBL, low,  <pv>.RDBL
-#    # % gui, $(name=), readback, VMAX, low,  <pv>.VMAX
-#    # % gui, $(name=), readback, OFF, low,  <pv>.OFF
-#    # % gui, $(name=), readback, RDBD, low,  <pv>.RDBD
-#    # % gui, $(name=), readback, FOFF, low,  <pv>.FOFF
-#    # % gui, $(name=), readback, ADEL, low,  <pv>.ADEL
-#    # % gui, $(name=), readback, NTM, low,  <pv>.NTM
+# % gui, $(name=), demand, PREC, low,  <pv>.PREC
+# % gui, $(name=), demand, EGU, low,  <pv>.EGU
+
 
 
 record(motor,"$(P)$(M)")
