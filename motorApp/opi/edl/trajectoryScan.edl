@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 517
-y 677
+x 521
+y 701
 w 952
 h 387
 font "arial-medium-r-18.0"
@@ -585,7 +585,7 @@ bgColor index 0
 useDisplayBg
 value {
   "# Traj Elements"
-  "(Max 2000)"
+  "(Max 100000)"
 }
 endObjectProperties
 
@@ -699,7 +699,7 @@ bgColor index 0
 useDisplayBg
 value {
   "# Output Pulses"
-  "(Max 20000)"
+  "(Max 100000)"
 }
 endObjectProperties
 

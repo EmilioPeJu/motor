@@ -33,7 +33,7 @@ option +r;
  * is almost unlimited because the data is stored in a file but the channel 
  * access limit with a double data type is 2000 on R3.13 clients.
  */
-#define MAX_ELEMENTS 3500
+#define MAX_ELEMENTS 100000
 
 /* Maximum # of output pulses.  At the moment the pulses are defined by a
  * timer which is synchronised with the trajectory points so the max number
