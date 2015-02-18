@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <display typeId="org.csstudio.opibuilder.Display" version="1.0.0">
   <show_close_button>true</show_close_button>
   <rules />
@@ -19,17 +19,17 @@
     <min_height>-1</min_height>
   </auto_scale_widgets>
   <background_color>
-    <color name="Canvas" red="200" green="200" blue="200" />
+    <color blue="200" green="200" name="Canvas" red="200" />
   </background_color>
   <width>325</width>
   <x>-1</x>
-  <name></name>
+  <name />
   <grid_space>5</grid_space>
   <show_ruler>true</show_ruler>
   <y>-1</y>
   <snap_to_geometry>false</snap_to_geometry>
   <foreground_color>
-    <color red="192" green="192" blue="192" />
+    <color blue="192" green="192" red="192" />
   </foreground_color>
   <actions hook="false" hook_all="false" />
   <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
@@ -46,7 +46,7 @@ $(pv_value)</tooltip>
     <transparent>false</transparent>
     <pv_value />
     <auto_size>false</auto_size>
-    <text></text>
+    <text />
     <rotation_angle>0.0</rotation_angle>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -62,7 +62,7 @@ $(pv_value)</tooltip>
     <pv_name>$(P)$(M).RBV</pv_name>
     <vertical_alignment>1</vertical_alignment>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <precision_from_pv>true</precision_from_pv>
     <widget_type>Text Update</widget_type>
@@ -70,14 +70,14 @@ $(pv_value)</tooltip>
     <wrap_words>false</wrap_words>
     <format_type>0</format_type>
     <background_color>
-      <color red="64" green="64" blue="64" />
+      <color blue="64" green="64" name="Monitor: BG" red="64" />
     </background_color>
     <width>255</width>
     <x>70</x>
     <name>Readback</name>
     <y>0</y>
     <foreground_color>
-      <color red="100" green="255" blue="100" />
+      <color blue="96" green="255" name="Monitor: FG" red="96" />
     </foreground_color>
     <actions hook="false" hook_all="false" />
     <font>
@@ -100,7 +100,7 @@ $(pv_value)</tooltip>
     <pv_name>$(P)$(M).MOVN</pv_name>
     <degree>0</degree>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <widget_type>Multistate Symbol Monitor</widget_type>
     <flip_horizontal>false</flip_horizontal>
@@ -134,7 +134,7 @@ $(pv_value)</tooltip>
     <enabled>true</enabled>
     <wuid>591ff34d:147d4ad1ac3:-79f5</wuid>
     <on_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </on_color>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -146,18 +146,18 @@ $(pv_value)</tooltip>
     <crop_bottom>0</crop_bottom>
     <no_animation>false</no_animation>
     <off_color>
-      <color red="0" green="0" blue="0" />
+      <color blue="0" green="0" red="0" />
     </off_color>
     <backcolor_alarm_sensitive>true</backcolor_alarm_sensitive>
     <background_color>
-      <color name="Canvas" red="200" green="200" blue="200" />
+      <color blue="200" green="200" name="Canvas" red="200" />
     </background_color>
     <boolean_label_position>0</boolean_label_position>
     <width>40</width>
     <x>0</x>
     <y>0</y>
     <foreground_color>
-      <color name="Black" red="0" green="0" blue="0" />
+      <color blue="0" green="0" name="Black" red="0" />
     </foreground_color>
     <crop_top>0</crop_top>
     <crop_right>0</crop_right>
@@ -179,7 +179,7 @@ $(pv_value)</tooltip>
     <wuid>-304029b7:147582c1239:-7965</wuid>
     <pv_value />
     <pv_control>false</pv_control>
-    <text></text>
+    <text />
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <height>20</height>
@@ -191,14 +191,14 @@ $(pv_value)</tooltip>
     </scale_options>
     <image>symbol/plus_icon.png</image>
     <visible>true</visible>
-    <pv_name></pv_name>
+    <pv_name />
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <widget_type>Action Button</widget_type>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color name="Canvas" red="200" green="200" blue="200" />
+      <color blue="205" green="205" name="Controller: BG" red="205" />
     </background_color>
     <width>25</width>
     <x>275</x>
@@ -206,19 +206,19 @@ $(pv_value)</tooltip>
     <y>25</y>
     <style>0</style>
     <foreground_color>
-      <color red="0" green="0" blue="210" />
+      <color blue="192" green="0" name="Controller: FG" red="0" />
     </foreground_color>
     <actions hook="false" hook_all="false">
       <action type="WRITE_PV">
         <pv_name>$(pv_name)</pv_name>
         <value>1</value>
         <timeout>10</timeout>
-        <confirm_message></confirm_message>
-        <description></description>
+        <confirm_message />
+        <description />
       </action>
     </actions>
     <font>
-      <opifont.name fontName="Arial" height="11" style="1">Default Bold</opifont.name>
+      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
@@ -230,7 +230,7 @@ $(pv_value)</tooltip>
     <rules />
     <pv_value />
     <auto_size>false</auto_size>
-    <text></text>
+    <text />
     <rotation_angle>0.0</rotation_angle>
     <show_units>false</show_units>
     <height>20</height>
@@ -240,11 +240,11 @@ $(pv_value)</tooltip>
     <pv_name>$(P)$(M).VAL</pv_name>
     <selector_type>0</selector_type>
     <border_color>
-      <color name="Controller" red="0" green="0" blue="255" />
+      <color blue="255" green="0" name="Controller" red="0" />
     </border_color>
     <precision_from_pv>true</precision_from_pv>
     <widget_type>Text Input</widget_type>
-    <confirm_message></confirm_message>
+    <confirm_message />
     <name>Demand</name>
     <style>0</style>
     <actions hook="false" hook_all="false" />
@@ -264,18 +264,18 @@ $(pv_value)</tooltip>
     <format_type>0</format_type>
     <limits_from_pv>false</limits_from_pv>
     <background_color>
-      <color name="Canvas" red="200" green="200" blue="200" />
+      <color blue="205" green="205" name="Controller: BG" red="205" />
     </background_color>
     <width>146</width>
     <x>125</x>
     <y>25</y>
     <maximum>1.7976931348623157E308</maximum>
     <foreground_color>
-      <color red="0" green="0" blue="210" />
+      <color blue="192" green="0" name="Controller: FG" red="0" />
     </foreground_color>
     <minimum>-1.7976931348623157E308</minimum>
     <font>
-      <fontdata fontName="Nimbus Sans L" height="11" style="0" />
+      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -291,7 +291,7 @@ $(pv_value)</tooltip>
     <wuid>-304029b7:147582c1239:-7966</wuid>
     <pv_value />
     <pv_control>false</pv_control>
-    <text></text>
+    <text />
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <height>20</height>
@@ -303,14 +303,14 @@ $(pv_value)</tooltip>
     </scale_options>
     <image>symbol/minus_icon.png</image>
     <visible>true</visible>
-    <pv_name></pv_name>
+    <pv_name />
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <widget_type>Action Button</widget_type>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color name="Canvas" red="200" green="200" blue="200" />
+      <color blue="205" green="205" name="Controller: BG" red="205" />
     </background_color>
     <width>26</width>
     <x>95</x>
@@ -318,19 +318,19 @@ $(pv_value)</tooltip>
     <y>25</y>
     <style>0</style>
     <foreground_color>
-      <color red="0" green="0" blue="210" />
+      <color blue="192" green="0" name="Controller: FG" red="0" />
     </foreground_color>
     <actions hook="false" hook_all="false">
       <action type="WRITE_PV">
         <pv_name>$(pv_name)</pv_name>
         <value>1</value>
         <timeout>10</timeout>
-        <confirm_message></confirm_message>
-        <description></description>
+        <confirm_message />
+        <description />
       </action>
     </actions>
     <font>
-      <opifont.name fontName="Arial" height="11" style="1">Default Bold</opifont.name>
+      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -346,7 +346,7 @@ $(pv_value)</tooltip>
     <wuid>-304029b7:147582c1239:-7963</wuid>
     <pv_value />
     <pv_control>false</pv_control>
-    <text></text>
+    <text />
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <height>20</height>
@@ -360,12 +360,12 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <pv_name>$(P)$(M).STOP</pv_name>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <widget_type>Action Button</widget_type>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color name="Canvas" red="200" green="200" blue="200" />
+      <color blue="205" green="205" name="Controller: BG" red="205" />
     </background_color>
     <width>26</width>
     <x>40</x>
@@ -373,19 +373,19 @@ $(pv_value)</tooltip>
     <y>0</y>
     <style>0</style>
     <foreground_color>
-      <color name="Major" red="255" green="0" blue="0" />
+      <color blue="192" green="0" name="Controller: FG" red="0" />
     </foreground_color>
     <actions hook="false" hook_all="false">
       <action type="WRITE_PV">
         <pv_name>$(pv_name)</pv_name>
         <value>1</value>
         <timeout>10</timeout>
-        <confirm_message></confirm_message>
-        <description></description>
+        <confirm_message />
+        <description />
       </action>
     </actions>
     <font>
-      <fontdata fontName="Nimbus Sans L" height="11" style="0" />
+      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
@@ -397,7 +397,7 @@ $(pv_value)</tooltip>
     <rules />
     <pv_value />
     <auto_size>false</auto_size>
-    <text></text>
+    <text />
     <rotation_angle>0.0</rotation_angle>
     <show_units>false</show_units>
     <height>18</height>
@@ -407,11 +407,11 @@ $(pv_value)</tooltip>
     <pv_name>$(P)$(M).TWV</pv_name>
     <selector_type>0</selector_type>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <precision_from_pv>true</precision_from_pv>
     <widget_type>Text Input</widget_type>
-    <confirm_message></confirm_message>
+    <confirm_message />
     <name>Tweak Step</name>
     <style>0</style>
     <actions hook="false" hook_all="false" />
@@ -431,18 +431,18 @@ $(pv_value)</tooltip>
     <format_type>0</format_type>
     <limits_from_pv>false</limits_from_pv>
     <background_color>
-      <color name="Canvas" red="200" green="200" blue="200" />
+      <color blue="205" green="205" name="Controller: BG" red="205" />
     </background_color>
     <width>66</width>
     <x>0</x>
     <y>26</y>
     <maximum>1.7976931348623157E308</maximum>
     <foreground_color>
-      <color red="0" green="0" blue="210" />
+      <color blue="192" green="0" name="Controller: FG" red="0" />
     </foreground_color>
     <minimum>-1.7976931348623157E308</minimum>
     <font>
-      <fontdata fontName="Nimbus Sans L" height="11" style="0" />
+      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
@@ -459,7 +459,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <pv_name>$(P)$(M).MSTA</pv_name>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <widget_type>LED</widget_type>
     <name>Low Limit</name>
@@ -470,7 +470,7 @@ $(pv_value)</tooltip>
     <enabled>true</enabled>
     <wuid>2e1670d1:14b2be7ec15:-7ae2</wuid>
     <on_color>
-      <color name="Yellow LED: On" red="255" green="255" blue="0" />
+      <color blue="0" green="255" name="Yellow LED: On" red="255" />
     </on_color>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -481,11 +481,11 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>true</keep_wh_ratio>
     </scale_options>
     <off_color>
-      <color red="96" green="96" blue="0" />
+      <color blue="0" green="96" red="96" />
     </off_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color red="240" green="240" blue="240" />
+      <color blue="240" green="240" red="240" />
     </background_color>
     <square_led>false</square_led>
     <width>20</width>
@@ -493,7 +493,7 @@ $(pv_value)</tooltip>
     <data_type>0</data_type>
     <y>25</y>
     <foreground_color>
-      <color red="192" green="192" blue="192" />
+      <color blue="192" green="192" red="192" />
     </foreground_color>
     <font>
       <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
@@ -514,7 +514,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <pv_name>$(P)$(M).MSTA</pv_name>
     <border_color>
-      <color red="0" green="128" blue="255" />
+      <color blue="255" green="128" red="0" />
     </border_color>
     <widget_type>LED</widget_type>
     <name>High Limit</name>
@@ -525,7 +525,7 @@ $(pv_value)</tooltip>
     <enabled>true</enabled>
     <wuid>2e1670d1:14b2be7ec15:-6c6b</wuid>
     <on_color>
-      <color name="Yellow LED: On" red="255" green="255" blue="0" />
+      <color blue="0" green="255" name="Yellow LED: On" red="255" />
     </on_color>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -536,11 +536,11 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>true</keep_wh_ratio>
     </scale_options>
     <off_color>
-      <color red="96" green="96" blue="0" />
+      <color blue="0" green="96" red="96" />
     </off_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color red="240" green="240" blue="240" />
+      <color blue="240" green="240" red="240" />
     </background_color>
     <square_led>false</square_led>
     <width>20</width>
@@ -548,7 +548,7 @@ $(pv_value)</tooltip>
     <data_type>0</data_type>
     <y>25</y>
     <foreground_color>
-      <color red="192" green="192" blue="192" />
+      <color blue="192" green="192" red="192" />
     </foreground_color>
     <font>
       <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>

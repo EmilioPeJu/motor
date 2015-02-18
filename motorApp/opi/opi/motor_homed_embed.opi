@@ -124,18 +124,18 @@ $(pv_value)</tooltip>
     <wrap_words>false</wrap_words>
     <format_type>0</format_type>
     <background_color>
-      <color blue="64" green="64" red="64" />
+      <color blue="64" green="64" name="Monitor: BG" red="64" />
     </background_color>
     <width>261</width>
     <x>40</x>
     <name>Readback</name>
     <y>0</y>
     <foreground_color>
-      <color blue="100" green="255" red="100" />
+      <color blue="96" green="255" name="Monitor: FG" red="96" />
     </foreground_color>
     <actions hook="false" hook_all="false" />
     <font>
-      <fontdata fontName="Nimbus Sans L" height="11" style="1" />
+      <opifont.name fontName="Arial" height="11" style="1">Default Bold</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.symbol.multistate.MultistateMonitorWidget" version="1.0.0">
