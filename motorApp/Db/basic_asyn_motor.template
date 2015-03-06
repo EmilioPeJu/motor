@@ -240,6 +240,7 @@ record(longout, "$(P)$(M):MR_MOVE_WRITE") {
 }
 
 #Record to calculate the following error
+#% archiver 1 Monitor
 record(calc, "$(P)$(M):FERROR")
 {
 	field(DESC,"Following Error")
