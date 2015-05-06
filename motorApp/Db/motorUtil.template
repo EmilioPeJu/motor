@@ -2,9 +2,6 @@
 #! DBDSTART
 #! DBDEND
 
-#% macro, __doc__, Template providing motors moving and stop all records for 
-# all motor records on this IOC
-#% macro, P, Device Prefix including colon
 
 # Setting VAL to "stop", stops ALL motorRecord's in this IOC.
 # $(P)allstop.VAL is monitored by motorUtil.
@@ -35,6 +32,13 @@ record(calc, "$(P)alldoneBlink") {
   field(CALC, "A?0:!B")
   field(INPA, "$(P)alldone")
   field(INPB, "$(P)alldoneBlink")
+}
+
+# Allow smart clients to maintain a list of moving motors
+record(waveform, "$(P)movingDiff") {
+  field(DESC, "Motor w/ last dmov change")
+  field(NELM, "62")
+  field(FTVL, "CHAR")
 }
 
 #! Further lines contain data used by VisualDCT

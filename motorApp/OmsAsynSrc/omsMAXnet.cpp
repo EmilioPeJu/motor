@@ -88,6 +88,8 @@ omsMAXnet::omsMAXnet(const char* portName, int numAxes, const char* serialPortNa
     notificationMutex = new epicsMutex();
     notificationCounter = 0;
     useWatchdog = true;
+    char eosstring[5];
+    int eoslen=0;
 
     serialPortName = epicsStrDup(serialPortName);
 
@@ -128,18 +130,16 @@ omsMAXnet::omsMAXnet(const char* portName, int numAxes, const char* serialPortNa
     timeout = 2.0;
     pasynUserSerial->timeout = 0.0;
 
-    // CAUTION firmware versions before 1.33.4 use '\n' for serial port and '\n\r' for IP port as InputEOS
-    // Set inputEOS in st.cmd for old firmware versions
-    status = pasynOctetSyncIO->setInputEos(pasynUserSyncIOSerial, "\n\r", 2);
-    if(status != asynSuccess){
-        printf("MAXnetConfig: unable to set InputEOS %s: %s\n", serialPortName, pasynUserSyncIOSerial->errorMessage);
-        return ;
+    // to override default setting, set input and output EOS in st.cmd
+    if (pasynOctetSyncIO->getInputEos(pasynUserSyncIOSerial, eosstring, 5, &eoslen) == asynSuccess) {
+        if (eoslen == 0)
+            if (pasynOctetSyncIO->setInputEos(pasynUserSyncIOSerial, "\n\r", 2) != asynSuccess)
+                printf("MAXnetConfig: unable to set InputEOS %s: %s\n", serialPortName, pasynUserSyncIOSerial->errorMessage);
     }
-
-    status = pasynOctetSyncIO->setOutputEos(pasynUserSyncIOSerial, "\n", 1);
-    if(status != asynSuccess){
-        printf("MAXnetConfig: unable to set OutputEOS %s: %s\n",serialPortName,pasynUserSyncIOSerial->errorMessage);
-        return ;
+    if (pasynOctetSyncIO->getOutputEos(pasynUserSyncIOSerial, eosstring, 5, &eoslen) == asynSuccess) {
+        if (eoslen == 0)
+            if (pasynOctetSyncIO->setOutputEos(pasynUserSyncIOSerial, "\n", 1) != asynSuccess)
+                printf("MAXnetConfig: unable to set OutputEOS %s: %s\n", serialPortName, pasynUserSyncIOSerial->errorMessage);
     }
 
     void* registrarPvt= NULL;
@@ -272,9 +272,9 @@ asynStatus omsMAXnet::sendReceive(const char *outputBuff, char *inputBuff, unsig
         nRead += nReadnext;
     }
     localBuffer[nRead] = '\0';
-	// cut off a leading /006
+	// cut off a leading CR, NL, /006
     outString = localBuffer;
-	while (*outString == 6) ++outString;
+    while ((*outString == 6)||(*outString == 13)||(*outString == 10)) ++outString;
 
 	// if input data is a notification read until expected data arrived
     while ((status == asynSuccess) && isNotification(outString)) {
@@ -288,9 +288,9 @@ asynStatus omsMAXnet::sendReceive(const char *outputBuff, char *inputBuff, unsig
             nRead += nReadnext;
         }
         localBuffer[nRead] = '\0';
-    	// cut off a leading /006
+    	// cut off a leading CR, NL, /006
         outString = localBuffer;
-    	while (*outString == 6) ++outString;
+        while ((*outString == 6)||(*outString == 13)||(*outString == 10)) ++outString;
     	if (notificationCounter > 0) --notificationCounter;
     }
 
@@ -324,6 +324,29 @@ int omsMAXnet::isNotification (char *buffer) {
     }
     else
         return 0;
+}
+
+/*
+ * disconnect and reconnect the serial / IP connection
+ */
+bool omsMAXnet::resetConnection(){
+
+    asynStatus status;
+    int autoConnect;
+
+    asynInterface *pasynInterface = pasynManager->findInterface(pasynUserSerial,asynCommonType,1);
+    if( pasynInterface == NULL) return false;
+
+    asynCommon* pasynCommonIntf = (asynCommon*)pasynInterface->pinterface;
+    pasynManager->isAutoConnect(pasynUserSerial, &autoConnect);
+
+    errlogPrintf("*** disconnect and reconnect serial/IP connection ****\n");
+    status = pasynCommonIntf->disconnect(pasynInterface->drvPvt, pasynUserSerial);
+    if (!autoConnect) status = pasynCommonIntf->connect(pasynInterface->drvPvt, pasynUserSerial);
+    epicsThreadSleep(0.1);
+    if (portConnected) errlogPrintf("*** reconnect done ****\n");
+
+   return true;
 }
 
 extern "C" int omsMAXnetConfig(

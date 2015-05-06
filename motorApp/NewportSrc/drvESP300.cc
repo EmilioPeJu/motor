@@ -2,10 +2,10 @@
 FILENAME... drvESP300.cc
 USAGE...    Motor record driver level support for Newport ESP300/100.
 
-Version:        $Revision: 17450 $
+Version:        $Revision: 17447 $
 Modified By:    $Author: sluiter $
-Last Modified:  $Date: 2014-05-27 11:39:49 -0500 (Tue, 27 May 2014) $
-HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-8-1/motorApp/NewportSrc/drvESP300.cc $
+Last Modified:  $Date: 2014-05-23 10:33:19 -0500 (Fri, 23 May 2014) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/NewportSrc/drvESP300.cc $
 */
 
 /*
@@ -224,7 +224,6 @@ static int set_status(int card, int signal)
     cntrl = (struct MMcontroller *) motor_state[card]->DevicePrivate;
     motor_info = &(motor_state[card]->motor_info[signal]);
     nodeptr = motor_info->motor_motion;
-
     status.All = motor_info->status.All;
 
     sprintf(outbuff, "%.2dMD", signal + 1);
@@ -343,7 +342,7 @@ static int set_status(int card, int signal)
         printf("ESP300 controller error = %d.\n", errcode);
     }
     else
-        status.Bits.RA_PROBLEM  = 0;
+        status.Bits.RA_PROBLEM = 0;
 
     /* Parse motor velocity? */
     /* NEEDS WORK */

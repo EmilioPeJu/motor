@@ -436,8 +436,11 @@ asynStatus omsBaseController::getFirmwareVersion()
         count++;
         errlogPrintf("OMS Firmware Version: %s\n", inputBuffer);
     }
-    //
-    if ((p = strstr(inputBuffer, "ver:"))){
+    //beta versions have a B as first letter
+    if ((p = strstr(inputBuffer, "ver:B"))){
+        count = sscanf(p, "ver:B%d.%d.%d,", &fwMajor, &fwMinor, &fwRevision);
+    }
+    else if ((p = strstr(inputBuffer, "ver:"))){
         count = sscanf(p, "ver:%d.%d.%d,", &fwMajor, &fwMinor, &fwRevision);
     }
     if ((p == NULL) || (count < 2)) {
@@ -468,12 +471,18 @@ asynStatus omsBaseController::Init(const char* initString, int multiple){
     /* send InitString */
     if ((initString != NULL) && (strlen(initString) > 0)) {
         if (multiple){
+            /* send each commmand in initstring individually */
+            char* tmpout = new char[strlen(initString)+2];
             char* inittmp = epicsStrDup(initString);
             for (tokSave = NULL, p = epicsStrtok_r(inittmp, ";", &tokSave);
                     p != NULL; p = epicsStrtok_r(NULL, ";", &tokSave)) {
-                sendOnlyLock(p);
+                strcpy(tmpout, p);
+                strcat(tmpout, ";");
+                sendOnlyLock(tmpout);
+                epicsThreadSleep(0.1);
             }
             free(inittmp);
+            delete[] tmpout;
         }
         else {
             sendOnlyLock(initString);
@@ -623,28 +632,31 @@ void omsBaseController::omsPoller()
 
         epicsTimeGetCurrent(&loopStart);
 
+        /* read all axis status values and reset done-field
+         * MDNN,MDNN,PNLN,PNNN,PNLN,PNNN,PNNN,PNNN */
         retry_count = 0;
-        while ((getAxesPositions(axisPosArr) != asynSuccess) && (retry_count < 5)){
+        while ((getAxesStatus(statusBuffer, sizeof(statusBuffer), &moveDone) != asynSuccess) && (retry_count < 5)){
+            Debug(1, "%s:%s:%s: error reading axes status\n", driverName, functionName, this->portName);
             epicsThreadSleep(0.1);
             ++retry_count;
         }
+
         if (retry_count > 4){
-            errlogPrintf("%s:%s:%s: error reading axis position after %d attempts\n",
+            errlogPrintf("%s:%s:%s: error reading axis status (%d attempts)\n",
                     driverName, functionName, this->portName, retry_count);
+            ++loopBreakCount;
+            resetConnection();
+            continue;
+        }
+
+        if (getAxesPositions(axisPosArr) != asynSuccess){
+            Debug(1, "%s:%s:%s: error reading axis positions\n", driverName, functionName, this->portName);
             ++loopBreakCount;
             continue;
         }
 
         if (useEncoder && (getEncoderPositions(encPosArr) != asynSuccess)){
-            Debug(1, "%s:%s:%s: error executing get Encoder Positions\n", driverName, functionName, this->portName);
-            ++loopBreakCount;
-            continue;
-        }
-
-        /* read all axis status values and reset done-field
-         * MDNN,MDNN,PNLN,PNNN,PNLN,PNNN,PNNN,PNNN */
-        if (getAxesStatus(statusBuffer, sizeof(statusBuffer), &moveDone) != asynSuccess){
-            Debug(1, "%s:%s:%s: error reading axes status\n", driverName, functionName, this->portName);
+            Debug(1, "%s:%s:%s: error reading encoder positions\n", driverName, functionName, this->portName);
             ++loopBreakCount;
             continue;
         }
@@ -732,7 +744,7 @@ void omsBaseController::omsPoller()
                         pAxis->setIntegerParam(motorStatusDone_, 1);
                         pAxis->setIntegerParam(motorStatusMoving_, 0);
                         if (pAxis->homing) pAxis->homing = 0;
-                        if (statusBuffer[i*STATUSSTRINGLEN + 2] == 'P')
+                        if (statusBuffer[i*STATUSSTRINGLEN] == 'P')
                         	pAxis->setIntegerParam(motorStatusHighLimit_, 1);
                         else
                         	pAxis->setIntegerParam(motorStatusLowLimit_, 1);
