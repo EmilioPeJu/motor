@@ -1,5 +1,6 @@
 from iocbuilder import AutoSubstitution, Device, ModuleBase
 from iocbuilder.modules.asyn import AsynPort, Asyn
+from iocbuilder.modules.seq import Seq
 from iocbuilder.arginfo import *
 from common import MotorLib, MotorRecord, basic_asyn_motor
 
@@ -8,7 +9,7 @@ __all__ = ['Xps', 'xps_asyn_motor']
 class Xps(AsynPort, Device):
     ''' XPS controller Device - instatiate one per controller '''
     deviceCount = 0
-    Dependencies = (MotorLib,)
+    Dependencies = (MotorLib,Seq)
     DbdFileList = ['devNewport']
     LibFileList = ['Newport']
     

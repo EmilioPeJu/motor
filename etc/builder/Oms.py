@@ -1,11 +1,12 @@
 from iocbuilder import Device, records, RecordFactory
 from iocbuilder.modules.asyn import Asyn
+from iocbuilder.modules.seq import Seq
 from common import MotorLib
 
 __all__ = ['OmsVme58']
 
 class OmsVme(Device):
-    Dependencies = (MotorLib,)
+    Dependencies = (MotorLib,Seq)
     DbdFileList = ['devOms']
     LibFileList = ['oms']
 
