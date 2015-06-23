@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <display typeId="org.csstudio.opibuilder.Display" version="1.0.0">
   <show_close_button>true</show_close_button>
   <rules />
@@ -10,7 +10,7 @@
   <macros>
     <include_parent_macros>true</include_parent_macros>
   </macros>
-  <boy_version>4.0.103.201502061513</boy_version>
+  <boy_version>4.0.103.201503201352</boy_version>
   <show_edit_range>true</show_edit_range>
   <widget_type>Display</widget_type>
   <auto_scale_widgets>
@@ -19,17 +19,17 @@
     <min_height>-1</min_height>
   </auto_scale_widgets>
   <background_color>
-    <color blue="200" green="200" name="Canvas" red="200" />
+    <color name="Canvas" red="200" green="200" blue="200" />
   </background_color>
   <width>325</width>
   <x>-1</x>
-  <name />
+  <name></name>
   <grid_space>5</grid_space>
   <show_ruler>true</show_ruler>
   <y>-1</y>
   <snap_to_geometry>false</snap_to_geometry>
   <foreground_color>
-    <color blue="192" green="192" red="192" />
+    <color red="192" green="192" blue="192" />
   </foreground_color>
   <actions hook="false" hook_all="false" />
   <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
@@ -37,7 +37,8 @@
     <forecolor_alarm_sensitive>true</forecolor_alarm_sensitive>
     <alarm_pulsing>false</alarm_pulsing>
     <precision>0</precision>
-    <tooltip>$(pv_name)
+    <tooltip>Readback
+$(pv_name)
 $(pv_value)</tooltip>
     <horizontal_alignment>1</horizontal_alignment>
     <rules />
@@ -46,7 +47,7 @@ $(pv_value)</tooltip>
     <transparent>false</transparent>
     <pv_value />
     <auto_size>false</auto_size>
-    <text />
+    <text></text>
     <rotation_angle>0.0</rotation_angle>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -62,7 +63,7 @@ $(pv_value)</tooltip>
     <pv_name>$(P)$(M).RBV</pv_name>
     <vertical_alignment>1</vertical_alignment>
     <border_color>
-      <color blue="255" green="128" red="0" />
+      <color red="0" green="128" blue="255" />
     </border_color>
     <precision_from_pv>true</precision_from_pv>
     <widget_type>Text Update</widget_type>
@@ -70,14 +71,14 @@ $(pv_value)</tooltip>
     <wrap_words>false</wrap_words>
     <format_type>0</format_type>
     <background_color>
-      <color blue="64" green="64" name="Monitor: BG" red="64" />
+      <color name="Monitor: BG" red="64" green="64" blue="64" />
     </background_color>
-    <width>255</width>
-    <x>70</x>
+    <width>191</width>
+    <x>105</x>
     <name>Readback</name>
-    <y>0</y>
+    <y>25</y>
     <foreground_color>
-      <color blue="96" green="255" name="Monitor: FG" red="96" />
+      <color name="Monitor: FG" red="96" green="255" blue="96" />
     </foreground_color>
     <actions hook="false" hook_all="false" />
     <font>
@@ -100,7 +101,7 @@ $(pv_value)</tooltip>
     <pv_name>$(P)$(M).MOVN</pv_name>
     <degree>0</degree>
     <border_color>
-      <color blue="255" green="128" red="0" />
+      <color red="0" green="128" blue="255" />
     </border_color>
     <widget_type>Multistate Symbol Monitor</widget_type>
     <flip_horizontal>false</flip_horizontal>
@@ -134,7 +135,7 @@ $(pv_value)</tooltip>
     <enabled>true</enabled>
     <wuid>591ff34d:147d4ad1ac3:-79f5</wuid>
     <on_color>
-      <color blue="0" green="0" red="0" />
+      <color red="0" green="0" blue="0" />
     </on_color>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -146,18 +147,18 @@ $(pv_value)</tooltip>
     <crop_bottom>0</crop_bottom>
     <no_animation>false</no_animation>
     <off_color>
-      <color blue="0" green="0" red="0" />
+      <color red="0" green="0" blue="0" />
     </off_color>
     <backcolor_alarm_sensitive>true</backcolor_alarm_sensitive>
     <background_color>
-      <color blue="200" green="200" name="Canvas" red="200" />
+      <color name="Canvas" red="200" green="200" blue="200" />
     </background_color>
     <boolean_label_position>0</boolean_label_position>
     <width>40</width>
     <x>0</x>
     <y>0</y>
     <foreground_color>
-      <color blue="0" green="0" name="Black" red="0" />
+      <color name="Black" red="0" green="0" blue="0" />
     </foreground_color>
     <crop_top>0</crop_top>
     <crop_right>0</crop_right>
@@ -171,7 +172,8 @@ $(pv_value)</tooltip>
     <border_style>2</border_style>
     <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
     <alarm_pulsing>false</alarm_pulsing>
-    <tooltip>$(pv_name)
+    <tooltip>Tweak Plus
+$(pv_name)
 $(pv_value)</tooltip>
     <push_action_index>0</push_action_index>
     <rules />
@@ -179,7 +181,7 @@ $(pv_value)</tooltip>
     <wuid>-304029b7:147582c1239:-7965</wuid>
     <pv_value />
     <pv_control>false</pv_control>
-    <text />
+    <text></text>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <height>20</height>
@@ -191,30 +193,30 @@ $(pv_value)</tooltip>
     </scale_options>
     <image>symbol/plus_icon.png</image>
     <visible>true</visible>
-    <pv_name />
+    <pv_name>$(P)$(M).TWF</pv_name>
     <border_color>
-      <color blue="255" green="128" red="0" />
+      <color red="0" green="128" blue="255" />
     </border_color>
     <widget_type>Action Button</widget_type>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color blue="205" green="205" name="Controller: BG" red="205" />
+      <color name="Controller: BG" red="205" green="205" blue="205" />
     </background_color>
-    <width>25</width>
-    <x>275</x>
+    <width>30</width>
+    <x>295</x>
     <name>Tweak Plus</name>
-    <y>25</y>
+    <y>0</y>
     <style>0</style>
     <foreground_color>
-      <color blue="192" green="0" name="Controller: FG" red="0" />
+      <color name="Controller: FG" red="0" green="0" blue="196" />
     </foreground_color>
     <actions hook="false" hook_all="false">
       <action type="WRITE_PV">
         <pv_name>$(pv_name)</pv_name>
         <value>1</value>
         <timeout>10</timeout>
-        <confirm_message />
-        <description />
+        <confirm_message></confirm_message>
+        <description></description>
       </action>
     </actions>
     <font>
@@ -224,27 +226,28 @@ $(pv_value)</tooltip>
   <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
     <alarm_pulsing>false</alarm_pulsing>
     <precision>0</precision>
-    <tooltip>$(pv_name)
+    <tooltip>Demand
+$(pv_name)
 $(pv_value)</tooltip>
     <horizontal_alignment>1</horizontal_alignment>
     <rules />
     <pv_value />
     <auto_size>false</auto_size>
-    <text />
+    <text></text>
     <rotation_angle>0.0</rotation_angle>
     <show_units>false</show_units>
-    <height>20</height>
+    <height>21</height>
     <multiline_input>false</multiline_input>
     <border_width>0</border_width>
     <visible>true</visible>
     <pv_name>$(P)$(M).VAL</pv_name>
     <selector_type>0</selector_type>
     <border_color>
-      <color blue="255" green="0" name="Controller" red="0" />
+      <color name="Controller" red="0" green="0" blue="255" />
     </border_color>
     <precision_from_pv>true</precision_from_pv>
     <widget_type>Text Input</widget_type>
-    <confirm_message />
+    <confirm_message></confirm_message>
     <name>Demand</name>
     <style>0</style>
     <actions hook="false" hook_all="false" />
@@ -264,14 +267,14 @@ $(pv_value)</tooltip>
     <format_type>0</format_type>
     <limits_from_pv>false</limits_from_pv>
     <background_color>
-      <color blue="205" green="205" name="Controller: BG" red="205" />
+      <color name="Controller: BG" red="205" green="205" blue="205" />
     </background_color>
-    <width>146</width>
-    <x>125</x>
-    <y>25</y>
+    <width>180</width>
+    <x>110</x>
+    <y>0</y>
     <maximum>1.7976931348623157E308</maximum>
     <foreground_color>
-      <color blue="192" green="0" name="Controller: FG" red="0" />
+      <color name="Controller: FG" red="0" green="0" blue="196" />
     </foreground_color>
     <minimum>-1.7976931348623157E308</minimum>
     <font>
@@ -283,7 +286,8 @@ $(pv_value)</tooltip>
     <border_style>2</border_style>
     <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
     <alarm_pulsing>false</alarm_pulsing>
-    <tooltip>$(pv_name)
+    <tooltip>Tweak Minus
+$(pv_name)
 $(pv_value)</tooltip>
     <push_action_index>0</push_action_index>
     <rules />
@@ -291,7 +295,7 @@ $(pv_value)</tooltip>
     <wuid>-304029b7:147582c1239:-7966</wuid>
     <pv_value />
     <pv_control>false</pv_control>
-    <text />
+    <text></text>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <height>20</height>
@@ -303,30 +307,30 @@ $(pv_value)</tooltip>
     </scale_options>
     <image>symbol/minus_icon.png</image>
     <visible>true</visible>
-    <pv_name />
+    <pv_name>$(P)$(M).TWR</pv_name>
     <border_color>
-      <color blue="255" green="128" red="0" />
+      <color red="0" green="128" blue="255" />
     </border_color>
     <widget_type>Action Button</widget_type>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color blue="205" green="205" name="Controller: BG" red="205" />
+      <color name="Controller: BG" red="205" green="205" blue="205" />
     </background_color>
-    <width>26</width>
-    <x>95</x>
+    <width>30</width>
+    <x>75</x>
     <name>Tweak Minus</name>
-    <y>25</y>
+    <y>0</y>
     <style>0</style>
     <foreground_color>
-      <color blue="192" green="0" name="Controller: FG" red="0" />
+      <color name="Controller: FG" red="0" green="0" blue="196" />
     </foreground_color>
     <actions hook="false" hook_all="false">
       <action type="WRITE_PV">
         <pv_name>$(pv_name)</pv_name>
         <value>1</value>
         <timeout>10</timeout>
-        <confirm_message />
-        <description />
+        <confirm_message></confirm_message>
+        <description></description>
       </action>
     </actions>
     <font>
@@ -338,7 +342,8 @@ $(pv_value)</tooltip>
     <border_style>2</border_style>
     <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
     <alarm_pulsing>false</alarm_pulsing>
-    <tooltip>$(pv_name)
+    <tooltip>Stop
+$(pv_name)
 $(pv_value)</tooltip>
     <push_action_index>0</push_action_index>
     <rules />
@@ -346,7 +351,7 @@ $(pv_value)</tooltip>
     <wuid>-304029b7:147582c1239:-7963</wuid>
     <pv_value />
     <pv_control>false</pv_control>
-    <text />
+    <text></text>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
     <height>20</height>
@@ -360,28 +365,28 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <pv_name>$(P)$(M).STOP</pv_name>
     <border_color>
-      <color blue="255" green="128" red="0" />
+      <color red="0" green="128" blue="255" />
     </border_color>
     <widget_type>Action Button</widget_type>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color blue="205" green="205" name="Controller: BG" red="205" />
+      <color name="Controller: BG" red="205" green="205" blue="205" />
     </background_color>
-    <width>26</width>
+    <width>30</width>
     <x>40</x>
     <name>auto(command|Stop)</name>
     <y>0</y>
     <style>0</style>
     <foreground_color>
-      <color blue="192" green="0" name="Controller: FG" red="0" />
+      <color name="Controller: FG" red="0" green="0" blue="196" />
     </foreground_color>
     <actions hook="false" hook_all="false">
       <action type="WRITE_PV">
         <pv_name>$(pv_name)</pv_name>
         <value>1</value>
         <timeout>10</timeout>
-        <confirm_message />
-        <description />
+        <confirm_message></confirm_message>
+        <description></description>
       </action>
     </actions>
     <font>
@@ -391,32 +396,33 @@ $(pv_value)</tooltip>
   <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
     <alarm_pulsing>false</alarm_pulsing>
     <precision>0</precision>
-    <tooltip>$(pv_name)
+    <tooltip>Tweak Step
+$(pv_name)
 $(pv_value)</tooltip>
     <horizontal_alignment>1</horizontal_alignment>
     <rules />
     <pv_value />
     <auto_size>false</auto_size>
-    <text />
+    <text></text>
     <rotation_angle>0.0</rotation_angle>
     <show_units>false</show_units>
-    <height>18</height>
+    <height>20</height>
     <multiline_input>false</multiline_input>
     <border_width>1</border_width>
     <visible>true</visible>
     <pv_name>$(P)$(M).TWV</pv_name>
     <selector_type>0</selector_type>
     <border_color>
-      <color blue="255" green="128" red="0" />
+      <color red="0" green="128" blue="255" />
     </border_color>
     <precision_from_pv>true</precision_from_pv>
     <widget_type>Text Input</widget_type>
-    <confirm_message />
+    <confirm_message></confirm_message>
     <name>Tweak Step</name>
     <style>0</style>
     <actions hook="false" hook_all="false" />
     <border_style>0</border_style>
-    <forecolor_alarm_sensitive>true</forecolor_alarm_sensitive>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
     <enabled>true</enabled>
     <wuid>2e1670d1:14b2be7ec15:-7eb3</wuid>
     <transparent>false</transparent>
@@ -431,14 +437,14 @@ $(pv_value)</tooltip>
     <format_type>0</format_type>
     <limits_from_pv>false</limits_from_pv>
     <background_color>
-      <color blue="205" green="205" name="Controller: BG" red="205" />
+      <color name="Canvas" red="200" green="200" blue="200" />
     </background_color>
-    <width>66</width>
+    <width>76</width>
     <x>0</x>
-    <y>26</y>
+    <y>25</y>
     <maximum>1.7976931348623157E308</maximum>
     <foreground_color>
-      <color blue="192" green="0" name="Controller: FG" red="0" />
+      <color name="Controller: FG" red="0" green="0" blue="196" />
     </foreground_color>
     <minimum>-1.7976931348623157E308</minimum>
     <font>
@@ -447,7 +453,7 @@ $(pv_value)</tooltip>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
     <alarm_pulsing>false</alarm_pulsing>
-    <tooltip>$(name)
+    <tooltip>Low Limit
 $(pv_name)
 $(pv_value)</tooltip>
     <rules />
@@ -459,7 +465,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <pv_name>$(P)$(M).MSTA</pv_name>
     <border_color>
-      <color blue="255" green="128" red="0" />
+      <color red="0" green="128" blue="255" />
     </border_color>
     <widget_type>LED</widget_type>
     <name>Low Limit</name>
@@ -470,7 +476,7 @@ $(pv_value)</tooltip>
     <enabled>true</enabled>
     <wuid>2e1670d1:14b2be7ec15:-7ae2</wuid>
     <on_color>
-      <color blue="0" green="255" name="Yellow LED: On" red="255" />
+      <color name="Yellow LED: On" red="255" green="255" blue="0" />
     </on_color>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -481,19 +487,19 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>true</keep_wh_ratio>
     </scale_options>
     <off_color>
-      <color blue="0" green="96" red="96" />
+      <color red="96" green="96" blue="0" />
     </off_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color blue="240" green="240" red="240" />
+      <color red="240" green="240" blue="240" />
     </background_color>
     <square_led>false</square_led>
     <width>20</width>
-    <x>70</x>
+    <x>80</x>
     <data_type>0</data_type>
     <y>25</y>
     <foreground_color>
-      <color blue="192" green="192" red="192" />
+      <color red="192" green="192" blue="192" />
     </foreground_color>
     <font>
       <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
@@ -502,19 +508,19 @@ $(pv_value)</tooltip>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
     <alarm_pulsing>false</alarm_pulsing>
-    <tooltip>$(name)
+    <tooltip>High Limit
 $(pv_name)
 $(pv_value)</tooltip>
     <rules />
     <effect_3d>true</effect_3d>
-    <bit>13</bit>
+    <bit>2</bit>
     <pv_value />
     <height>20</height>
     <border_width>1</border_width>
     <visible>true</visible>
     <pv_name>$(P)$(M).MSTA</pv_name>
     <border_color>
-      <color blue="255" green="128" red="0" />
+      <color red="0" green="128" blue="255" />
     </border_color>
     <widget_type>LED</widget_type>
     <name>High Limit</name>
@@ -525,7 +531,7 @@ $(pv_value)</tooltip>
     <enabled>true</enabled>
     <wuid>2e1670d1:14b2be7ec15:-6c6b</wuid>
     <on_color>
-      <color blue="0" green="255" name="Yellow LED: On" red="255" />
+      <color name="Yellow LED: On" red="255" green="255" blue="0" />
     </on_color>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -536,19 +542,19 @@ $(pv_value)</tooltip>
       <keep_wh_ratio>true</keep_wh_ratio>
     </scale_options>
     <off_color>
-      <color blue="0" green="96" red="96" />
+      <color red="96" green="96" blue="0" />
     </off_color>
     <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
     <background_color>
-      <color blue="240" green="240" red="240" />
+      <color red="240" green="240" blue="240" />
     </background_color>
     <square_led>false</square_led>
     <width>20</width>
-    <x>305</x>
+    <x>300</x>
     <data_type>0</data_type>
     <y>25</y>
     <foreground_color>
-      <color blue="192" green="192" red="192" />
+      <color red="192" green="192" blue="192" />
     </foreground_color>
     <font>
       <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
