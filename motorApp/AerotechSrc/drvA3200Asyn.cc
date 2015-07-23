@@ -453,7 +453,7 @@ static int motorAxisSetInteger(AXIS_HDL pAxis, motorAxisParam_t function, int va
             ret_status = sendAndReceive(pAxis->pController, outputBuff, inputBuff, sizeof(inputBuff));
 
             /* Prevent Task #2 from blocking during LINEAR commands. */
-            ret_status = sendAndReceive(pAxis->pController, (char *) "WAIT MODE AUTO", inputBuff, sizeof(inputBuff));
+            ret_status = sendAndReceive(pAxis->pController, (char *) "WAIT MODE INPOS", inputBuff, sizeof(inputBuff));
 
             break;
 
@@ -727,7 +727,7 @@ static void A3200Poller(A3200Controller *pController)
 
             motorParam->setInteger(params, motorAxisCommError, 0);
 
-            move_active = !(axis_status & AXISSTATUS_MoveDone);
+            move_active = !(axis_status & AXISSTATUS_WaitDone);
             motorParam->setInteger(params, motorAxisDone, !move_active);
             if (move_active)
                 anyMoving = true;
@@ -939,7 +939,7 @@ int A3200AsynConfig(int card,             /* Controller number */
     sendAndReceive(pController, "~INITQUEUE", inputBuff, sizeof(inputBuff));
 
     /* Prevent Task #2 and #3 from blocking during LINEAR commands. */
-    sendAndReceive(pController, (char *) "WAIT MODE AUTO", inputBuff, sizeof(inputBuff));
+    sendAndReceive(pController, (char *) "WAIT MODE INPOS", inputBuff, sizeof(inputBuff));
     sendAndReceive(pController, (char *) "~TASK 3", inputBuff, sizeof(inputBuff));
     sendAndReceive(pController, (char *) "WAIT MODE AUTO", inputBuff, sizeof(inputBuff));
     sendAndReceive(pController, (char *) "~TASK 2", inputBuff, sizeof(inputBuff));
