@@ -467,7 +467,7 @@ ss xpsTrajectoryScan {
             if (xpsStatus != 45) {
             	/* Check again */
 		        printf("Possible odd status value=%d, retrying\n",xpsStatus);            	
-		        epicsThreadSleep(0.1);
+		        delay(0.1);
                 %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
             }
             if (xpsStatus == 45) {
