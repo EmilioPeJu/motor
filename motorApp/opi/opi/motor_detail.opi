@@ -10,7 +10,7 @@
   <macros>
     <include_parent_macros>true</include_parent_macros>
   </macros>
-  <boy_version>4.0.103.201502061513</boy_version>
+  <boy_version>4.0.104.201510210901</boy_version>
   <show_edit_range>true</show_edit_range>
   <widget_type>Display</widget_type>
   <auto_scale_widgets>
@@ -33,301 +33,508 @@
   </foreground_color>
   <actions hook="false" hook_all="false" />
   <widget typeId="org.csstudio.opibuilder.widgets.detailpanel" version="1.0.0">
-    <row_24_row_name>Offset</row_24_row_name>
+    <row_24_row_name>Set/Use</row_24_row_name>
+    <row_84_row_name_value />
+    <row_79_row_name_value />
+    <row_19_row_name_value />
+    <row_49_row_name_value />
+    <row_39_row_level>0</row_39_row_level>
+    <row_169_row_name_value />
+    <row_199_row_name_value />
+    <row_139_row_name_value />
+    <row_29_row_name>Steps per Rev</row_29_row_name>
+    <row_10_row_level>0</row_10_row_level>
+    <row_45_row_mode>0</row_45_row_mode>
+    <row_24_row_name_value />
+    <row_0_row_name_value />
+    <row_54_row_name_value />
+    <row_121_row_name_value />
     <x>0</x>
     <y>0</y>
+    <row_151_row_name_value />
+    <row_181_row_name_value />
+    <row_114_row_name_value />
+    <row_144_row_name_value />
     <row_26_row_level>0</row_26_row_level>
-    <row_35_row_level>0</row_35_row_level>
-    <row_9_row_height>27</row_9_row_height>
-    <row_33_row_name>Motion</row_33_row_name>
-    <row_15_row_name>Jog Forward</row_15_row_name>
-    <row_48_row_height>27</row_48_row_height>
-    <row_0_row_name></row_0_row_name>
-    <row_43_row_name>Move Fraction</row_43_row_name>
-    <macros>
-      <include_parent_macros>true</include_parent_macros>
-    </macros>
-    <row_14_row_height>27</row_14_row_height>
-    <row_33_row_mode>3</row_33_row_mode>
-    <row_8_row_height>27</row_8_row_height>
-    <row_9_row_mode>0</row_9_row_mode>
-    <row_15_row_mode>0</row_15_row_mode>
-    <row_36_row_level>0</row_36_row_level>
-    <row_35_row_tooltip>Base Velocity</row_35_row_tooltip>
-    <row_20_row_height>27</row_20_row_height>
-    <row_34_row_level>0</row_34_row_level>
-    <row_8_row_tooltip>Dial High Limit</row_8_row_tooltip>
-    <row_0_row_tooltip></row_0_row_tooltip>
-    <row_9_row_name>Dial Low Limit</row_9_row_name>
-    <color_select_back>
-      <color red="217" green="217" blue="255" />
-    </color_select_back>
-    <row_46_row_tooltip></row_46_row_tooltip>
-    <row_27_row_level>0</row_27_row_level>
-    <row_42_row_name>Backlash Secs to Vel</row_42_row_name>
-    <row_13_row_height>27</row_13_row_height>
-    <row_13_row_tooltip>Home Forward</row_13_row_tooltip>
-    <row_32_row_mode>0</row_32_row_mode>
-    <row_0_row_level>0</row_0_row_level>
-    <color_even_row_back>
-      <color name="Canvas" red="200" green="200" blue="200" />
-    </color_even_row_back>
-    <row_42_row_mode>0</row_42_row_mode>
-    <row_24_row_tooltip>Offset</row_24_row_tooltip>
-    <border_style>0</border_style>
-    <row_28_row_level>0</row_28_row_level>
-    <row_23_row_name>Set/Use</row_23_row_name>
-    <row_22_row_height>27</row_22_row_height>
-    <row_25_row_mode>0</row_25_row_mode>
-    <row_39_row_height>27</row_39_row_height>
-    <row_23_row_mode>0</row_23_row_mode>
-    <row_24_row_level>0</row_24_row_level>
-    <row_25_row_name>Use Encoder</row_25_row_name>
-    <row_37_row_level>0</row_37_row_level>
-    <row_43_row_mode>0</row_43_row_mode>
-    <row_15_row_height>27</row_15_row_height>
-    <height>1709</height>
-    <row_34_row_name>Max Velocity</row_34_row_name>
-    <row_45_row_height>27</row_45_row_height>
-    <row_45_row_level>0</row_45_row_level>
-    <row_31_row_tooltip>Readback Step Size</row_31_row_tooltip>
-    <row_34_row_tooltip>Max Velocity</row_34_row_tooltip>
-    <row_43_row_level>0</row_43_row_level>
-    <row_31_row_mode>0</row_31_row_mode>
-    <row_1_row_mode>3</row_1_row_mode>
-    <row_41_row_level>0</row_41_row_level>
-    <row_4_row_tooltip>Encoder Loss, Amplifier Loss, Sys Fail</row_4_row_tooltip>
-    <row_47_row_level>0</row_47_row_level>
-    <row_42_row_tooltip>Backlash Secs to Vel</row_42_row_tooltip>
-    <row_14_row_name>Home Reverse</row_14_row_name>
-    <row_23_row_tooltip>Set/Use</row_23_row_tooltip>
-    <row_34_row_mode>0</row_34_row_mode>
-    <row_38_row_height>27</row_38_row_height>
-    <row_16_row_level>0</row_16_row_level>
-    <row_18_row_level>0</row_18_row_level>
-    <row_1_row_name>Status</row_1_row_name>
-    <row_21_row_height>27</row_21_row_height>
-    <row_20_row_tooltip>High</row_20_row_tooltip>
-    <row_45_row_tooltip>Max Retrys</row_45_row_tooltip>
-    <row_31_row_name>Readback Step Size</row_31_row_name>
-    <row_14_row_mode>0</row_14_row_mode>
     <row_40_row_mode>0</row_40_row_mode>
-    <row_5_row_height>27</row_5_row_height>
+    <row_5_row_height>25</row_5_row_height>
+    <pv_value />
+    <row_174_row_name_value />
+    <row_2_row_name>Status</row_2_row_name>
+    <row_48_row_level>0</row_48_row_level>
+    <row_35_row_level>0</row_35_row_level>
+    <widget_type>Detail Panel</widget_type>
+    <row_12_row_mode>3</row_12_row_mode>
+    <row_82_row_name_value />
+    <row_17_row_name_value />
+    <row_45_row_name>Retry Deadband</row_45_row_name>
+    <row_47_row_name_value />
+    <row_77_row_name_value />
     <row_7_row_mode>0</row_7_row_mode>
+    <row_178_row_name_value />
+    <row_9_row_height>27</row_9_row_height>
+    <row_148_row_name_value />
+    <row_38_row_mode>0</row_38_row_mode>
+    <row_44_row_height>27</row_44_row_height>
+    <vert_divider_pos>160</vert_divider_pos>
     <row_24_row_height>27</row_24_row_height>
+    <row_118_row_name_value />
+    <row_31_row_height>27</row_31_row_height>
+    <row_17_row_name>Jog Reverse</row_17_row_name>
     <row_11_row_height>27</row_11_row_height>
+    <row_14_row_level>0</row_14_row_level>
+    <row_36_row_name>Base Velocity</row_36_row_name>
+    <row_2_row_name_value />
+    <row_33_row_name>Use Encoder if Present</row_33_row_name>
     <row_3_row_level>0</row_3_row_level>
+    <row_15_row_name>Home Reverse</row_15_row_name>
+    <row_23_row_level>0</row_23_row_level>
+    <row_48_row_height>27</row_48_row_height>
+    <row_75_row_name_value />
+    <row_5_row_name>ELoss Clear</row_5_row_name>
     <row_22_row_level>0</row_22_row_level>
     <row_18_row_height>27</row_18_row_height>
+    <row_172_row_name_value />
+    <row_112_row_name_value />
+    <row_142_row_name_value />
+    <row_17_row_height>27</row_17_row_height>
+    <row_26_row_mode>0</row_26_row_mode>
+    <row_27_row_height>27</row_27_row_height>
     <color_odd_row_fore>
       <color red="0" green="0" blue="0" />
     </color_odd_row_fore>
+    <row_40_row_level>0</row_40_row_level>
     <row_13_row_level>0</row_13_row_level>
-    <row_40_row_name>Backlash Distance</row_40_row_name>
-    <row_5_row_tooltip>Lim</row_5_row_tooltip>
-    <row_29_row_level>0</row_29_row_level>
-    <row_30_row_tooltip>Encoder Step Size</row_30_row_tooltip>
-    <color_select_fore>
-      <color red="0" green="0" blue="0" />
-    </color_select_fore>
-    <row_46_row_name>Other</row_46_row_name>
-    <row_2_row_level>0</row_2_row_level>
-    <row_37_row_height>27</row_37_row_height>
-    <enabled>true</enabled>
-    <row_33_row_level>0</row_33_row_level>
-    <row_30_row_level>0</row_30_row_level>
-    <width>360</width>
-    <row_43_row_height>27</row_43_row_height>
-    <visible>true</visible>
-    <row_16_row_height>27</row_16_row_height>
-    <color_even_row_fore>
-      <color red="0" green="0" blue="0" />
-    </color_even_row_fore>
-    <row_41_row_tooltip>Backlash Velocity</row_41_row_tooltip>
-    <tooltip></tooltip>
-    <row_16_row_name>Jog Reverse</row_16_row_name>
-    <row_32_row_name>Use Encoder if Present</row_32_row_name>
-    <row_46_row_level>0</row_46_row_level>
-    <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
-    </font>
-    <row_42_row_level>0</row_42_row_level>
-    <row_41_row_mode>0</row_41_row_mode>
-    <row_46_row_height>20</row_46_row_height>
-    <row_6_row_name>User High Limit</row_6_row_name>
-    <row_21_row_level>0</row_21_row_level>
-    <row_7_row_height>27</row_7_row_height>
-    <row_39_row_mode>0</row_39_row_mode>
-    <row_16_row_mode>0</row_16_row_mode>
-    <row_25_row_level>0</row_25_row_level>
-    <row_count>49</row_count>
-    <row_6_row_mode>0</row_6_row_mode>
-    <row_47_row_tooltip>PREC</row_47_row_tooltip>
-    <row_38_row_level>0</row_38_row_level>
-    <row_35_row_height>27</row_35_row_height>
-    <row_0_row_mode>1</row_0_row_mode>
-    <row_39_row_tooltip>Jog Acceleration</row_39_row_tooltip>
-    <row_36_row_tooltip>Velocity</row_36_row_tooltip>
-    <row_7_row_level>0</row_7_row_level>
-    <rules />
-    <row_2_row_tooltip>Direction Positive, Done, High Limit, Home Limit, Unused, Closed Loop, Following Error, At Home, Encoder Present, Problem, Moving, Gain Support, Comms Error, Low Limit, Homed</row_2_row_tooltip>
-    <row_47_row_mode>0</row_47_row_mode>
-    <row_25_row_tooltip>Use Encoder</row_25_row_tooltip>
-    <row_24_row_mode>0</row_24_row_mode>
-    <row_41_row_name>Backlash Velocity</row_41_row_name>
-    <row_17_row_tooltip>Tweak Forward</row_17_row_tooltip>
-    <row_14_row_tooltip>Home Reverse</row_14_row_tooltip>
-    <row_30_row_height>27</row_30_row_height>
-    <row_2_row_height>307</row_2_row_height>
-    <row_29_row_height>27</row_29_row_height>
-    <row_47_row_name>PREC</row_47_row_name>
-    <row_17_row_level>0</row_17_row_level>
-    <row_28_row_tooltip>Steps per Rev</row_28_row_tooltip>
-    <row_29_row_name>EGUs per Rev</row_29_row_name>
-    <row_10_row_level>0</row_10_row_level>
-    <widget_type>Detail Panel</widget_type>
-    <row_38_row_mode>0</row_38_row_mode>
-    <vert_divider_pos>160</vert_divider_pos>
-    <row_5_row_name>Limit Violation</row_5_row_name>
-    <row_27_row_height>27</row_27_row_height>
+    <row_52_row_name_value />
+    <row_22_row_name_value />
+    <row_0_row_name></row_0_row_name>
     <row_29_row_mode>0</row_29_row_mode>
-    <row_11_row_tooltip>Sync VAL=RBV</row_11_row_tooltip>
-    <row_48_row_name>EGU</row_48_row_name>
-    <row_19_row_tooltip>Tweak Step</row_19_row_tooltip>
-    <row_15_row_tooltip>Jog Forward</row_15_row_tooltip>
+    <row_45_row_name_value />
+    <row_15_row_name_value />
+    <row_11_row_tooltip>Kill</row_11_row_tooltip>
+    <row_43_row_name>Backlash Secs to Vel</row_43_row_name>
+    <row_12_row_tooltip>Sync VAL=RBV</row_12_row_tooltip>
+    <row_48_row_name>PREC</row_48_row_name>
+    <row_19_row_tooltip>Tweak Reverse</row_19_row_tooltip>
+    <row_15_row_tooltip>Home Reverse</row_15_row_tooltip>
+    <row_9_row_name_value />
+    <row_16_row_tooltip>Jog Forward</row_16_row_tooltip>
+    <row_10_row_height>27</row_10_row_height>
+    <row_165_row_name_value />
+    <row_105_row_name_value />
+    <row_195_row_name_value />
+    <row_135_row_name_value />
+    <row_9_row_tooltip>Dial High Limit</row_9_row_tooltip>
+    <row_12_row_name>Sync VAL=RBV</row_12_row_name>
+    <row_1_row_tooltip>Status</row_1_row_tooltip>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    </macros>
     <row_6_row_level>0</row_6_row_level>
+    <row_30_row_mode>0</row_30_row_mode>
+    <row_40_row_name>Jog Acceleration</row_40_row_name>
+    <row_5_row_tooltip></row_5_row_tooltip>
     <color_odd_row_back>
       <color name="Controller: BG" red="205" green="205" blue="205" />
     </color_odd_row_back>
-    <row_38_row_name>JVEL</row_38_row_name>
+    <row_22_row_name>Direction</row_22_row_name>
+    <row_127_row_name_value />
+    <row_14_row_height>27</row_14_row_height>
+    <row_31_row_name_value />
+    <row_38_row_name>Secs to Velocity</row_38_row_name>
+    <row_187_row_name_value />
+    <row_157_row_name_value />
+    <row_33_row_mode>0</row_33_row_mode>
+    <row_36_row_mode>0</row_36_row_mode>
+    <row_8_row_height>27</row_8_row_height>
     <row_41_row_height>27</row_41_row_height>
-    <row_22_row_tooltip>User Offset</row_22_row_tooltip>
-    <row_26_row_tooltip>Low</row_26_row_tooltip>
-    <row_5_row_mode>3</row_5_row_mode>
-    <row_10_row_mode>3</row_10_row_mode>
+    <row_22_row_tooltip>Direction</row_22_row_tooltip>
+    <row_61_row_name_value />
+    <row_9_row_mode>0</row_9_row_mode>
+    <row_91_row_name_value />
+    <row_68_row_name_value />
+    <row_98_row_name_value />
+    <row_38_row_name_value />
+    <row_26_row_tooltip>Use Encoder</row_26_row_tooltip>
+    <row_5_row_mode>0</row_5_row_mode>
+    <row_15_row_mode>0</row_15_row_mode>
+    <row_158_row_name_value />
+    <row_10_row_mode>0</row_10_row_mode>
+    <row_25_row_height>27</row_25_row_height>
+    <row_29_row_level>0</row_29_row_level>
+    <row_35_row_mode>0</row_35_row_mode>
     <actions hook="false" hook_all="false" />
-    <row_39_row_name>Jog Acceleration</row_39_row_name>
+    <row_39_row_name>JVEL</row_39_row_name>
+    <row_43_row_name_value />
+    <row_140_row_name_value />
+    <row_36_row_level>0</row_36_row_level>
     <row_1_row_height>22</row_1_row_height>
+    <row_26_row_name>Use Encoder</row_26_row_name>
+    <row_30_row_tooltip>EGUs per Rev</row_30_row_tooltip>
+    <row_192_row_name_value />
+    <row_37_row_name_value />
+    <row_32_row_tooltip>Readback Step Size</row_32_row_tooltip>
+    <row_41_row_name_value />
     <row_48_row_mode>0</row_48_row_mode>
-    <row_33_row_tooltip>Motor readback</row_33_row_tooltip>
+    <row_97_row_name_value />
+    <row_35_row_tooltip>Max Velocity</row_35_row_tooltip>
+    <row_33_row_tooltip>Use Encoder if Present</row_33_row_tooltip>
+    <row_38_row_tooltip>Secs to Velocity</row_38_row_tooltip>
+    <row_134_row_name_value />
+    <row_194_row_name_value />
+    <row_20_row_height>27</row_20_row_height>
+    <color_select_fore>
+      <color red="0" green="0" blue="0" />
+    </color_select_fore>
     <row_40_row_height>27</row_40_row_height>
-    <row_6_row_tooltip>User High Limit</row_6_row_tooltip>
+    <row_30_row_name>EGUs per Rev</row_30_row_name>
+    <row_186_row_name_value />
+    <row_34_row_level>0</row_34_row_level>
+    <row_8_row_tooltip>User Low Limit</row_8_row_tooltip>
+    <row_44_row_name_value />
+    <row_22_row_mode>0</row_22_row_mode>
+    <row_29_row_name_value />
+    <row_0_row_tooltip></row_0_row_tooltip>
+    <row_141_row_name_value />
+    <pv_name></pv_name>
+    <row_40_row_name_value />
+    <row_6_row_tooltip>Lim</row_6_row_tooltip>
+    <row_46_row_name>Max Retrys</row_46_row_name>
     <row_28_row_mode>0</row_28_row_mode>
+    <row_126_row_name_value />
+    <row_89_row_name_value />
+    <name>Detail Panel</name>
+    <row_9_row_name>Dial High Limit</row_9_row_name>
+    <row_36_row_name_value />
+    <color_select_back>
+      <color red="217" green="217" blue="255" />
+    </color_select_back>
+    <row_2_row_level>0</row_2_row_level>
+    <row_96_row_name_value />
+    <row_133_row_name_value />
+    <row_159_row_name_value />
+    <row_21_row_tooltip>High</row_21_row_tooltip>
     <row_19_row_mode>0</row_19_row_mode>
-    <row_44_row_tooltip>Retry Deadband</row_44_row_tooltip>
+    <row_46_row_tooltip>Max Retrys</row_46_row_tooltip>
+    <row_44_row_tooltip>Move Fraction</row_44_row_tooltip>
+    <row_27_row_level>0</row_27_row_level>
+    <row_42_row_name>Backlash Velocity</row_42_row_name>
+    <row_193_row_name_value />
+    <row_29_row_tooltip>Steps per Rev</row_29_row_tooltip>
+    <row_27_row_tooltip>Low</row_27_row_tooltip>
+    <row_13_row_height>27</row_13_row_height>
+    <row_51_row_name_value />
+    <row_190_row_name_value />
+    <row_130_row_name_value />
+    <row_93_row_name_value />
+    <row_28_row_name_value />
     <row_28_row_height>27</row_28_row_height>
+    <row_31_row_level>0</row_31_row_level>
+    <row_88_row_name_value />
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
-    <row_10_row_name>Kill</row_10_row_name>
+    <row_167_row_name_value />
+    <row_184_row_name_value />
+    <row_33_row_name_value />
+    <row_124_row_name_value />
+    <row_107_row_name_value />
+    <row_185_row_name_value />
+    <row_10_row_name>Dial Low Limit</row_10_row_name>
     <row_3_row_height>22</row_3_row_height>
+    <row_32_row_level>0</row_32_row_level>
+    <row_125_row_name_value />
+    <row_34_row_name_value />
+    <row_94_row_name_value />
+    <row_37_row_height>27</row_37_row_height>
+    <enabled>true</enabled>
+    <row_33_row_level>0</row_33_row_level>
+    <row_10_row_tooltip>Dial Low Limit</row_10_row_tooltip>
+    <row_13_row_tooltip>Motor demand</row_13_row_tooltip>
+    <row_13_row_name>Commands</row_13_row_name>
+    <row_1_row_level>0</row_1_row_level>
+    <row_18_row_tooltip>Tweak Forward</row_18_row_tooltip>
+    <row_30_row_level>0</row_30_row_level>
+    <width>360</width>
+    <row_32_row_mode>0</row_32_row_mode>
+    <row_2_row_mode>0</row_2_row_mode>
+    <row_43_row_height>27</row_43_row_height>
+    <row_86_row_name_value />
+    <row_26_row_name_value />
+    <row_35_row_name_value />
+    <row_132_row_name_value />
+    <row_0_row_level>0</row_0_row_level>
+    <row_123_row_name_value />
+    <row_183_row_name_value />
+    <visible>true</visible>
+    <row_109_row_name_value />
+    <row_16_row_height>27</row_16_row_height>
+    <row_95_row_name_value />
+    <color_even_row_back>
+      <color name="Canvas" red="200" green="200" blue="200" />
+    </color_even_row_back>
+    <row_168_row_name_value />
+    <row_3_row_tooltip>ELoss</row_3_row_tooltip>
+    <row_108_row_name_value />
+    <color_even_row_fore>
+      <color red="0" green="0" blue="0" />
+    </color_even_row_fore>
+    <row_6_row_height>27</row_6_row_height>
+    <row_27_row_name_value />
+    <row_131_row_name_value />
+    <row_50_row_name_value />
+    <row_87_row_name_value />
+    <row_191_row_name_value />
     <row_34_row_height>27</row_34_row_height>
-    <row_19_row_name>Tweak Step</row_19_row_name>
+    <row_42_row_mode>0</row_42_row_mode>
+    <scripts />
+    <row_41_row_tooltip>Backlash Distance</row_41_row_tooltip>
+    <row_116_row_name_value />
+    <row_176_row_name_value />
+    <row_24_row_tooltip>Set/Use</row_24_row_tooltip>
+    <row_19_row_name>Tweak Reverse</row_19_row_name>
+    <row_49_row_tooltip>EGU</row_49_row_tooltip>
+    <row_42_row_name_value />
+    <row_30_row_name_value />
+    <tooltip></tooltip>
     <border_width>1</border_width>
-    <row_0_row_height>82</row_0_row_height>
-    <row_37_row_name>Secs to Velocity</row_37_row_name>
+    <row_16_row_name>Jog Forward</row_16_row_name>
+    <border_style>0</border_style>
+    <row_28_row_level>0</row_28_row_level>
+    <row_18_row_name_value />
+    <wuid>-4f4b678c:14c085f666c:-759f</wuid>
+    <row_48_row_name_value />
+    <row_78_row_name_value />
+    <row_0_row_height>83</row_0_row_height>
+    <row_32_row_name>Readback Step Size</row_32_row_name>
+    <row_115_row_name_value />
+    <row_145_row_name_value />
+    <row_3_row_mode>3</row_3_row_mode>
+    <row_46_row_level>0</row_46_row_level>
+    <row_117_row_name_value />
+    <row_175_row_name_value />
+    <row_37_row_name>Velocity</row_37_row_name>
+    <row_177_row_name_value />
+    <row_147_row_name_value />
+    <row_60_row_name_value />
+    <row_90_row_name_value />
+    <font>
+      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+    </font>
+    <row_8_row_mode>0</row_8_row_mode>
+    <row_19_row_level>0</row_19_row_level>
+    <row_42_row_level>0</row_42_row_level>
+    <row_13_row_mode>3</row_13_row_mode>
     <row_19_row_height>27</row_19_row_height>
-    <row_11_row_name>Sync VAL=RBV</row_11_row_name>
+    <row_32_row_name_value />
+    <row_11_row_name>Kill</row_11_row_name>
     <row_26_row_height>27</row_26_row_height>
+    <row_41_row_mode>0</row_41_row_mode>
+    <row_46_row_height>27</row_46_row_height>
+    <row_6_row_name>Limit Violation</row_6_row_name>
+    <row_21_row_level>0</row_21_row_level>
+    <row_122_row_name_value />
+    <row_152_row_name_value />
+    <row_182_row_name_value />
+    <row_23_row_name>User Offset</row_23_row_name>
+    <row_49_row_name>EGU</row_49_row_name>
     <row_8_row_level>0</row_8_row_level>
-    <row_20_row_name>Calibration</row_20_row_name>
+    <row_22_row_height>27</row_22_row_height>
+    <row_20_row_name>Tweak Step</row_20_row_name>
+    <row_25_row_mode>0</row_25_row_mode>
+    <row_1_row_name_value />
+    <row_7_row_height>27</row_7_row_height>
+    <row_25_row_name_value />
+    <row_55_row_name_value />
+    <row_85_row_name_value />
+    <row_42_row_height>27</row_42_row_height>
+    <row_119_row_name_value />
+    <row_179_row_name_value />
+    <row_149_row_name_value />
+    <row_16_row_name_value />
     <row_4_row_height>67</row_4_row_height>
+    <row_39_row_mode>0</row_39_row_mode>
+    <row_16_row_mode>0</row_16_row_mode>
+    <row_46_row_name_value />
+    <row_76_row_name_value />
+    <row_113_row_name_value />
+    <row_106_row_name_value />
+    <row_3_row_name>ELoss</row_3_row_name>
+    <row_69_row_name_value />
+    <row_99_row_name_value />
+    <row_173_row_name_value />
+    <row_39_row_name_value />
+    <row_143_row_name_value />
+    <row_166_row_name_value />
+    <row_25_row_level>0</row_25_row_level>
+    <row_136_row_name_value />
+    <row_35_row_name>Max Velocity</row_35_row_name>
+    <row_196_row_name_value />
+    <row_62_row_name_value />
+    <row_92_row_name_value />
     <row_4_row_level>0</row_4_row_level>
-    <row_46_row_mode>3</row_46_row_mode>
+    <row_8_row_name>User Low Limit</row_8_row_name>
+    <row_39_row_height>27</row_39_row_height>
+    <row_49_row_height>27</row_49_row_height>
+    <row_46_row_mode>0</row_46_row_mode>
+    <row_count>50</row_count>
+    <row_23_row_name_value />
+    <row_18_row_mode>0</row_18_row_mode>
+    <row_53_row_name_value />
+    <row_49_row_level>0</row_49_row_level>
     <row_12_row_level>0</row_12_row_level>
-    <row_28_row_name>Steps per Rev</row_28_row_name>
-    <row_20_row_mode>3</row_20_row_mode>
+    <row_83_row_name_value />
+    <row_28_row_name>Motor Step Size</row_28_row_name>
+    <row_36_row_height>27</row_36_row_height>
+    <row_23_row_mode>0</row_23_row_mode>
+    <row_20_row_mode>0</row_20_row_mode>
+    <row_3_row_name_value />
+    <row_6_row_mode>3</row_6_row_mode>
+    <row_5_row_level>0</row_5_row_level>
     <scale_options>
       <width_scalable>true</width_scalable>
       <height_scalable>true</height_scalable>
       <keep_wh_ratio>false</keep_wh_ratio>
     </scale_options>
+    <row_120_row_name_value />
+    <row_43_row_tooltip>Backlash Secs to Vel</row_43_row_tooltip>
+    <row_150_row_name_value />
+    <row_180_row_name_value />
     <display_level>0</display_level>
+    <row_24_row_level>0</row_24_row_level>
+    <row_11_row_level>0</row_11_row_level>
+    <row_47_row_tooltip></row_47_row_tooltip>
+    <row_25_row_name>Offset</row_25_row_name>
     <row_32_row_height>27</row_32_row_height>
-    <row_37_row_tooltip>Secs to Velocity</row_37_row_tooltip>
+    <row_23_row_height>27</row_23_row_height>
+    <row_49_row_mode>0</row_49_row_mode>
+    <row_37_row_level>0</row_37_row_level>
+    <row_43_row_mode>0</row_43_row_mode>
+    <row_72_row_name_value />
+    <row_128_row_name_value />
+    <row_38_row_level>0</row_38_row_level>
+    <row_15_row_height>27</row_15_row_height>
+    <row_40_row_tooltip>Jog Acceleration</row_40_row_tooltip>
+    <height>1816</height>
+    <row_35_row_height>27</row_35_row_height>
+    <row_34_row_name>Motion</row_34_row_name>
+    <row_45_row_height>27</row_45_row_height>
+    <row_9_row_level>0</row_9_row_level>
+    <row_45_row_level>0</row_45_row_level>
+    <row_5_row_name_value />
+    <row_13_row_name_value />
+    <row_0_row_mode>1</row_0_row_mode>
+    <row_71_row_name_value />
+    <row_170_row_name_value />
+    <row_110_row_name_value />
+    <row_31_row_tooltip>Encoder Step Size</row_31_row_tooltip>
+    <row_67_row_name_value />
+    <row_11_row_name_value />
+    <row_34_row_tooltip>Motor readback</row_34_row_tooltip>
+    <row_188_row_name_value />
+    <row_39_row_tooltip>JVEL</row_39_row_tooltip>
+    <row_43_row_level>0</row_43_row_level>
+    <row_164_row_name_value />
+    <row_36_row_tooltip>Base Velocity</row_36_row_tooltip>
+    <row_104_row_name_value />
+    <row_73_row_name_value />
+    <row_37_row_tooltip>Velocity</row_37_row_tooltip>
+    <row_27_row_name>Resolution</row_27_row_name>
+    <row_7_row_level>0</row_7_row_level>
     <row_33_row_height>27</row_33_row_height>
+    <row_14_row_name_value />
+    <row_156_row_name_value />
+    <rules />
+    <row_18_row_name>Tweak Forward</row_18_row_name>
+    <row_31_row_mode>0</row_31_row_mode>
+    <row_74_row_name_value />
+    <row_2_row_tooltip>Direction Positive, Done, High Limit, Home Limit, Unused, Closed Loop, Following Error, At Home, Encoder Present, Problem, Moving, Gain Support, Comms Error, Low Limit, Homed</row_2_row_tooltip>
+    <row_171_row_name_value />
+    <row_70_row_name_value />
+    <row_111_row_name_value />
+    <row_1_row_mode>3</row_1_row_mode>
+    <row_59_row_name_value />
+    <row_4_row_name_value />
+    <row_41_row_level>0</row_41_row_level>
+    <row_4_row_tooltip>Encoder Loss, Amplifier Loss, Sys Fail</row_4_row_tooltip>
+    <row_47_row_level>0</row_47_row_level>
+    <row_8_row_name_value />
+    <row_47_row_mode>3</row_47_row_mode>
+    <row_10_row_name_value />
+    <row_66_row_name_value />
+    <row_42_row_tooltip>Backlash Velocity</row_42_row_tooltip>
+    <row_14_row_name>Home Forward</row_14_row_name>
+    <row_103_row_name_value />
+    <row_189_row_name_value />
+    <row_163_row_name_value />
+    <row_23_row_tooltip>User Offset</row_23_row_tooltip>
+    <row_44_row_mode>0</row_44_row_mode>
     <row_4_row_mode>0</row_4_row_mode>
-    <row_48_row_tooltip>EGU</row_48_row_tooltip>
+    <row_25_row_tooltip>Offset</row_25_row_tooltip>
+    <row_129_row_name_value />
+    <row_48_row_tooltip>PREC</row_48_row_tooltip>
+    <row_81_row_name_value />
+    <row_15_row_level>0</row_15_row_level>
+    <row_160_row_name_value />
+    <row_34_row_mode>3</row_34_row_mode>
+    <row_38_row_height>27</row_38_row_height>
+    <row_58_row_name_value />
+    <row_197_row_name_value />
+    <row_16_row_level>0</row_16_row_level>
+    <row_24_row_mode>0</row_24_row_mode>
+    <row_137_row_name_value />
+    <row_154_row_name_value />
+    <row_63_row_name_value />
+    <row_100_row_name_value />
+    <row_21_row_name_value />
+    <row_155_row_name_value />
+    <row_64_row_name_value />
+    <row_47_row_height>20</row_47_row_height>
+    <row_41_row_name>Backlash Distance</row_41_row_name>
     <row_20_row_level>0</row_20_row_level>
+    <row_21_row_mode>3</row_21_row_mode>
+    <row_17_row_tooltip>Jog Reverse</row_17_row_tooltip>
+    <row_18_row_level>0</row_18_row_level>
     <row_37_row_mode>0</row_37_row_mode>
-    <row_7_row_name>User Low Limit</row_7_row_name>
-    <row_7_row_tooltip>User Low Limit</row_7_row_tooltip>
+    <row_14_row_tooltip>Home Forward</row_14_row_tooltip>
+    <row_7_row_name_value />
+    <row_21_row_name>Calibration</row_21_row_name>
+    <row_30_row_height>27</row_30_row_height>
+    <row_56_row_name_value />
+    <row_65_row_name_value />
+    <row_2_row_height>307</row_2_row_height>
+    <row_102_row_name_value />
+    <row_7_row_name>User High Limit</row_7_row_name>
+    <row_29_row_height>27</row_29_row_height>
+    <row_162_row_name_value />
+    <row_27_row_mode>3</row_27_row_mode>
+    <row_153_row_name_value />
+    <row_7_row_tooltip>User High Limit</row_7_row_tooltip>
+    <row_20_row_name_value />
+    <row_1_row_name>Status</row_1_row_name>
+    <row_138_row_name_value />
+    <row_198_row_name_value />
     <row_17_row_mode>0</row_17_row_mode>
     <row_11_row_mode>3</row_11_row_mode>
-    <row_4_row_name>ELoss</row_4_row_name>
-    <row_39_row_level>0</row_39_row_level>
-    <row_45_row_mode>0</row_45_row_mode>
-    <row_2_row_name>Status</row_2_row_name>
-    <row_48_row_level>0</row_48_row_level>
-    <row_12_row_mode>3</row_12_row_mode>
-    <row_45_row_name>Max Retrys</row_45_row_name>
-    <row_44_row_height>27</row_44_row_height>
-    <row_31_row_height>27</row_31_row_height>
-    <row_17_row_name>Tweak Forward</row_17_row_name>
-    <row_14_row_level>0</row_14_row_level>
-    <row_36_row_name>Velocity</row_36_row_name>
-    <row_23_row_level>0</row_23_row_level>
-    <row_17_row_height>27</row_17_row_height>
-    <row_26_row_mode>3</row_26_row_mode>
-    <row_40_row_level>0</row_40_row_level>
-    <row_12_row_tooltip>Motor demand</row_12_row_tooltip>
-    <row_16_row_tooltip>Jog Reverse</row_16_row_tooltip>
-    <row_10_row_height>27</row_10_row_height>
-    <row_9_row_tooltip>Dial Low Limit</row_9_row_tooltip>
-    <row_12_row_name>Commands</row_12_row_name>
-    <row_1_row_tooltip>Status</row_1_row_tooltip>
-    <row_30_row_mode>0</row_30_row_mode>
-    <row_22_row_name>User Offset</row_22_row_name>
-    <row_36_row_mode>0</row_36_row_mode>
-    <row_25_row_height>27</row_25_row_height>
-    <row_35_row_mode>0</row_35_row_mode>
-    <row_26_row_name>Resolution</row_26_row_name>
-    <row_32_row_tooltip>Use Encoder if Present</row_32_row_tooltip>
-    <row_38_row_tooltip>JVEL</row_38_row_tooltip>
-    <row_30_row_name>Encoder Step Size</row_30_row_name>
-    <row_22_row_mode>0</row_22_row_mode>
-    <name>Detail Panel</name>
-    <row_21_row_tooltip>Direction</row_21_row_tooltip>
-    <row_29_row_tooltip>EGUs per Rev</row_29_row_tooltip>
-    <row_27_row_tooltip>Motor Step Size</row_27_row_tooltip>
-    <row_31_row_level>0</row_31_row_level>
-    <row_32_row_level>0</row_32_row_level>
-    <row_10_row_tooltip>Kill</row_10_row_tooltip>
-    <row_13_row_name>Home Forward</row_13_row_name>
-    <row_1_row_level>0</row_1_row_level>
-    <row_18_row_tooltip>Tweak Reverse</row_18_row_tooltip>
-    <row_2_row_mode>0</row_2_row_mode>
-    <row_3_row_tooltip>ELoss</row_3_row_tooltip>
-    <row_6_row_height>27</row_6_row_height>
-    <scripts />
-    <wuid>-4f4b678c:14c085f666c:-759f</wuid>
-    <row_3_row_mode>3</row_3_row_mode>
-    <row_8_row_mode>0</row_8_row_mode>
-    <row_19_row_level>0</row_19_row_level>
-    <row_13_row_mode>0</row_13_row_mode>
-    <row_42_row_height>27</row_42_row_height>
-    <row_3_row_name>ELoss</row_3_row_name>
-    <row_35_row_name>Base Velocity</row_35_row_name>
-    <row_8_row_name>Dial High Limit</row_8_row_name>
-    <row_18_row_mode>0</row_18_row_mode>
-    <row_36_row_height>27</row_36_row_height>
-    <row_5_row_level>0</row_5_row_level>
-    <row_43_row_tooltip>Move Fraction</row_43_row_tooltip>
-    <row_11_row_level>0</row_11_row_level>
-    <row_23_row_height>27</row_23_row_height>
-    <row_40_row_tooltip>Backlash Distance</row_40_row_tooltip>
-    <row_9_row_level>0</row_9_row_level>
-    <row_27_row_name>Motor Step Size</row_27_row_name>
-    <row_18_row_name>Tweak Reverse</row_18_row_name>
-    <row_44_row_mode>0</row_44_row_mode>
-    <row_15_row_level>0</row_15_row_level>
-    <row_47_row_height>27</row_47_row_height>
-    <row_21_row_mode>0</row_21_row_mode>
-    <row_21_row_name>Direction</row_21_row_name>
-    <row_27_row_mode>0</row_27_row_mode>
-    <row_44_row_name>Retry Deadband</row_44_row_name>
+    <row_101_row_name_value />
+    <row_47_row_name>Other</row_47_row_name>
+    <row_80_row_name_value />
+    <row_6_row_name_value />
+    <row_57_row_name_value />
+    <row_161_row_name_value />
+    <row_17_row_level>0</row_17_row_level>
+    <row_44_row_name>Move Fraction</row_44_row_name>
+    <row_21_row_height>27</row_21_row_height>
     <row_44_row_level>0</row_44_row_level>
+    <row_20_row_tooltip>Tweak Step</row_20_row_tooltip>
+    <row_146_row_name_value />
+    <row_45_row_tooltip>Retry Deadband</row_45_row_tooltip>
+    <row_4_row_name>ELoss</row_4_row_name>
     <row_12_row_height>27</row_12_row_height>
+    <row_28_row_tooltip>Motor Step Size</row_28_row_tooltip>
+    <row_12_row_name_value />
+    <row_31_row_name>Encoder Step Size</row_31_row_name>
+    <row_14_row_mode>0</row_14_row_mode>
     <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
       <border_style>0</border_style>
       <tooltip></tooltip>
@@ -337,7 +544,7 @@
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>82</height>
+      <height>83</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -376,7 +583,7 @@
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-759d</wuid>
         <scripts />
-        <height>81</height>
+        <height>83</height>
         <border_width>1</border_width>
         <scale_options>
           <width_scalable>true</width_scalable>
@@ -396,7 +603,7 @@
         <background_color>
           <color red="200" green="200" blue="200" />
         </background_color>
-        <width>361</width>
+        <width>363</width>
         <x>0</x>
         <name>auto(boyembed)</name>
         <y>0</y>
@@ -439,7 +646,7 @@
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>82</y>
+      <y>83</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -534,7 +741,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>104</y>
+      <y>105</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -645,7 +852,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>104</y>
+      <y>105</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -666,7 +873,7 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-7597</wuid>
         <on_color>
-          <color name="Green LED: On" red="0" green="255" blue="0" />
+          <color name="Red LED: On" red="255" green="0" blue="0" />
         </on_color>
         <horizontal>true</horizontal>
         <pv_value />
@@ -719,7 +926,7 @@ $(pv_value)</tooltip>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>67</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -740,7 +947,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>126</y>
+      <y>127</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -761,7 +968,7 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-7595</wuid>
         <on_color>
-          <color name="Green LED: On" red="0" green="255" blue="0" />
+          <color name="Red LED: On" red="255" green="0" blue="0" />
         </on_color>
         <horizontal>false</horizontal>
         <pv_value />
@@ -818,6 +1025,101 @@ $(pv_value)</tooltip>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
+      <height>25</height>
+      <border_width>1</border_width>
+      <scale_options>
+        <width_scalable>false</width_scalable>
+        <height_scalable>false</height_scalable>
+        <keep_wh_ratio>true</keep_wh_ratio>
+      </scale_options>
+      <macros>
+        <include_parent_macros>true</include_parent_macros>
+      </macros>
+      <visible>true</visible>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <widget_type>Grouping Container</widget_type>
+      <background_color>
+        <color red="200" green="200" blue="200" />
+      </background_color>
+      <width>200</width>
+      <x>160</x>
+      <name>Row</name>
+      <y>194</y>
+      <foreground_color>
+        <color name="Text: FG" red="0" green="0" blue="0" />
+      </foreground_color>
+      <actions hook="false" hook_all="false" />
+      <fc>false</fc>
+      <show_scrollbar>false</show_scrollbar>
+      <font>
+        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      </font>
+      <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
+        <toggle_button>false</toggle_button>
+        <border_style>0</border_style>
+        <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+        <alarm_pulsing>false</alarm_pulsing>
+        <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+        <push_action_index>0</push_action_index>
+        <rules />
+        <enabled>true</enabled>
+        <wuid>5b6f4dc9:150a3b6067f:-6bed</wuid>
+        <pv_value />
+        <text>$(actions)</text>
+        <scripts />
+        <border_alarm_sensitive>false</border_alarm_sensitive>
+        <height>25</height>
+        <border_width>1</border_width>
+        <scale_options>
+          <width_scalable>true</width_scalable>
+          <height_scalable>true</height_scalable>
+          <keep_wh_ratio>false</keep_wh_ratio>
+        </scale_options>
+        <image></image>
+        <visible>true</visible>
+        <pv_name>$(P)$(M):ELOSSRC.A</pv_name>
+        <border_color>
+          <color red="0" green="128" blue="255" />
+        </border_color>
+        <widget_type>Action Button</widget_type>
+        <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+        <background_color>
+          <color name="Controller: BG" red="205" green="205" blue="205" />
+        </background_color>
+        <width>200</width>
+        <x>0</x>
+        <name>auto(command|ELossClr)</name>
+        <y>0</y>
+        <style>0</style>
+        <foreground_color>
+          <color name="Controller: FG" red="0" green="0" blue="196" />
+        </foreground_color>
+        <actions hook="false" hook_all="false">
+          <action type="WRITE_PV">
+            <pv_name>$(pv_name)</pv_name>
+            <value>0</value>
+            <timeout>10</timeout>
+            <confirm_message></confirm_message>
+            <description>ELoss Clear</description>
+          </action>
+        </actions>
+        <font>
+          <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+        </font>
+      </widget>
+    </widget>
+    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
+      <border_style>0</border_style>
+      <tooltip></tooltip>
+      <rules />
+      <enabled>true</enabled>
+      <wuid>-4f4b678c:14c085f666c:-7592</wuid>
+      <transparent>false</transparent>
+      <lock_children>false</lock_children>
+      <scripts />
       <height>27</height>
       <border_width>1</border_width>
       <scale_options>
@@ -839,7 +1141,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>126</y>
+      <y>219</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -860,7 +1162,7 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-7591</wuid>
         <on_color>
-          <color name="Green LED: On" red="0" green="255" blue="0" />
+          <color name="Yellow LED: On" red="255" green="255" blue="0" />
         </on_color>
         <horizontal>false</horizontal>
         <pv_value />
@@ -1023,7 +1325,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7592</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7590</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -1048,7 +1350,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>153</y>
+      <y>246</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1121,7 +1423,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7590</wuid>
+      <wuid>-4f4b678c:14c085f666c:-758e</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -1146,7 +1448,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>153</y>
+      <y>246</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1219,7 +1521,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-758e</wuid>
+      <wuid>-4f4b678c:14c085f666c:-758c</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -1244,7 +1546,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>153</y>
+      <y>246</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1317,7 +1619,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-758c</wuid>
+      <wuid>-4f4b678c:14c085f666c:-758a</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -1342,7 +1644,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>153</y>
+      <y>246</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1415,7 +1717,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-758a</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7588</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -1440,7 +1742,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>153</y>
+      <y>246</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1462,7 +1764,6 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-7573</wuid>
         <pv_value />
-        <pv_control>false</pv_control>
         <text>$(actions)</text>
         <scripts />
         <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -1511,7 +1812,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7588</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7586</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -1536,7 +1837,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>180</y>
+      <y>273</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1558,7 +1859,6 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-7571</wuid>
         <pv_value />
-        <pv_control>false</pv_control>
         <text>$(actions)</text>
         <scripts />
         <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -1607,7 +1907,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7586</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7584</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -1632,7 +1932,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>207</y>
+      <y>300</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1648,11 +1948,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7584</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7582</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -1673,7 +1973,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>234</y>
+      <y>327</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1695,7 +1995,6 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-7581</wuid>
         <pv_value />
-        <pv_control>false</pv_control>
         <text>$(actions)</text>
         <scripts />
         <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -1744,11 +2043,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7582</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7580</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -1764,12 +2063,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>234</y>
+      <y>354</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1791,7 +2090,6 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-757f</wuid>
         <pv_value />
-        <pv_control>false</pv_control>
         <text>$(actions)</text>
         <scripts />
         <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -1840,11 +2138,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7580</wuid>
+      <wuid>-4f4b678c:14c085f666c:-757e</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -1865,7 +2163,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>234</y>
+      <y>381</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1887,7 +2185,6 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-757d</wuid>
         <pv_value />
-        <pv_control>false</pv_control>
         <text>$(actions)</text>
         <scripts />
         <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -1936,11 +2233,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-757e</wuid>
+      <wuid>-4f4b678c:14c085f666c:-757c</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -1956,12 +2253,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>234</y>
+      <y>408</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -1983,7 +2280,6 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-757b</wuid>
         <pv_value />
-        <pv_control>false</pv_control>
         <text>$(actions)</text>
         <scripts />
         <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -2032,11 +2328,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-757c</wuid>
+      <wuid>-4f4b678c:14c085f666c:-757a</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -2057,7 +2353,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>234</y>
+      <y>435</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2079,7 +2375,6 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-7579</wuid>
         <pv_value />
-        <pv_control>false</pv_control>
         <text>$(actions)</text>
         <scripts />
         <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -2128,11 +2423,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-757a</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7578</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -2148,12 +2443,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>234</y>
+      <y>462</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2175,7 +2470,6 @@ $(pv_value)</tooltip>
         <enabled>true</enabled>
         <wuid>-4f4b678c:14c085f666c:-7577</wuid>
         <pv_value />
-        <pv_control>false</pv_control>
         <text>$(actions)</text>
         <scripts />
         <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -2224,11 +2518,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7578</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7576</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -2249,7 +2543,7 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>234</y>
+      <y>489</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2322,52 +2616,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7576</wuid>
-      <transparent>false</transparent>
-      <lock_children>false</lock_children>
-      <scripts />
-      <height>27</height>
-      <border_width>1</border_width>
-      <scale_options>
-        <width_scalable>false</width_scalable>
-        <height_scalable>false</height_scalable>
-        <keep_wh_ratio>true</keep_wh_ratio>
-      </scale_options>
-      <macros>
-        <include_parent_macros>true</include_parent_macros>
-      </macros>
-      <visible>true</visible>
-      <border_color>
-        <color red="0" green="128" blue="255" />
-      </border_color>
-      <widget_type>Grouping Container</widget_type>
-      <background_color>
-        <color red="205" green="205" blue="205" />
-      </background_color>
-      <width>200</width>
-      <x>160</x>
-      <name>Row</name>
-      <y>234</y>
-      <foreground_color>
-        <color name="Text: FG" red="0" green="0" blue="0" />
-      </foreground_color>
-      <actions hook="false" hook_all="false" />
-      <fc>false</fc>
-      <show_scrollbar>false</show_scrollbar>
-      <font>
-        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
-      </font>
-    </widget>
-    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
-      <border_style>0</border_style>
-      <tooltip></tooltip>
-      <rules />
-      <enabled>true</enabled>
       <wuid>-4f4b678c:14c085f666c:-7574</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -2388,7 +2641,48 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>261</y>
+      <y>516</y>
+      <foreground_color>
+        <color name="Text: FG" red="0" green="0" blue="0" />
+      </foreground_color>
+      <actions hook="false" hook_all="false" />
+      <fc>false</fc>
+      <show_scrollbar>false</show_scrollbar>
+      <font>
+        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      </font>
+    </widget>
+    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
+      <border_style>0</border_style>
+      <tooltip></tooltip>
+      <rules />
+      <enabled>true</enabled>
+      <wuid>-4f4b678c:14c085f666c:-7572</wuid>
+      <transparent>false</transparent>
+      <lock_children>false</lock_children>
+      <scripts />
+      <height>1</height>
+      <border_width>1</border_width>
+      <scale_options>
+        <width_scalable>false</width_scalable>
+        <height_scalable>false</height_scalable>
+        <keep_wh_ratio>true</keep_wh_ratio>
+      </scale_options>
+      <macros>
+        <include_parent_macros>true</include_parent_macros>
+      </macros>
+      <visible>true</visible>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <widget_type>Grouping Container</widget_type>
+      <background_color>
+        <color red="205" green="205" blue="205" />
+      </background_color>
+      <width>200</width>
+      <x>160</x>
+      <name>Row</name>
+      <y>543</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2447,7 +2741,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7572</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7570</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -2467,12 +2761,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>261</y>
+      <y>543</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2545,7 +2839,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7570</wuid>
+      <wuid>-4f4b678c:14c085f666c:-756e</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -2565,12 +2859,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>261</y>
+      <y>543</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2629,7 +2923,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-756e</wuid>
+      <wuid>-4f4b678c:14c085f666c:-756c</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -2649,12 +2943,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>261</y>
+      <y>543</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2713,7 +3007,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-756c</wuid>
+      <wuid>-4f4b678c:14c085f666c:-756a</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -2733,12 +3027,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>261</y>
+      <y>543</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2797,52 +3091,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-756a</wuid>
-      <transparent>false</transparent>
-      <lock_children>false</lock_children>
-      <scripts />
-      <height>27</height>
-      <border_width>1</border_width>
-      <scale_options>
-        <width_scalable>false</width_scalable>
-        <height_scalable>false</height_scalable>
-        <keep_wh_ratio>true</keep_wh_ratio>
-      </scale_options>
-      <macros>
-        <include_parent_macros>true</include_parent_macros>
-      </macros>
-      <visible>true</visible>
-      <border_color>
-        <color red="0" green="128" blue="255" />
-      </border_color>
-      <widget_type>Grouping Container</widget_type>
-      <background_color>
-        <color red="200" green="200" blue="200" />
-      </background_color>
-      <width>200</width>
-      <x>160</x>
-      <name>Row</name>
-      <y>261</y>
-      <foreground_color>
-        <color name="Text: FG" red="0" green="0" blue="0" />
-      </foreground_color>
-      <actions hook="false" hook_all="false" />
-      <fc>false</fc>
-      <show_scrollbar>false</show_scrollbar>
-      <font>
-        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
-      </font>
-    </widget>
-    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
-      <border_style>0</border_style>
-      <tooltip></tooltip>
-      <rules />
-      <enabled>true</enabled>
       <wuid>-4f4b678c:14c085f666c:-7568</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -2863,7 +3116,48 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>288</y>
+      <y>543</y>
+      <foreground_color>
+        <color name="Text: FG" red="0" green="0" blue="0" />
+      </foreground_color>
+      <actions hook="false" hook_all="false" />
+      <fc>false</fc>
+      <show_scrollbar>false</show_scrollbar>
+      <font>
+        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      </font>
+    </widget>
+    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
+      <border_style>0</border_style>
+      <tooltip></tooltip>
+      <rules />
+      <enabled>true</enabled>
+      <wuid>-4f4b678c:14c085f666c:-7566</wuid>
+      <transparent>false</transparent>
+      <lock_children>false</lock_children>
+      <scripts />
+      <height>1</height>
+      <border_width>1</border_width>
+      <scale_options>
+        <width_scalable>false</width_scalable>
+        <height_scalable>false</height_scalable>
+        <keep_wh_ratio>true</keep_wh_ratio>
+      </scale_options>
+      <macros>
+        <include_parent_macros>true</include_parent_macros>
+      </macros>
+      <visible>true</visible>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <widget_type>Grouping Container</widget_type>
+      <background_color>
+        <color red="200" green="200" blue="200" />
+      </background_color>
+      <width>200</width>
+      <x>160</x>
+      <name>Row</name>
+      <y>570</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -2936,7 +3230,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7566</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7564</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -2956,12 +3250,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>288</y>
+      <y>570</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3029,7 +3323,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7564</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7562</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3049,12 +3343,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>288</y>
+      <y>570</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3122,7 +3416,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7562</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7560</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3142,12 +3436,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>288</y>
+      <y>570</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3220,7 +3514,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7560</wuid>
+      <wuid>-4f4b678c:14c085f666c:-755e</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3240,12 +3534,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>288</y>
+      <y>570</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3313,7 +3607,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-755e</wuid>
+      <wuid>-4f4b678c:14c085f666c:-755c</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3333,12 +3627,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>288</y>
+      <y>570</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3406,52 +3700,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-755c</wuid>
-      <transparent>false</transparent>
-      <lock_children>false</lock_children>
-      <scripts />
-      <height>27</height>
-      <border_width>1</border_width>
-      <scale_options>
-        <width_scalable>false</width_scalable>
-        <height_scalable>false</height_scalable>
-        <keep_wh_ratio>true</keep_wh_ratio>
-      </scale_options>
-      <macros>
-        <include_parent_macros>true</include_parent_macros>
-      </macros>
-      <visible>true</visible>
-      <border_color>
-        <color red="0" green="128" blue="255" />
-      </border_color>
-      <widget_type>Grouping Container</widget_type>
-      <background_color>
-        <color red="205" green="205" blue="205" />
-      </background_color>
-      <width>200</width>
-      <x>160</x>
-      <name>Row</name>
-      <y>288</y>
-      <foreground_color>
-        <color name="Text: FG" red="0" green="0" blue="0" />
-      </foreground_color>
-      <actions hook="false" hook_all="false" />
-      <fc>false</fc>
-      <show_scrollbar>false</show_scrollbar>
-      <font>
-        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
-      </font>
-    </widget>
-    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
-      <border_style>0</border_style>
-      <tooltip></tooltip>
-      <rules />
-      <enabled>true</enabled>
       <wuid>-4f4b678c:14c085f666c:-755a</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>27</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -3472,7 +3725,48 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>570</y>
+      <foreground_color>
+        <color name="Text: FG" red="0" green="0" blue="0" />
+      </foreground_color>
+      <actions hook="false" hook_all="false" />
+      <fc>false</fc>
+      <show_scrollbar>false</show_scrollbar>
+      <font>
+        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      </font>
+    </widget>
+    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
+      <border_style>0</border_style>
+      <tooltip></tooltip>
+      <rules />
+      <enabled>true</enabled>
+      <wuid>-4f4b678c:14c085f666c:-7558</wuid>
+      <transparent>false</transparent>
+      <lock_children>false</lock_children>
+      <scripts />
+      <height>1</height>
+      <border_width>1</border_width>
+      <scale_options>
+        <width_scalable>false</width_scalable>
+        <height_scalable>false</height_scalable>
+        <keep_wh_ratio>true</keep_wh_ratio>
+      </scale_options>
+      <macros>
+        <include_parent_macros>true</include_parent_macros>
+      </macros>
+      <visible>true</visible>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <widget_type>Grouping Container</widget_type>
+      <background_color>
+        <color red="205" green="205" blue="205" />
+      </background_color>
+      <width>200</width>
+      <x>160</x>
+      <name>Row</name>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3545,7 +3839,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7558</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7556</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3565,12 +3859,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3643,7 +3937,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7556</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7554</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3663,12 +3957,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3741,7 +4035,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7554</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7552</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3761,12 +4055,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3839,7 +4133,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7552</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7550</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3859,12 +4153,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -3937,7 +4231,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7550</wuid>
+      <wuid>-4f4b678c:14c085f666c:-754e</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -3957,12 +4251,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -4035,7 +4329,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-754e</wuid>
+      <wuid>-4f4b678c:14c085f666c:-754c</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -4055,12 +4349,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -4133,7 +4427,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-754c</wuid>
+      <wuid>-4f4b678c:14c085f666c:-754a</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -4153,12 +4447,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -4231,7 +4525,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-754a</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7548</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -4251,12 +4545,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -4329,7 +4623,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7548</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7546</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -4349,12 +4643,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -4427,7 +4721,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7546</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7544</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -4447,12 +4741,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -4525,7 +4819,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7544</wuid>
+      <wuid>-4f4b678c:14c085f666c:-7542</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -4545,12 +4839,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="200" green="200" blue="200" />
+        <color red="205" green="205" blue="205" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>315</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
       </foreground_color>
@@ -4623,52 +4917,11 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7542</wuid>
-      <transparent>false</transparent>
-      <lock_children>false</lock_children>
-      <scripts />
-      <height>20</height>
-      <border_width>1</border_width>
-      <scale_options>
-        <width_scalable>false</width_scalable>
-        <height_scalable>false</height_scalable>
-        <keep_wh_ratio>true</keep_wh_ratio>
-      </scale_options>
-      <macros>
-        <include_parent_macros>true</include_parent_macros>
-      </macros>
-      <visible>true</visible>
-      <border_color>
-        <color red="0" green="128" blue="255" />
-      </border_color>
-      <widget_type>Grouping Container</widget_type>
-      <background_color>
-        <color red="200" green="200" blue="200" />
-      </background_color>
-      <width>200</width>
-      <x>160</x>
-      <name>Row</name>
-      <y>315</y>
-      <foreground_color>
-        <color name="Text: FG" red="0" green="0" blue="0" />
-      </foreground_color>
-      <actions hook="false" hook_all="false" />
-      <fc>false</fc>
-      <show_scrollbar>false</show_scrollbar>
-      <font>
-        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
-      </font>
-    </widget>
-    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
-      <border_style>0</border_style>
-      <tooltip></tooltip>
-      <rules />
-      <enabled>true</enabled>
       <wuid>-4f4b678c:14c085f666c:-7540</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
-      <height>1</height>
+      <height>20</height>
       <border_width>1</border_width>
       <scale_options>
         <width_scalable>false</width_scalable>
@@ -4689,9 +4942,50 @@ $(pv_value)</tooltip>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>335</y>
+      <y>597</y>
       <foreground_color>
         <color name="Text: FG" red="0" green="0" blue="0" />
+      </foreground_color>
+      <actions hook="false" hook_all="false" />
+      <fc>false</fc>
+      <show_scrollbar>false</show_scrollbar>
+      <font>
+        <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      </font>
+    </widget>
+    <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
+      <border_style>0</border_style>
+      <tooltip></tooltip>
+      <rules />
+      <enabled>true</enabled>
+      <wuid>-4f4b678c:14c085f666c:-7103</wuid>
+      <transparent>false</transparent>
+      <lock_children>false</lock_children>
+      <scripts />
+      <height>1</height>
+      <border_width>1</border_width>
+      <scale_options>
+        <width_scalable>false</width_scalable>
+        <height_scalable>false</height_scalable>
+        <keep_wh_ratio>true</keep_wh_ratio>
+      </scale_options>
+      <macros>
+        <include_parent_macros>true</include_parent_macros>
+      </macros>
+      <visible>true</visible>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <widget_type>Grouping Container</widget_type>
+      <background_color>
+        <color red="200" green="200" blue="200" />
+      </background_color>
+      <width>200</width>
+      <x>160</x>
+      <name>Row</name>
+      <y>617</y>
+      <foreground_color>
+        <color red="192" green="192" blue="192" />
       </foreground_color>
       <actions hook="false" hook_all="false" />
       <fc>false</fc>
@@ -4762,7 +5056,7 @@ $(pv_value)</tooltip>
       <tooltip></tooltip>
       <rules />
       <enabled>true</enabled>
-      <wuid>-4f4b678c:14c085f666c:-7103</wuid>
+      <wuid>5b6f4dc9:150a3b6067f:-6bf5</wuid>
       <transparent>false</transparent>
       <lock_children>false</lock_children>
       <scripts />
@@ -4782,12 +5076,12 @@ $(pv_value)</tooltip>
       </border_color>
       <widget_type>Grouping Container</widget_type>
       <background_color>
-        <color red="205" green="205" blue="205" />
+        <color red="200" green="200" blue="200" />
       </background_color>
       <width>200</width>
       <x>160</x>
       <name>Row</name>
-      <y>335</y>
+      <y>617</y>
       <foreground_color>
         <color red="192" green="192" blue="192" />
       </foreground_color>

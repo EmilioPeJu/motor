@@ -10,7 +10,7 @@
   <macros>
     <include_parent_macros>true</include_parent_macros>
   </macros>
-  <boy_version>4.0.103.201503201352</boy_version>
+  <boy_version>4.0.104.201510030256</boy_version>
   <show_edit_range>true</show_edit_range>
   <widget_type>Display</widget_type>
   <auto_scale_widgets>
@@ -27,11 +27,66 @@
   <grid_space>5</grid_space>
   <show_ruler>true</show_ruler>
   <y>-1</y>
-  <snap_to_geometry>false</snap_to_geometry>
+  <snap_to_geometry>true</snap_to_geometry>
   <foreground_color>
     <color red="192" green="192" blue="192" />
   </foreground_color>
   <actions hook="false" hook_all="false" />
+  <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
+    <toggle_button>false</toggle_button>
+    <border_style>2</border_style>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <alarm_pulsing>false</alarm_pulsing>
+    <tooltip>Stop
+$(pv_name)
+$(pv_value)</tooltip>
+    <push_action_index>0</push_action_index>
+    <rules />
+    <enabled>true</enabled>
+    <wuid>-304029b7:147582c1239:-7963</wuid>
+    <pv_value />
+    <text></text>
+    <scripts />
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <height>20</height>
+    <border_width>1</border_width>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <image>symbol/stop_icon.png</image>
+    <visible>true</visible>
+    <pv_name>$(P)$(M).STOP</pv_name>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <widget_type>Action Button</widget_type>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color name="Controller: BG" red="205" green="205" blue="205" />
+    </background_color>
+    <width>30</width>
+    <x>40</x>
+    <name>auto(command|Stop)</name>
+    <y>0</y>
+    <style>0</style>
+    <foreground_color>
+      <color name="Controller: FG" red="0" green="0" blue="196" />
+    </foreground_color>
+    <actions hook="false" hook_all="false">
+      <action type="WRITE_PV">
+        <pv_name>$(pv_name)</pv_name>
+        <value>1</value>
+        <timeout>10</timeout>
+        <confirm_message></confirm_message>
+        <description></description>
+      </action>
+    </actions>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+  </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
     <border_style>0</border_style>
     <forecolor_alarm_sensitive>true</forecolor_alarm_sensitive>
@@ -82,7 +137,7 @@ $(pv_value)</tooltip>
     </foreground_color>
     <actions hook="false" hook_all="false" />
     <font>
-      <opifont.name fontName="Arial" height="11" style="1">Default Bold</opifont.name>
+      <opifont.name fontName="Sans" height="10" style="1">Default Bold</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.symbol.multistate.MultistateMonitorWidget" version="1.0.0">
@@ -117,12 +172,12 @@ $(pv_value)</tooltip>
     </permutation_matrix>
     <name>Symbol</name>
     <actions hook="false" hook_all="true">
-      <action type="OPEN_OPI_IN_VIEW">
+      <action type="OPEN_DISPLAY">
         <path>motor_detail.opi</path>
         <macros>
           <include_parent_macros>true</include_parent_macros>
         </macros>
-        <Position>1</Position>
+        <mode>3</mode>
         <description>Open detail screen</description>
       </action>
     </actions>
@@ -164,7 +219,7 @@ $(pv_value)</tooltip>
     <crop_right>0</crop_right>
     <stretch_to_fit>true</stretch_to_fit>
     <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -180,7 +235,6 @@ $(pv_value)</tooltip>
     <enabled>true</enabled>
     <wuid>-304029b7:147582c1239:-7965</wuid>
     <pv_value />
-    <pv_control>false</pv_control>
     <text></text>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -220,65 +274,7 @@ $(pv_value)</tooltip>
       </action>
     </actions>
     <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
-    </font>
-  </widget>
-  <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
-    <alarm_pulsing>false</alarm_pulsing>
-    <precision>0</precision>
-    <tooltip>Demand
-$(pv_name)
-$(pv_value)</tooltip>
-    <horizontal_alignment>1</horizontal_alignment>
-    <rules />
-    <pv_value />
-    <auto_size>false</auto_size>
-    <text></text>
-    <rotation_angle>0.0</rotation_angle>
-    <show_units>false</show_units>
-    <height>21</height>
-    <multiline_input>false</multiline_input>
-    <border_width>0</border_width>
-    <visible>true</visible>
-    <pv_name>$(P)$(M).VAL</pv_name>
-    <selector_type>0</selector_type>
-    <border_color>
-      <color name="Controller" red="0" green="0" blue="255" />
-    </border_color>
-    <precision_from_pv>true</precision_from_pv>
-    <widget_type>Text Input</widget_type>
-    <confirm_message></confirm_message>
-    <name>Demand</name>
-    <style>0</style>
-    <actions hook="false" hook_all="false" />
-    <border_style>3</border_style>
-    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
-    <enabled>true</enabled>
-    <wuid>2e1670d1:14b2be7ec15:-7ef1</wuid>
-    <transparent>false</transparent>
-    <scripts />
-    <border_alarm_sensitive>false</border_alarm_sensitive>
-    <scale_options>
-      <width_scalable>true</width_scalable>
-      <height_scalable>true</height_scalable>
-      <keep_wh_ratio>false</keep_wh_ratio>
-    </scale_options>
-    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
-    <format_type>0</format_type>
-    <limits_from_pv>false</limits_from_pv>
-    <background_color>
-      <color name="Controller: BG" red="205" green="205" blue="205" />
-    </background_color>
-    <width>180</width>
-    <x>110</x>
-    <y>0</y>
-    <maximum>1.7976931348623157E308</maximum>
-    <foreground_color>
-      <color name="Controller: FG" red="0" green="0" blue="196" />
-    </foreground_color>
-    <minimum>-1.7976931348623157E308</minimum>
-    <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -294,7 +290,6 @@ $(pv_value)</tooltip>
     <enabled>true</enabled>
     <wuid>-304029b7:147582c1239:-7966</wuid>
     <pv_value />
-    <pv_control>false</pv_control>
     <text></text>
     <scripts />
     <border_alarm_sensitive>false</border_alarm_sensitive>
@@ -334,63 +329,7 @@ $(pv_value)</tooltip>
       </action>
     </actions>
     <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
-    </font>
-  </widget>
-  <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
-    <toggle_button>false</toggle_button>
-    <border_style>2</border_style>
-    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
-    <alarm_pulsing>false</alarm_pulsing>
-    <tooltip>Stop
-$(pv_name)
-$(pv_value)</tooltip>
-    <push_action_index>0</push_action_index>
-    <rules />
-    <enabled>true</enabled>
-    <wuid>-304029b7:147582c1239:-7963</wuid>
-    <pv_value />
-    <pv_control>false</pv_control>
-    <text></text>
-    <scripts />
-    <border_alarm_sensitive>false</border_alarm_sensitive>
-    <height>20</height>
-    <border_width>1</border_width>
-    <scale_options>
-      <width_scalable>true</width_scalable>
-      <height_scalable>true</height_scalable>
-      <keep_wh_ratio>false</keep_wh_ratio>
-    </scale_options>
-    <image>symbol/stop_icon.png</image>
-    <visible>true</visible>
-    <pv_name>$(P)$(M).STOP</pv_name>
-    <border_color>
-      <color red="0" green="128" blue="255" />
-    </border_color>
-    <widget_type>Action Button</widget_type>
-    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
-    <background_color>
-      <color name="Controller: BG" red="205" green="205" blue="205" />
-    </background_color>
-    <width>30</width>
-    <x>40</x>
-    <name>auto(command|Stop)</name>
-    <y>0</y>
-    <style>0</style>
-    <foreground_color>
-      <color name="Controller: FG" red="0" green="0" blue="196" />
-    </foreground_color>
-    <actions hook="false" hook_all="false">
-      <action type="WRITE_PV">
-        <pv_name>$(pv_name)</pv_name>
-        <value>1</value>
-        <timeout>10</timeout>
-        <confirm_message></confirm_message>
-        <description></description>
-      </action>
-    </actions>
-    <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
@@ -448,7 +387,7 @@ $(pv_value)</tooltip>
     </foreground_color>
     <minimum>-1.7976931348623157E308</minimum>
     <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
     </font>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
@@ -456,9 +395,19 @@ $(pv_value)</tooltip>
     <tooltip>Low Limit
 $(pv_name)
 $(pv_value)</tooltip>
-    <rules />
+    <rules>
+      <rule name="DirectionalLimits" prop_id="bit" out_exp="true">
+        <exp bool_exp="pv0 &gt;= 1">
+          <value>13</value>
+        </exp>
+        <exp bool_exp="pv0 &lt; 1">
+          <value>2</value>
+        </exp>
+        <pv trig="true">$(P)$(M).MRES</pv>
+      </rule>
+    </rules>
     <effect_3d>true</effect_3d>
-    <bit>13</bit>
+    <bit>2</bit>
     <pv_value />
     <height>20</height>
     <border_width>1</border_width>
@@ -502,7 +451,7 @@ $(pv_value)</tooltip>
       <color red="192" green="192" blue="192" />
     </foreground_color>
     <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
     </font>
     <off_label>OFF</off_label>
   </widget>
@@ -511,9 +460,19 @@ $(pv_value)</tooltip>
     <tooltip>High Limit
 $(pv_name)
 $(pv_value)</tooltip>
-    <rules />
+    <rules>
+      <rule name="DirectionalLimits" prop_id="bit" out_exp="true">
+        <exp bool_exp="pv0 &gt;= 1">
+          <value>2</value>
+        </exp>
+        <exp bool_exp="pv0 &lt; 1">
+          <value>13</value>
+        </exp>
+        <pv trig="true">$(P)$(M).MRES</pv>
+      </rule>
+    </rules>
     <effect_3d>true</effect_3d>
-    <bit>2</bit>
+    <bit>13</bit>
     <pv_value />
     <height>20</height>
     <border_width>1</border_width>
@@ -557,8 +516,66 @@ $(pv_value)</tooltip>
       <color red="192" green="192" blue="192" />
     </foreground_color>
     <font>
-      <opifont.name fontName="Arial" height="11" style="0">Default</opifont.name>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
     </font>
     <off_label>OFF</off_label>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
+    <alarm_pulsing>false</alarm_pulsing>
+    <precision>0</precision>
+    <tooltip>Demand
+$(pv_name)
+$(pv_value)</tooltip>
+    <horizontal_alignment>1</horizontal_alignment>
+    <rules />
+    <pv_value />
+    <auto_size>false</auto_size>
+    <text></text>
+    <rotation_angle>0.0</rotation_angle>
+    <show_units>false</show_units>
+    <height>21</height>
+    <multiline_input>false</multiline_input>
+    <border_width>0</border_width>
+    <visible>true</visible>
+    <pv_name>$(P)$(M).VAL</pv_name>
+    <selector_type>0</selector_type>
+    <border_color>
+      <color name="Controller" red="0" green="0" blue="255" />
+    </border_color>
+    <precision_from_pv>true</precision_from_pv>
+    <widget_type>Text Input</widget_type>
+    <confirm_message></confirm_message>
+    <name>Demand</name>
+    <style>0</style>
+    <actions hook="false" hook_all="false" />
+    <border_style>3</border_style>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <enabled>true</enabled>
+    <wuid>2e1670d1:14b2be7ec15:-7ef1</wuid>
+    <transparent>false</transparent>
+    <scripts />
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <format_type>0</format_type>
+    <limits_from_pv>false</limits_from_pv>
+    <background_color>
+      <color name="Controller: BG" red="205" green="205" blue="205" />
+    </background_color>
+    <width>180</width>
+    <x>110</x>
+    <y>0</y>
+    <maximum>1.7976931348623157E308</maximum>
+    <foreground_color>
+      <color name="Controller: FG" red="0" green="0" blue="196" />
+    </foreground_color>
+    <minimum>-1.7976931348623157E308</minimum>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
   </widget>
 </display>
