@@ -23,7 +23,7 @@
   </background_color>
   <width>360</width>
   <x>-1</x>
-  <name></name>
+  <name />
   <grid_space>5</grid_space>
   <show_ruler>true</show_ruler>
   <y>-1</y>
@@ -52,7 +52,7 @@
     </macros>
     <resize_behaviour>2</resize_behaviour>
     <visible>true</visible>
-    <group_name></group_name>
+    <group_name />
     <border_color>
       <color red="0" green="0" blue="0" />
     </border_color>

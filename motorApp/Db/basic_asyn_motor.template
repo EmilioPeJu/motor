@@ -131,6 +131,14 @@
 # % gui, $(name=), demand, PREC,   <pv>.PREC
 # % gui, $(name=), demand, EGU,   <pv>.EGU
 
+# % gui, $(name=), demand, Output Specification,   <pv>.OUT
+# % gui, $(name=), readback, Readback Location,   <pv>.RDBL
+# % gui, $(name=), readback, Desired Output Loc,   <pv>.DOL
+# % gui, $(name=), readback, Output Mode Select,   <pv>.OMSL
+# % gui, $(name=), readback, Readback Out Link,   <pv>.RLNK
+# % gui, $(name=), demand, DMOV Input Link,   <pv>.DINP
+# % gui, $(name=), demand, RMP Input Link,   <pv>.RINP
+# % gui, $(name=), demand, Stop Out Link,   <pv>.STOO
 
 
 record(motor,"$(P)$(M)")
