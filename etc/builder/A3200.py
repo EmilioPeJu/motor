@@ -10,6 +10,7 @@ class A3200Asyn(Device):
     DbdFileList=["devAerotech"]
         
 class Aerotech_A3200_controller(AsynPort):
+    """Aerotech A3200 controller. Connect to an AsynIP port to control the A3200 over Ethernet. ASCII command interface must be enabled on the A3200 and firewall configured."""
     Dependencies=(A3200Asyn,)
     
     # Count how many instances of this class we will have created
@@ -34,6 +35,13 @@ class Aerotech_A3200_controller(AsynPort):
         print "#     (6) Time to poll (msec) when an axis is idle. 0 for no polling"
         
         print 'A3200AsynConfig(%(controllerNum)d, "%(port)s", %(address)d, %(numAxes)d, %(movingPollingRate)d, %(idlePollingRate)d)' % self.__dict__
+        print ""
+        print "# Asyn-based Motor Record support"
+        print "#   (1) Asyn port"
+        print "#   (2) Driver name"
+        print "#   (3) Controller index"
+        print "#   (4) Max. number of axes"
+        print "drvAsynMotorConfigure(\"%(name)s\",\"motorA3200\", %(address)d, %(numAxes)d)" % self.__dict__
         
     def InitialiseOnce(self):
         # Print the class init line in teh startup script
@@ -52,4 +60,3 @@ class Aerotech_A3200_controller(AsynPort):
         numAxes = Simple("Number of axes to control", int),
         movingPollingRate = Simple("Time to poll (msec) when an axis is in motion", int),
         idlePollingRate = Simple("Time to poll (msec) when an axis is idle. 0 for no polling", int))
-    
