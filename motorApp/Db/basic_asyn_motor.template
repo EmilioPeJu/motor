@@ -30,6 +30,7 @@
 #% macro, UEIP   , Use Encoder If Present
 #% macro, URIP   , Use RDBL If Present
 #% macro, RDBL   , Readback Location, set URIP = 1 if you specify this
+#% macro, RLNK   , Readback output link
 #% macro, RTRY   , Max retry count
 #% macro, DLY    , Readback settle time (s)
 #% macro, OFF    , User Offset (EGU)
@@ -181,6 +182,7 @@ record(motor,"$(P)$(M)")
 	field(ADEL, "$(ADEL=0)")
 	field(NTM, "$(NTM=1)")
 	field(SDIS, "$(P)$(M):SDIS.VAL")	
+	field(RLNK, "$(RLNK=)")
 }
 
 # record that holds the ADDR
