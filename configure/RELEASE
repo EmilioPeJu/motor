@@ -15,8 +15,8 @@ SUPPORT=/dls_sw/prod/R3.14.12.3/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-ASYN=$(SUPPORT)/asyn/4-26
-BUSY=$(SUPPORT)/busy/1-6-1
+ASYN=$(SUPPORT)/asyn/4-31
+BUSY=$(SUPPORT)/busy/1-6-1dls1
 #ASYN=$(AJFWORK)/asyn
 #BUSY=$(AJFWORK)/busy
 
