@@ -29,191 +29,9 @@
   <snap_to_geometry>true</snap_to_geometry>
   <widget_type>Display</widget_type>
   <width>411</width>
-  <wuid>-5f34cdc8:15e4c647e9b:-7dbd</wuid>
+  <wuid>62759bd5:15e325a75c4:-5a49</wuid>
   <x>553</x>
   <y>111</y>
-  <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
-    <actions hook="false" hook_all="false" />
-    <background_color>
-      <color red="240" green="240" blue="240" />
-    </background_color>
-    <border_color>
-      <color red="0" green="128" blue="255" />
-    </border_color>
-    <border_style>0</border_style>
-    <border_width>1</border_width>
-    <enabled>true</enabled>
-    <fc>false</fc>
-    <font>
-      <opifont.name fontName="Liberation Sans" height="15" style="0" pixels="true">Default</opifont.name>
-    </font>
-    <foreground_color>
-      <color red="192" green="192" blue="192" />
-    </foreground_color>
-    <height>29</height>
-    <lock_children>true</lock_children>
-    <macros>
-      <include_parent_macros>true</include_parent_macros>
-    </macros>
-    <name>0</name>
-    <rules>
-      <rule name="visibleRule" prop_id="visible" out_exp="false">
-        <exp bool_exp="pv0&gt;=2.0&amp;&amp; pv0&lt;3.0">
-          <value>true</value>
-        </exp>
-        <exp bool_exp="true">
-          <value>false</value>
-        </exp>
-        <pv trig="true">=(A&amp;2)</pv>
-      </rule>
-    </rules>
-    <scale_options>
-      <width_scalable>true</width_scalable>
-      <height_scalable>true</height_scalable>
-      <keep_wh_ratio>false</keep_wh_ratio>
-    </scale_options>
-    <scripts />
-    <show_scrollbar>false</show_scrollbar>
-    <tooltip></tooltip>
-    <transparent>true</transparent>
-    <visible>true</visible>
-    <widget_type>Grouping Container</widget_type>
-    <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7dbc</wuid>
-    <x>5</x>
-    <y>150</y>
-    <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
-      <actions hook="false" hook_all="false" />
-      <auto_size>false</auto_size>
-      <background_color>
-        <color name="Red" red="255" green="0" blue="0" />
-      </background_color>
-      <border_color>
-        <color name="Black" red="0" green="0" blue="0" />
-      </border_color>
-      <border_style>0</border_style>
-      <border_width>1</border_width>
-      <enabled>true</enabled>
-      <font>
-        <fontdata fontName="liberation sans" height="10" style="0" pixels="true" />
-      </font>
-      <foreground_color>
-        <color name="Text: FG" red="0" green="0" blue="0" />
-      </foreground_color>
-      <height>28</height>
-      <horizontal_alignment>1</horizontal_alignment>
-      <name>EDM Label</name>
-      <rules />
-      <scale_options>
-        <width_scalable>true</width_scalable>
-        <height_scalable>true</height_scalable>
-        <keep_wh_ratio>false</keep_wh_ratio>
-      </scale_options>
-      <scripts />
-      <text>Amplifier Loss</text>
-      <tooltip></tooltip>
-      <transparent>false</transparent>
-      <vertical_alignment>1</vertical_alignment>
-      <visible>true</visible>
-      <widget_type>Label</widget_type>
-      <width>98</width>
-      <wrap_words>false</wrap_words>
-      <wuid>-5f34cdc8:15e4c647e9b:-7dbb</wuid>
-      <x>0</x>
-      <y>0</y>
-    </widget>
-  </widget>
-  <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
-    <actions hook="false" hook_all="false" />
-    <background_color>
-      <color red="240" green="240" blue="240" />
-    </background_color>
-    <border_color>
-      <color red="0" green="128" blue="255" />
-    </border_color>
-    <border_style>0</border_style>
-    <border_width>1</border_width>
-    <enabled>true</enabled>
-    <fc>false</fc>
-    <font>
-      <opifont.name fontName="Liberation Sans" height="15" style="0" pixels="true">Default</opifont.name>
-    </font>
-    <foreground_color>
-      <color red="192" green="192" blue="192" />
-    </foreground_color>
-    <height>29</height>
-    <lock_children>true</lock_children>
-    <macros>
-      <include_parent_macros>true</include_parent_macros>
-    </macros>
-    <name>1</name>
-    <rules>
-      <rule name="visibleRule" prop_id="visible" out_exp="false">
-        <exp bool_exp="pv0&gt;=4.0&amp;&amp; pv0&lt;5.0">
-          <value>true</value>
-        </exp>
-        <exp bool_exp="true">
-          <value>false</value>
-        </exp>
-        <pv trig="true">=(A&amp;4)</pv>
-      </rule>
-    </rules>
-    <scale_options>
-      <width_scalable>true</width_scalable>
-      <height_scalable>true</height_scalable>
-      <keep_wh_ratio>false</keep_wh_ratio>
-    </scale_options>
-    <scripts />
-    <show_scrollbar>false</show_scrollbar>
-    <tooltip></tooltip>
-    <transparent>true</transparent>
-    <visible>true</visible>
-    <widget_type>Grouping Container</widget_type>
-    <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7dba</wuid>
-    <x>5</x>
-    <y>150</y>
-    <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
-      <actions hook="false" hook_all="false" />
-      <auto_size>false</auto_size>
-      <background_color>
-        <color name="Red" red="255" green="0" blue="0" />
-      </background_color>
-      <border_color>
-        <color name="Black" red="0" green="0" blue="0" />
-      </border_color>
-      <border_style>0</border_style>
-      <border_width>1</border_width>
-      <enabled>true</enabled>
-      <font>
-        <fontdata fontName="liberation sans" height="10" style="0" pixels="true" />
-      </font>
-      <foreground_color>
-        <color name="Text: FG" red="0" green="0" blue="0" />
-      </foreground_color>
-      <height>28</height>
-      <horizontal_alignment>1</horizontal_alignment>
-      <name>EDM Label</name>
-      <rules />
-      <scale_options>
-        <width_scalable>true</width_scalable>
-        <height_scalable>true</height_scalable>
-        <keep_wh_ratio>false</keep_wh_ratio>
-      </scale_options>
-      <scripts />
-      <text>Safety Check Fail</text>
-      <tooltip></tooltip>
-      <transparent>false</transparent>
-      <vertical_alignment>1</vertical_alignment>
-      <visible>true</visible>
-      <widget_type>Label</widget_type>
-      <width>98</width>
-      <wrap_words>false</wrap_words>
-      <wuid>-5f34cdc8:15e4c647e9b:-7db9</wuid>
-      <x>0</x>
-      <y>0</y>
-    </widget>
-  </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
     <actions hook="false" hook_all="false" />
     <background_color>
@@ -251,7 +69,7 @@
     <visible>true</visible>
     <widget_type>Grouping Container</widget_type>
     <width>361</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7db8</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a44</wuid>
     <x>30</x>
     <y>0</y>
     <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
@@ -308,7 +126,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Rectangle</widget_type>
       <width>356</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7db7</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a43</wuid>
       <x>0</x>
       <y>0</y>
     </widget>
@@ -360,7 +178,7 @@ $(pv_value)</tooltip>
       <widget_type>Text Update</widget_type>
       <width>356</width>
       <wrap_words>false</wrap_words>
-      <wuid>-5f34cdc8:15e4c647e9b:-7db6</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a42</wuid>
       <x>0</x>
       <y>3</y>
     </widget>
@@ -417,7 +235,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Polyline</widget_type>
       <width>356</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7db5</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a41</wuid>
       <x>0</x>
       <y>3</y>
     </widget>
@@ -474,7 +292,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Polyline</widget_type>
       <width>356</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7db4</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a40</wuid>
       <x>0</x>
       <y>3</y>
     </widget>
@@ -531,7 +349,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7db3</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a3f</wuid>
     <x>205</x>
     <y>470</y>
   </widget>
@@ -587,7 +405,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7db2</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a3e</wuid>
     <x>5</x>
     <y>410</y>
   </widget>
@@ -643,7 +461,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7db1</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a3d</wuid>
     <x>105</x>
     <y>410</y>
   </widget>
@@ -699,7 +517,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7db0</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a3c</wuid>
     <x>205</x>
     <y>410</y>
   </widget>
@@ -755,7 +573,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7daf</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a3b</wuid>
     <x>305</x>
     <y>410</y>
   </widget>
@@ -811,7 +629,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7dae</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a3a</wuid>
     <x>5</x>
     <y>440</y>
   </widget>
@@ -867,7 +685,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7dad</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a39</wuid>
     <x>105</x>
     <y>440</y>
   </widget>
@@ -923,7 +741,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7dac</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a38</wuid>
     <x>205</x>
     <y>440</y>
   </widget>
@@ -979,7 +797,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7dab</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a37</wuid>
     <x>305</x>
     <y>440</y>
   </widget>
@@ -1035,7 +853,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7daa</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a36</wuid>
     <x>5</x>
     <y>470</y>
   </widget>
@@ -1091,7 +909,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da9</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a35</wuid>
     <x>105</x>
     <y>470</y>
   </widget>
@@ -1144,7 +962,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da8</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a34</wuid>
     <x>305</x>
     <y>470</y>
   </widget>
@@ -1232,7 +1050,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Scaled Slider</widget_type>
     <width>390</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da7</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a33</wuid>
     <x>2</x>
     <y>34</y>
   </widget>
@@ -1300,7 +1118,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>199</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da6</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a32</wuid>
     <x>105</x>
     <y>151</y>
   </widget>
@@ -1391,7 +1209,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Boolean Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da5</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a31</wuid>
     <x>205</x>
     <y>211</y>
   </widget>
@@ -1459,7 +1277,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da4</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a30</wuid>
     <x>205</x>
     <y>241</y>
   </widget>
@@ -1550,7 +1368,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Boolean Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da3</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a2f</wuid>
     <x>105</x>
     <y>211</y>
   </widget>
@@ -1618,7 +1436,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da2</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a2e</wuid>
     <x>105</x>
     <y>241</y>
   </widget>
@@ -1658,7 +1476,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>70</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da1</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a2d</wuid>
     <x>300</x>
     <y>149</y>
   </widget>
@@ -1736,7 +1554,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Byte Monitor</widget_type>
     <width>22</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7da0</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a2c</wuid>
     <x>379</x>
     <y>148</y>
   </widget>
@@ -1776,7 +1594,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>70</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d9f</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a2b</wuid>
     <x>300</x>
     <y>172</y>
   </widget>
@@ -1854,7 +1672,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Byte Monitor</widget_type>
     <width>22</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d9e</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a2a</wuid>
     <x>379</x>
     <y>171</y>
   </widget>
@@ -1894,7 +1712,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>70</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d9d</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a29</wuid>
     <x>300</x>
     <y>195</y>
   </widget>
@@ -1934,7 +1752,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>70</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d9c</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a28</wuid>
     <x>300</x>
     <y>218</y>
   </widget>
@@ -2012,7 +1830,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Byte Monitor</widget_type>
     <width>22</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d9b</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a27</wuid>
     <x>379</x>
     <y>217</y>
   </widget>
@@ -2052,7 +1870,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>70</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d9a</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a26</wuid>
     <x>300</x>
     <y>310</y>
   </widget>
@@ -2130,7 +1948,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Byte Monitor</widget_type>
     <width>22</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d99</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a25</wuid>
     <x>379</x>
     <y>309</y>
   </widget>
@@ -2174,7 +1992,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Menu Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d98</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a24</wuid>
     <x>105</x>
     <y>340</y>
   </widget>
@@ -2214,7 +2032,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>64</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d97</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a23</wuid>
     <x>10</x>
     <y>345</y>
   </widget>
@@ -2258,7 +2076,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Menu Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d96</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a22</wuid>
     <x>105</x>
     <y>370</y>
   </widget>
@@ -2298,7 +2116,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>57</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d95</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a21</wuid>
     <x>210</x>
     <y>345</y>
   </widget>
@@ -2342,7 +2160,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Menu Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d94</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a20</wuid>
     <x>305</x>
     <y>340</y>
   </widget>
@@ -2382,7 +2200,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>93</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d93</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a1f</wuid>
     <x>205</x>
     <y>380</y>
   </widget>
@@ -2426,7 +2244,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Menu Button</widget_type>
     <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d92</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a1e</wuid>
     <x>305</x>
     <y>370</y>
   </widget>
@@ -2466,7 +2284,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>43</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d91</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a1d</wuid>
     <x>10</x>
     <y>187</y>
   </widget>
@@ -2506,7 +2324,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>26</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d90</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a1c</wuid>
     <x>10</x>
     <y>217</y>
   </widget>
@@ -2546,7 +2364,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>47</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d8f</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a1b</wuid>
     <x>10</x>
     <y>247</y>
   </widget>
@@ -2586,7 +2404,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>58</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d8e</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a1a</wuid>
     <x>10</x>
     <y>125</y>
   </widget>
@@ -2664,7 +2482,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Byte Monitor</widget_type>
     <width>22</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d8d</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a19</wuid>
     <x>379</x>
     <y>194</y>
   </widget>
@@ -2716,7 +2534,7 @@ $(pv_value)</tooltip>
     <widget_type>Text Update</widget_type>
     <width>148</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d8c</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a18</wuid>
     <x>254</x>
     <y>116</y>
   </widget>
@@ -2747,8 +2565,8 @@ $(pv_value)</tooltip>
     <height>41</height>
     <horizontal_alignment>0</horizontal_alignment>
     <limits_from_pv>false</limits_from_pv>
-    <maximum>Infinity</maximum>
-    <minimum>-Infinity</minimum>
+    <maximum>1.7976931348623157E308</maximum>
+    <minimum>-1.7976931348623157E308</minimum>
     <multiline_input>false</multiline_input>
     <name>EDM Text Entry</name>
     <precision>0</precision>
@@ -2773,7 +2591,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Text Input</widget_type>
     <width>149</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d8b</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a17</wuid>
     <x>105</x>
     <y>111</y>
   </widget>
@@ -2813,7 +2631,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>84</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d8a</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a16</wuid>
     <x>10</x>
     <y>283</y>
   </widget>
@@ -2871,7 +2689,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Rectangle</widget_type>
     <width>476</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d89</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a15</wuid>
     <x>0</x>
     <y>335</y>
   </widget>
@@ -2929,7 +2747,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Rectangle</widget_type>
     <width>476</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d88</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a14</wuid>
     <x>0</x>
     <y>405</y>
   </widget>
@@ -2969,7 +2787,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>41</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d87</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a13</wuid>
     <x>10</x>
     <y>380</y>
   </widget>
@@ -3047,7 +2865,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Byte Monitor</widget_type>
     <width>22</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d86</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a12</wuid>
     <x>379</x>
     <y>240</y>
   </widget>
@@ -3087,7 +2905,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>70</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d85</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a11</wuid>
     <x>300</x>
     <y>241</y>
   </widget>
@@ -3118,8 +2936,8 @@ $(pv_value)</tooltip>
     <height>41</height>
     <horizontal_alignment>0</horizontal_alignment>
     <limits_from_pv>false</limits_from_pv>
-    <maximum>Infinity</maximum>
-    <minimum>-Infinity</minimum>
+    <maximum>1.7976931348623157E308</maximum>
+    <minimum>-1.7976931348623157E308</minimum>
     <multiline_input>false</multiline_input>
     <name>EDM Text Entry</name>
     <precision>0</precision>
@@ -3144,7 +2962,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Text Input</widget_type>
     <width>149</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d84</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a10</wuid>
     <x>105</x>
     <y>270</y>
   </widget>
@@ -3222,7 +3040,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Byte Monitor</widget_type>
     <width>22</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d83</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a0f</wuid>
     <x>379</x>
     <y>263</y>
   </widget>
@@ -3262,7 +3080,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>70</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d82</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a0e</wuid>
     <x>300</x>
     <y>264</y>
   </widget>
@@ -3303,7 +3121,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Grouping Container</widget_type>
     <width>51</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d81</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a0d</wuid>
     <x>360</x>
     <y>0</y>
     <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
@@ -3371,7 +3189,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Rectangle</widget_type>
       <width>43</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d80</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a0c</wuid>
       <x>4</x>
       <y>4</y>
     </widget>
@@ -3429,7 +3247,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Ellipse</widget_type>
       <width>50</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d7f</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a0b</wuid>
       <x>1</x>
       <y>1</y>
     </widget>
@@ -3487,7 +3305,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Ellipse</widget_type>
       <width>50</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d7e</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a0a</wuid>
       <x>-1</x>
       <y>-1</y>
     </widget>
@@ -3545,7 +3363,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Ellipse</widget_type>
       <width>50</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d7d</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a09</wuid>
       <x>1</x>
       <y>1</y>
     </widget>
@@ -3603,7 +3421,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Ellipse</widget_type>
       <width>6</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d7c</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a08</wuid>
       <x>11</x>
       <y>5</y>
     </widget>
@@ -3661,7 +3479,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Rectangle</widget_type>
       <width>19</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d7b</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a07</wuid>
       <x>16</x>
       <y>9</y>
     </widget>
@@ -3719,7 +3537,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Rectangle</widget_type>
       <width>19</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d7a</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a06</wuid>
       <x>16</x>
       <y>9</y>
     </widget>
@@ -3761,7 +3579,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Grouping Container</widget_type>
     <width>51</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d79</wuid>
+    <wuid>62759bd5:15e325a75c4:-5a05</wuid>
     <x>0</x>
     <y>0</y>
     <widget typeId="org.csstudio.opibuilder.widgets.Ellipse" version="1.0.0">
@@ -3818,7 +3636,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Ellipse</widget_type>
       <width>50</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d78</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a04</wuid>
       <x>1</x>
       <y>1</y>
     </widget>
@@ -3876,7 +3694,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Ellipse</widget_type>
       <width>50</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d77</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a03</wuid>
       <x>-1</x>
       <y>-1</y>
     </widget>
@@ -3934,7 +3752,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Ellipse</widget_type>
       <width>50</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d76</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a02</wuid>
       <x>1</x>
       <y>1</y>
     </widget>
@@ -3992,7 +3810,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Ellipse</widget_type>
       <width>6</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d75</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a01</wuid>
       <x>11</x>
       <y>5</y>
     </widget>
@@ -4032,126 +3850,7 @@ $(pv_value)</tooltip>
       <widget_type>Label</widget_type>
       <width>50</width>
       <wrap_words>false</wrap_words>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d74</wuid>
-      <x>0</x>
-      <y>0</y>
-    </widget>
-  </widget>
-  <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
-    <actions hook="false" hook_all="false" />
-    <background_color>
-      <color red="240" green="240" blue="240" />
-    </background_color>
-    <border_color>
-      <color red="0" green="128" blue="255" />
-    </border_color>
-    <border_style>0</border_style>
-    <border_width>1</border_width>
-    <enabled>true</enabled>
-    <fc>false</fc>
-    <font>
-      <opifont.name fontName="Liberation Sans" height="15" style="0" pixels="true">Default</opifont.name>
-    </font>
-    <foreground_color>
-      <color red="192" green="192" blue="192" />
-    </foreground_color>
-    <height>29</height>
-    <lock_children>true</lock_children>
-    <macros>
-      <include_parent_macros>true</include_parent_macros>
-    </macros>
-    <name>5</name>
-    <rules>
-      <rule name="visibleRule" prop_id="visible" out_exp="false">
-        <exp bool_exp="pv0&gt;=1.0&amp;&amp; pv0&lt;2.0">
-          <value>true</value>
-        </exp>
-        <exp bool_exp="true">
-          <value>false</value>
-        </exp>
-        <pv trig="true">=(A&amp;1)</pv>
-      </rule>
-    </rules>
-    <scale_options>
-      <width_scalable>true</width_scalable>
-      <height_scalable>true</height_scalable>
-      <keep_wh_ratio>false</keep_wh_ratio>
-    </scale_options>
-    <scripts />
-    <show_scrollbar>false</show_scrollbar>
-    <tooltip></tooltip>
-    <transparent>true</transparent>
-    <visible>true</visible>
-    <widget_type>Grouping Container</widget_type>
-    <width>99</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d73</wuid>
-    <x>5</x>
-    <y>150</y>
-    <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
-      <actions hook="true" hook_all="true">
-        <action type="WRITE_PV">
-          <pv_name>$(pv_name)</pv_name>
-          <value>0</value>
-          <timeout>10</timeout>
-          <confirm_message></confirm_message>
-          <description></description>
-        </action>
-      </actions>
-      <alarm_pulsing>false</alarm_pulsing>
-      <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
-      <background_color>
-        <color red="240" green="240" blue="240" />
-      </background_color>
-      <border_alarm_sensitive>false</border_alarm_sensitive>
-      <border_color>
-        <color red="0" green="128" blue="255" />
-      </border_color>
-      <border_style>0</border_style>
-      <border_width>1</border_width>
-      <enabled>true</enabled>
-      <font>
-        <fontdata fontName="liberation sans" height="10" style="0" pixels="true" />
-      </font>
-      <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
-      <foreground_color>
-        <color name="Text: FG" red="0" green="0" blue="0" />
-      </foreground_color>
-      <height>29</height>
-      <image></image>
-      <name>EDM Message Button</name>
-      <push_action_index>0</push_action_index>
-      <pv_name>$(motor):ELOSSRC.A</pv_name>
-      <pv_value />
-      <rules>
-        <rule name="OnOffBackgroundRule" prop_id="background_color" out_exp="false">
-          <exp bool_exp="widget.getValue() == 1">
-            <value>
-              <color name="Red" red="255" green="0" blue="0" />
-            </value>
-          </exp>
-          <exp bool_exp="true">
-            <value>
-              <color name="Red" red="255" green="0" blue="0" />
-            </value>
-          </exp>
-          <pv trig="true">$(motor):ELOSSRC.A</pv>
-        </rule>
-      </rules>
-      <scale_options>
-        <width_scalable>true</width_scalable>
-        <height_scalable>true</height_scalable>
-        <keep_wh_ratio>false</keep_wh_ratio>
-      </scale_options>
-      <scripts />
-      <style>0</style>
-      <text>Encoder Loss Reset</text>
-      <toggle_button>false</toggle_button>
-      <tooltip>$(pv_name)
-$(pv_value)</tooltip>
-      <visible>true</visible>
-      <widget_type>Action Button</widget_type>
-      <width>99</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d72</wuid>
+      <wuid>62759bd5:15e325a75c4:-5a00</wuid>
       <x>0</x>
       <y>0</y>
     </widget>
@@ -4192,7 +3891,7 @@ $(pv_value)</tooltip>
     <widget_type>Label</widget_type>
     <width>70</width>
     <wrap_words>false</wrap_words>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d71</wuid>
+    <wuid>62759bd5:15e325a75c4:-59fd</wuid>
     <x>302</x>
     <y>289</y>
   </widget>
@@ -4270,7 +3969,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Byte Monitor</widget_type>
     <width>22</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d70</wuid>
+    <wuid>62759bd5:15e325a75c4:-59fc</wuid>
     <x>379</x>
     <y>286</y>
   </widget>
@@ -4321,7 +4020,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Grouping Container</widget_type>
     <width>101</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d6f</wuid>
+    <wuid>62759bd5:15e325a75c4:-59fb</wuid>
     <x>5</x>
     <y>310</y>
     <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -4388,7 +4087,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Action Button</widget_type>
       <width>99</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d6e</wuid>
+      <wuid>62759bd5:15e325a75c4:-59fa</wuid>
       <x>0</x>
       <y>0</y>
     </widget>
@@ -4457,7 +4156,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Action Button</widget_type>
     <width>201</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d6d</wuid>
+    <wuid>62759bd5:15e325a75c4:-59f9</wuid>
     <x>105</x>
     <y>310</y>
   </widget>
@@ -4508,7 +4207,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Grouping Container</widget_type>
     <width>199</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d6c</wuid>
+    <wuid>62759bd5:15e325a75c4:-59f8</wuid>
     <x>105</x>
     <y>181</y>
     <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
@@ -4563,7 +4262,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Action Button</widget_type>
       <width>99</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d6b</wuid>
+      <wuid>62759bd5:15e325a75c4:-59f7</wuid>
       <x>0</x>
       <y>0</y>
     </widget>
@@ -4619,7 +4318,7 @@ $(pv_value)</tooltip>
       <visible>true</visible>
       <widget_type>Action Button</widget_type>
       <width>99</width>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d6a</wuid>
+      <wuid>62759bd5:15e325a75c4:-59f6</wuid>
       <x>100</x>
       <y>0</y>
     </widget>
@@ -4671,7 +4370,7 @@ $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>Grouping Container</widget_type>
     <width>196</width>
-    <wuid>-5f34cdc8:15e4c647e9b:-7d69</wuid>
+    <wuid>62759bd5:15e325a75c4:-59f5</wuid>
     <x>105</x>
     <y>190</y>
     <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
@@ -4722,9 +4421,169 @@ $(pv_value)</tooltip>
       <widget_type>Text Update</widget_type>
       <width>195</width>
       <wrap_words>false</wrap_words>
-      <wuid>-5f34cdc8:15e4c647e9b:-7d68</wuid>
+      <wuid>62759bd5:15e325a75c4:-59f4</wuid>
       <x>0</x>
       <y>0</y>
     </widget>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.ActionButton" version="2.0.0">
+    <actions hook="true" hook_all="true">
+      <action type="WRITE_PV">
+        <pv_name>$(pv_name)</pv_name>
+        <value>0</value>
+        <timeout>10</timeout>
+        <confirm_message></confirm_message>
+        <description></description>
+      </action>
+    </actions>
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <fontdata fontName="liberation sans" height="10" style="0" pixels="true" />
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color name="Text: FG" red="0" green="0" blue="0" />
+    </foreground_color>
+    <height>29</height>
+    <image></image>
+    <name>EDM Message Button</name>
+    <push_action_index>0</push_action_index>
+    <pv_name>$(motor):ELOSSRC.A</pv_name>
+    <pv_value />
+    <rules>
+      <rule name="OnOffBackgroundRule" prop_id="background_color" out_exp="false">
+        <exp bool_exp="widget.getValue() == 1">
+          <value>
+            <color name="Red" red="255" green="0" blue="0" />
+          </value>
+        </exp>
+        <exp bool_exp="true">
+          <value>
+            <color name="Red" red="255" green="0" blue="0" />
+          </value>
+        </exp>
+        <pv trig="true">$(motor):ELOSSRC.A</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts>
+      <path pathString="visible.py" checkConnect="true" sfe="false" seoe="false">
+        <pv trig="true">loc://$(DID)eloss1("='$(motor):ELOSS' == 1 || '$(motor):ELOSS' == 3 || '$(motor):ELOSS' == 5 || '$(motor):ELOSS' == 7")</pv>
+      </path>
+    </scripts>
+    <style>0</style>
+    <text>Encoder Loss Reset</text>
+    <toggle_button>false</toggle_button>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>Action Button</widget_type>
+    <width>99</width>
+    <wuid>62759bd5:15e325a75c4:-59fe</wuid>
+    <x>5</x>
+    <y>150</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <auto_size>false</auto_size>
+    <background_color>
+      <color name="Red" red="255" green="0" blue="0" />
+    </background_color>
+    <border_color>
+      <color name="Black" red="0" green="0" blue="0" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <fontdata fontName="liberation sans" height="10" style="0" pixels="true" />
+    </font>
+    <foreground_color>
+      <color name="Text: FG" red="0" green="0" blue="0" />
+    </foreground_color>
+    <height>28</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <name>EDM Label</name>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts>
+      <path pathString="visible.py" checkConnect="true" sfe="false" seoe="false">
+        <pv trig="true">loc://$(DID)eloss2("='$(motor):ELOSS' == 2 || '$(motor):ELOSS' == 3 || '$(motor):ELOSS' == 6 || '$(motor):ELOSS' == 7")</pv>
+      </path>
+    </scripts>
+    <text>Amplifier Loss</text>
+    <tooltip></tooltip>
+    <transparent>false</transparent>
+    <vertical_alignment>1</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Label</widget_type>
+    <width>98</width>
+    <wrap_words>false</wrap_words>
+    <wuid>62759bd5:15e325a75c4:-5a47</wuid>
+    <x>5</x>
+    <y>150</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <auto_size>false</auto_size>
+    <background_color>
+      <color name="Red" red="255" green="0" blue="0" />
+    </background_color>
+    <border_color>
+      <color name="Black" red="0" green="0" blue="0" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <fontdata fontName="liberation sans" height="10" style="0" pixels="true" />
+    </font>
+    <foreground_color>
+      <color name="Text: FG" red="0" green="0" blue="0" />
+    </foreground_color>
+    <height>28</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <name>EDM Label</name>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts>
+      <path pathString="visible.py" checkConnect="true" sfe="false" seoe="false">
+        <pv trig="true">loc://$(DID)eloss3("='$(motor):ELOSS' == 4 || '$(motor):ELOSS' == 5 || '$(motor):ELOSS' == 6 || '$(motor):ELOSS' == 7")</pv>
+      </path>
+    </scripts>
+    <text>Safety Check Fail</text>
+    <tooltip></tooltip>
+    <transparent>false</transparent>
+    <vertical_alignment>1</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Label</widget_type>
+    <width>98</width>
+    <wrap_words>false</wrap_words>
+    <wuid>62759bd5:15e325a75c4:-5a45</wuid>
+    <x>5</x>
+    <y>150</y>
   </widget>
 </display>
