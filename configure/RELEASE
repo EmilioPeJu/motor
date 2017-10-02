@@ -21,7 +21,7 @@ BUSY=$(SUPPORT)/busy/1-6-1dls1
 #BUSY=$(AJFWORK)/busy
 
 # Need the sequencer and busy for the MM4005 and XPS trajectory scanning
-SNCSEQ=$(SUPPORT)/seq/2-2-2
+SNCSEQ=$(SUPPORT)/seq/2-2-4
 #SNCSEQ=$(AJFWORK)/seq
 
 # Recommended EPICS release: R3.14.12.3
