@@ -198,7 +198,7 @@ record(stringout, "$(P)$(M):PORT") {
 }
 
 # record that holds the SCALE
-record(stringout, "$(P)$(M):SCALE") {
+record(ao, "$(P)$(M):SCALE") {
     field(PINI, "YES")
     field(VAL, "$(SCALE=1)")
 }
