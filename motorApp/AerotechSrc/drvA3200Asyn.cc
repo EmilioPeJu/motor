@@ -70,6 +70,9 @@ in file LICENSE that is included with this distribution.
 #include "drvA3200Asyn.h"
 #include "epicsExport.h"
 
+// Extra A3200 parameters
+#include "A3200ExtraParams.h"
+
 /* NOTE: The following two files are copied from the A3200 C library include files.
 * If changing the driver to target a different version of the A3200, copy the following two files from that version's C library include files */
 #include "A3200CommonStructures.h"
@@ -410,6 +413,9 @@ static int motorAxisSetInteger(AXIS_HDL pAxis, motorAxisParam_t function, int va
 
     switch (function)
     {
+    	case axisFaultStatus:
+    		PRINT(pAxis->logParam, TERROR, "A3200 axis fault status updated\n");
+    		break;
         case motorAxisClosedLoop:
             ret_status = sendAndReceive(pAxis->pController, (char *) TaskStateStr, inputBuff, sizeof(inputBuff));
             if (ret_status != asynSuccess || inputBuff[0] != ASCII_ACK_CHAR)
@@ -757,11 +763,13 @@ static void A3200Poller(A3200Controller *pController)
             PRINT(pAxis->logParam, IODRIVER, "A3200Poller: axis %s axisStatus=%x, position=%f\n",
                   pAxis->axisName, pAxis->axisStatus, pAxis->currentCmdPos);
 
+            // Check for axis fault
             if (axis_fault && axis_fault != pAxis->lastFault)
             {
                 PRINT(pAxis->logParam, TERROR, "A3200Poller: controller fault on axis=%s fault=0x%X\n", pAxis->axisName, axis_fault);
                 pAxis->lastFault = axis_fault;
             }
+            motorParam->setInteger(pAxis->params, axisFaultStatus, axis_fault);
 
             vfbk /= fabs(pAxis->stepSize);
             motorParam->setDouble(pAxis->params, motorAxisActualVel, vfbk);
@@ -835,6 +843,7 @@ int A3200AsynConfig(int card,             /* Controller number */
         return MOTOR_AXIS_ERROR;
     }
 
+
     pController = &pA3200Controller[card];
 
     pController->numAxes = numAxes;
@@ -890,7 +899,8 @@ int A3200AsynConfig(int card,             /* Controller number */
             pAxis->card = card;
             pAxis->axis = axis;
             pAxis->mutexId = epicsMutexMustCreate();
-            pAxis->params = motorParam->create(0, MOTOR_AXIS_NUM_PARAMS);
+            pAxis->params = motorParam->create(0, MOTOR_AXIS_NUM_PARAMS + A3200_NUM_PARAMS);
+
             strncpy(pAxis->axisName, &inputBuff[1], sizeof(pAxis->axisName) - 1);
 
             sprintf(outputBuff, GET_PARAM_FORMAT_STRING, "PositionFeedbackType", pAxis->axisName);

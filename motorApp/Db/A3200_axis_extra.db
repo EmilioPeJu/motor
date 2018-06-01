@@ -1,0 +1,19 @@
+# Aerotech A3200 extra axis records
+#
+# % macro, P      , Device prefix
+# % macro, M      , Device suffix
+# % macro, N      , Axis number
+# % macro, PORT   , Asyn port
+# % macro, ADDR   , Asyn port address
+#
+
+# Axis status
+grecord(ai,"$(P)$(M):AXIS$(N):STATUS") {
+    field(DESC,"Aerotech axis status")
+    field(DTYP, "asynInt32")
+    field(PINI, "1")
+    field(VAL, "0")
+    field(PREC,"0")
+    field(SCAN, "I/O Intr")
+    field(INP,"@asyn($(PORT),$(ADDR))AXIS_FAULT_STATUS")
+}
