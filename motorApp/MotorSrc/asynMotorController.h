@@ -174,7 +174,7 @@ class epicsShareClass asynMotorController : public asynPortDriver {
   
   /* Functions to deal with moveToHome.*/
   virtual asynStatus startMoveToHomeThread();
-  void asynMotorMoveToHome();
+  virtual void asynMotorMoveToHome();
   
   /* These are the functions for profile moves */
   virtual asynStatus initializeProfile(size_t maxPoints);

@@ -1,0 +1,39 @@
+
+file basic_asyn_motor.template
+{
+pattern { P, M, DESC, DTYP, DIR, VELO, VBAS, ACCL, BDST, BVEL, BACC, PORT, ADDR, MRES, PREC, EGU, DHLM, DLLM, HLSV, INIT, SREV, RRES, TWV, ERES, JAR, UEIP, VMAX, OFF, RDBD, FOFF, ADEL, NTM, HOMEVIS}
+        { mp49t:, sim1, "sim", asynMotor, 0, 5, 0, 0.1, 0, 0, 0, PMAC1, 1, 0.001, 3, mm, 50000000, -50000000, MINOR, "", 200, 0, 1.0, 0, 0, 0, 5, 0, 0, 0, 0.5, YES, 1}
+	{ mp49t:, sim2, "sim", asynMotor, 0, 5, 0, 0.1, 0, 0, 0, PMAC1, 2, 0.001, 3, mm, 50000000, -50000000, MINOR, "", 200, 0, 1.0, 0, 0, 0, 5, 0, 0, 0, 0, NO, 1}
+	{ mp49t:, sim3, "sim", asynMotor, 0, 5, 0, 0.1, 0, 0, 0, PMAC1, 3, 0.001, 3, mm, 50000000, -50000000, MINOR, "", 200, 0, 1.0, 0, 0, 0, 5, 0, 0, 0, 0, NO, 1}
+	{ mp49t:, sim4, "sim", asynMotor, 0, 5, 0, 0.1, 0, 0, 0, PMAC1, 4, 0.001, 3, mm, 50000000, -50000000, MINOR, "", 200, 0, 1.0, 0, 0, 0, 5, 0, 0, 0, 0, YES, 1}
+	{ mp49t:, sim5, "sim", asynMotor, 0, 5, 0, 0.1, 0, 0, 0, PMAC1, 5, 0.001, 3, mm, 50000000, -50000000, MINOR, "", 200, 0, 1.0, 0, 0, 0, 5, 0, 0, 0, 0, NO, 0}
+	{ mp49t:, sim6, "sim", asynMotor, 0, 5, 0, 0.1, 0, 0, 0, PMAC1, 6, 0.001, 3, mm, 50000000, -50000000, MINOR, "", 200, 0, 1.0, 0, 0, 0, 5, 0, 0, 0, 0, YES, 0}
+	
+}
+
+
+file bo.template
+{
+pattern {P, R, DTYP, OUT, ZNAM, ONAM, SCAN }
+        {mp49t:, defer, asynUInt32Digital, "@asynMask(PMAC1,1,1)MOTOR_DEFER_MOVES", "OFF", "ON", Passive }
+}
+
+
+file dlssrstatus.template
+{
+pattern { device }
+        { mp49t:sim:SR }
+}
+
+file dlssrfile.template
+{
+pattern {device, file}
+        { mp49t:sim:SR, 0}
+}
+
+file limit_alarm.template
+{
+pattern {P, name}
+ 	{ mp49t:sim1:alarm, mp49t:sim1.RBV}
+}
+

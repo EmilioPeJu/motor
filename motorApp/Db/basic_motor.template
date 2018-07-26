@@ -1,0 +1,42 @@
+# AUTOSAVE: level 0 = before record init, level 1 = before AND after record init
+#% autosave 0 DVAL OFF
+#% autosave 1 DIR DHLM DLLM TWV VBAS VELO ACCL BDST BVEL BACC RDBD EGU RTRY UEIP URIP DLY PREC DISA DISP FOFF OFF FRAC OMSL JVEL JAR
+#% autosave 2 DESC
+#% archiver 0.5 Monitor
+#% archiver 0.5 Monitor RBV
+#% gdatag,template,simpleMotor,$(gda_name=),$(gda_desc=$(DESC))
+#% gdatag,motor,rw,$(gda_name=),RECORD,Motor
+record(motor, "$(P)$(M)") {
+  field(SCAN, "Passive")
+  field(MRES, "$(MRES)")
+  field(SREV, "$(SREV)")
+  field(RRES, "$(RRES)")
+  field(TWV, "$(TWV)")
+  field(ERES, "$(ERES)")
+  field(JVEL, "$(JVEL)")
+  field(JAR, "$(JAR)")
+  field(UEIP, "$(UEIP)")
+  field(PREM, "$(PREM)")
+  field(POST, "$(POST)")
+  field(DESC, "$(DESC)")
+  field(DTYP, "$(DTYP)")
+  field(DIR, "$(DIR)")
+  field(VELO, "$(VELO)")
+  field(VBAS, "$(VBAS)")
+  field(VMAX, "$(VMAX)")
+  field(ACCL, "$(ACCL)")
+  field(BDST, "$(BDST)")
+  field(BVEL, "$(BVEL)")
+  field(BACC, "$(BACC)")
+  field(OUT, "#C$(C) S$(S) @$(PARAM)")
+  field(PREC, "$(PREC)")
+  field(EGU, "$(EGU)")
+  field(DHLM, "$(DHLM)")
+  field(DLLM, "$(DLLM)")
+  field(HLSV, "$(HLSV)")
+  field(INIT, "$(INIT)")
+  field(RTRY, "0")
+  field(FOFF, "$(FOFF)")
+}
+
+

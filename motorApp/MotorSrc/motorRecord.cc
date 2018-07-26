@@ -2,10 +2,10 @@
 FILENAME...     motorRecord.cc
 USAGE...        Motor Record Support.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 17843 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2014-09-11 10:37:22 -0500 (Thu, 11 Sep 2014) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/MotorSrc/motorRecord.cc $
 */
 
 /*

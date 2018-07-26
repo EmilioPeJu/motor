@@ -21,9 +21,9 @@ program XPS_trajectoryScan("P=13BMC:,R=traj1,IPADDR=164.54.160.34,PORT=5001,"
 %% #include <math.h>
 %% #include <stdarg.h>
 %% #include "XPS_C8_drivers.h"
-%% #include "XPS_C8_errors.h"
 %% #include "Socket.h"
 %% #include "xps_ftp.h"
+%% #include "drvXPSAsyn.h"
 
 #include <seq_release.h> /* definition of MAGIC */
 #define VERSION_INT(MAJ,MIN) ((MAJ)*1000000+(MIN)*1000)
@@ -36,13 +36,13 @@ option +r;
  * is almost unlimited because the data is stored in a file but the channel 
  * access limit with a double data type is 2000 on R3.13 clients.
  */
-#define MAX_ELEMENTS 2000
+#define MAX_ELEMENTS 100000
 
 /* Maximum # of output pulses.  At the moment the pulses are defined by a
  * timer which is synchronised with the trajectory points so the max number
  * of pulses equals the max number of elements.
  */
-#define MAX_PULSES 2000
+#define MAX_PULSES 100000
 
 /* Note that MAX_ELEMENTS, and MAX_PULSES must be defined before
  * including the trajectoryScan.h */
@@ -55,25 +55,26 @@ option +r;
 #define POLL_INTERVAL 0.1
 
 /* Socket timeouts */
-#define POLL_TIMEOUT 1.0
+#define POLL_TIMEOUT 50.0
 #define DRIVE_TIMEOUT 100000.  /* Forever */
 #define ABORT_TIMEOUT 10.
 
 /* Used within the exec state as a timeout within the while loops which wait for
  * the ss xpsTrajectoryRun to catch up.  The delays are 0.1 second, so 100 loops
  * is 10 seconds. */
-#define COUNT_TIMEOUT  100
+#define COUNT_TIMEOUT  200
 
 /* The maximum size of the item names in gathering, e.g. "GROUP2.POSITIONER1.CurrentPosition" */
 #define MAX_GATHERING_AXIS_STRING 60
 /* Number of items per axis */
 #define NUM_GATHERING_ITEMS 2
-/* Total length of gathering configuration string */
+/* Total length of gathering string */
 #define MAX_GATHERING_STRING MAX_GATHERING_AXIS_STRING * NUM_GATHERING_ITEMS * MAX_AXES
-#define GATHERING_MAX_READ_LEN 65536
 
 /* Constants used for FTP to the XPS */
 #define TRAJECTORY_DIRECTORY "/Admin/public/Trajectories"
+#define GATHERING_DIRECTORY "/Admin/public/"
+#define GATHERING_FILE "Gathering.dat"
 
 int status;
 int i;
@@ -297,6 +298,11 @@ ss xpsTrajectoryScan {
 
     state execute {
         entry {
+            /* Set exec status to UNDEFINED */
+            execStatus = STATUS_UNDEFINED;
+            pvPut(execStatus);
+            strcpy(execMessage, " ");
+            pvPut(execMessage);
             if (debugLevel > 0) {
                 printMessage("XPS_trajectoryScan: ss xpsTrajectoryScan: state execute:"
                        " entry\n");
@@ -357,23 +363,16 @@ ss xpsTrajectoryScan {
                                                            axisName[j],
                                                            &motorLowLimit[j], 
                                                            &motorHighLimit[j]);
-                    /* Note that epicsMotorPos is in user coordinates, motorMinPos and motorLow/HighLimit
-                     * are in XPS (dial) coordinates, need to do conversion */
-                    if (epicsMotorDir[j] == 0) dir=1; else dir=-1;
-                    if (((epicsMotorPos[j]*dir + epicsMotorOff[j]) + motorMinPos[j]) < motorLowLimit[j]) {
+                    if ((epicsMotorPos[j] + motorMinPos[j] - epicsMotorOff[j]) < motorLowLimit[j]) {
                         execStatus = STATUS_FAILURE;
                         pvPut(execStatus);
-                        sprintf(execMessage, "Low soft limit violation on motor %d", j);
+                        sprintf(execMessage, "Low soft limit violation on motor %d", j+1);
                         pvPut(execMessage);
-                        printMessage("Low soft limit violation on motor %d, epicsMotorPos=%f, motorMinPos=%f, motorLowLimit=%f\n", 
-                                j, epicsMotorPos[j], motorMinPos[j], motorLowLimit[j]);
                     }
-                    if (((epicsMotorPos[j]*dir + epicsMotorOff[j]) + motorMaxPos[j]) > motorHighLimit[j]) {
+                    if ((epicsMotorPos[j] + motorMaxPos[j] - epicsMotorOff[j]) > motorHighLimit[j]) {
                         execStatus = STATUS_FAILURE;
                         pvPut(execStatus);
-                        sprintf(execMessage, "High soft limit violation on motor %d", j);
-                        printMessage("High soft limit violation on motor %d, epicsMotorPos=%f, motorMaxPos=%f, motorHighLimit=%f\n", 
-                                j, epicsMotorPos[j], motorMaxPos[j], motorHighLimit[j]);
+                        sprintf(execMessage, "High soft limit violation on motor %d", j+1);
                         pvPut(execMessage);
                     }
                 }
@@ -381,7 +380,7 @@ ss xpsTrajectoryScan {
         }
  
 
-        when (execStatus == STATUS_FAILURE) {
+        when ((execStatus == STATUS_FAILURE) || (execStatus == STATUS_ABORT)) {
             /* Clear execute command, post.  This is a "busy" record, don't
              * want to do this until execution is complete. */
             if (debugLevel > 0) {
@@ -393,7 +392,7 @@ ss xpsTrajectoryScan {
         } state monitor_inputs
 
 
-        when (execStatus != STATUS_FAILURE) {
+        when ((execStatus != STATUS_FAILURE) && (execStatus != STATUS_ABORT)) {
             %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
             /* Setting execState here will cause the xpsTrajectoryRun SS to wake up */
             if (debugLevel > 0) {
@@ -465,6 +464,12 @@ ss xpsTrajectoryScan {
             for (j=0; j<numAxes; j++) pvPut(motorCurrent[j]);
 
             %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
+            if (xpsStatus != 45) {
+            	/* Check again */
+		        printf("Possible odd status value=%d, retrying\n",xpsStatus);            	
+		        delay(0.1);
+                %%pVar->xpsStatus = getGroupStatus(ssId, pVar);
+            }
             if (xpsStatus == 45) {
                 %%pVar->ncomplete = currentElement(ssId, pVar);
                 sprintf(execMessage, "Executing element %d/%d", 
@@ -484,7 +489,8 @@ ss xpsTrajectoryScan {
                 sprintf(execMessage,"XPS Status Error=%d", xpsStatus);
             }
             /* See if the elapsed time is more than expected, time out */
-            if (difftime(time(0), startTime) > (expectedTime+10)) {
+            if (difftime(time(0), startTime) > (npulses/1000+expectedTime+10.0)) {
+				printf("Timeout: difftime = %f\n",difftime(time(0), startTime) - (npulses/1000+expectedTime+10.0));     
                 execState = EXECUTE_STATE_FLYBACK;
                 execStatus = STATUS_TIMEOUT;
                 strcpy(execMessage, "Timeout");
@@ -581,8 +587,7 @@ ss xpsTrajectoryScan {
  * state set. */
 ss xpsTrajectoryAbort {
     state monitorAbort {
-        when ((efTestAndClear(abortMon)) && (abort==1) &&
-              (execState==EXECUTE_STATE_EXECUTING)) {
+        when ((efTestAndClear(abortMon)) && (abort==1)) {
 
             execStatus = STATUS_ABORT;
             if (debugLevel > 0) {
@@ -657,8 +662,9 @@ static int getMotorPositions(SS_ID ssId, struct UserVar *pVar, double *pos)
 
     /* Read the current positions of all the axes */
     
-    status = GroupPositionCurrentGet(pVar->positionSocket,
+    status = GroupPositionCurrentGet(pVar->pollSocket,
                                      pVar->groupName,pVar->numAxes,pos);
+
     if (status != 0)
         printMessage("Error performing GroupPositionCurrentGet%i\n", status);
     /* Convert from XPS units (which are EPICS motor dial units) to user units */
@@ -900,17 +906,19 @@ static void trajectoryExecute(SS_ID ssId, struct UserVar *pVar)
         return;
     }
         
-    /* Stop the gathering */    
+    /* Save the gathered data to a file */    
     if (pVar->debugLevel > 0) {
         printMessage("XPS_trajectoryScan: trajectoryExecute:"
-               " calling GatheringStop(%d)\n", pVar->pollSocket);
+               " calling GatheringStopAndSave(%d)\n", pVar->pollSocket);
     }
-    status = GatheringStop(pVar->pollSocket);
-    
+    XPSDisablePoll(1);
+	sleep(1);
+    status = GatheringStopAndSave(pVar->pollSocket);
+    XPSDisablePoll(0);    
     /* status -30 means gathering not started i.e. aborted before the end of
        1 trajectory element */
     if ((status != 0) && (status != -30))
-        printMessage("Error performing GatheringStop, status=%d\n", status);
+        printMessage("Error performing GatheringStopAndSave, status=%d\n", status);
     
     return;
 }
@@ -932,11 +940,11 @@ static void buildAndVerify(SS_ID ssId, struct UserVar *pVar)
     double preTimeMax, postTimeMax;
     double preVelocity[MAX_AXES], postVelocity[MAX_AXES];
     double time;
-    int dir[MAX_AXES];
     
     if (pVar->debugLevel > 0) {
         printMessage("XPS_trajectoryScan: buildAndVerify:"
-               " entry\n");
+               " entry (%s, %s, %s)\n", 
+            pVar->xpsAddress, pVar->userName, pVar->password);
     }
     /* We create trajectories with an extra element at the beginning and at the end.
      * The distance and time of the first element is defined so that the motors will
@@ -968,9 +976,6 @@ static void buildAndVerify(SS_ID ssId, struct UserVar *pVar)
          * is "correct" but subject to roundoff errors when sending ASCII commands
          * to XPS.  Reduce acceleration 10% to account for this. */
         maxAcceleration[j] = 0.9 * maxAcceleration[j];
-        /* Note: the preDistance and postDistance numbers computed here are
-         * in user coordinates, not XPS coordinates, because they are used for 
-         * EPICS moves at the start and end of the scan */
         if (pVar->moveMode == MOVE_MODE_RELATIVE) {
             distance = pVar->motorTrajectory[j][0];
         } else {
@@ -1000,17 +1005,12 @@ static void buildAndVerify(SS_ID ssId, struct UserVar *pVar)
     /* Create the trajectory file */
     trajFile =  fopen (pVar->trajectoryFile, "w");
 
-    /* Compute the sign relationship of user coordinates to XPS coordinates for
-     * each axis */
-    for (j=0; j<pVar->numAxes; j++) {
-        if (pVar->epicsMotorDir[j] == 0) dir[j]=1; else dir[j]=-1;
-    }
     /* Create the initial acceleration element */
     fprintf(trajFile,"%f", preTimeMax);
     for (j=0; j<pVar->numAxes; j++) 
-        fprintf(trajFile,", %f, %f", pVar->preDistance[j]*dir[j], preVelocity[j]*dir[j]);
+        fprintf(trajFile,", %f, %f", pVar->preDistance[j], preVelocity[j]);
     fprintf(trajFile,"\n");
- 
+   
     /* The number of points in the file is nelements for MOVE_MODE_RELATIVE and
      * nelements-1 for other modes */
     if (pVar->moveMode == MOVE_MODE_RELATIVE) 
@@ -1025,23 +1025,23 @@ static void buildAndVerify(SS_ID ssId, struct UserVar *pVar)
             T1 = T0;
         for (j=0; j<pVar->numAxes; j++) {
             if (pVar->moveMode == MOVE_MODE_RELATIVE) {
-                D0 = pVar->motorTrajectory[j][i] * dir[j];
+                D0 = pVar->motorTrajectory[j][i];
                 if (i < npoints-1) 
-                    D1 = pVar->motorTrajectory[j][i+1] * dir[j];
+                    D1 = pVar->motorTrajectory[j][i+1];
                 else
                     D1 = D0;
             } else {
-                D0 = pVar->motorTrajectory[j][i+1] *dir[j] - 
-                           pVar->motorTrajectory[j][i] * dir[j];
+                D0 = pVar->motorTrajectory[j][i+1] - 
+                           pVar->motorTrajectory[j][i];
                 if (i < npoints-1) 
-                    D1 = pVar->motorTrajectory[j][i+2] * dir[j] - 
-                           pVar->motorTrajectory[j][i+1] * dir[j];
+                    D1 = pVar->motorTrajectory[j][i+2] - 
+                           pVar->motorTrajectory[j][i+1];
                 else
                     D1 = D0;
             }
                 
             /* Average either side of the point? */
-            trajVel = ((D0 + D1) / (T0 + T1));
+            trajVel = (D0 + D1) / (T0 + T1);
             if (!(pVar->moveAxis[j])) {
                 D0 = 0.0;    /* Axis turned off*/
                 trajVel = 0.0;
@@ -1056,9 +1056,15 @@ static void buildAndVerify(SS_ID ssId, struct UserVar *pVar)
     /* Create the final acceleration element. Final velocity must be 0. */
     fprintf(trajFile,"%f", postTimeMax);
     for (j=0; j<pVar->numAxes; j++) 
-        fprintf(trajFile,", %f, %f", pVar->postDistance[j]*dir[j], 0.);
+        fprintf(trajFile,", %f, %f", pVar->postDistance[j], 0.);
     fprintf(trajFile,"\n");
     fclose (trajFile);
+
+    if (pVar->debugLevel > 0) {
+    printf("XPS_trajectoryScan: buildAndVerify:"
+            " connecting over ftp (%s, %s, %s)\n", 
+            pVar->xpsAddress, pVar->userName, pVar->password);
+	}
     
     /* FTP the trajectory file from the local directory to the XPS */
     status = ftpConnect(pVar->xpsAddress, pVar->userName, pVar->password, &ftpSocket);
@@ -1162,85 +1168,128 @@ static int getGroupStatus(SS_ID ssId, struct UserVar *pVar)
 }
 
 
-/* Function to read the gathering data that was collected
- * by the XPS as the trajectory was performed and read back the
+/* Function to load the GatheringExternal.dat file which was written
+ * by the XPS after the trajectory was performed and read back the
  * actual motor positions and calculate the position errors */ 
 static void readGathering(SS_ID ssId, struct UserVar *pVar)
 {
-    char *buffer, *bptr, *tptr;
-    int currentSamples, maxSamples;
+    char buffer[MAX_GATHERING_STRING];
+    FILE *gatheringFile;
+    int i,j;
+    int nitems;
     double setpointPosition, actualPosition;
+    int ftpSocket;
     int status;
     int dir;
-    int i, j;
-    int nitems;
-    int numRead, numInBuffer, numChars;
-
+    int ok;
+    char * bptr;
+    int success;
+    char c;
     
     if (pVar->debugLevel > 0) {
         printMessage("XPS_trajectoryScan: readGathering:"
                " entry\n");
     }
-    /* Read the number of lines of gathering */
-    status = GatheringCurrentNumberGet(pVar->pollSocket, &currentSamples, &maxSamples);
+    /* FTP the gathering file from the XPS to the local directory */
+    status = ftpConnect(pVar->xpsAddress, pVar->userName, pVar->password, &ftpSocket);
     if (status != 0) {
-        printMessage("Error calling GatherCurrentNumberGet, status=%d\n", status);
+        printMessage("Error calling ftpConnect, status=%d\n", status);
         return;
     }
-    if (currentSamples != pVar->npulses) {
-        printMessage("readGathering: error, npulses=%d, currentSamples=%d\n", 
-            pVar->npulses, currentSamples);
+    status = ftpChangeDir(ftpSocket, GATHERING_DIRECTORY);
+    if (status != 0) {
+        printMessage("Error calling ftpChangeDir, status=%d\n", status);
         return;
     }
-    buffer = (char *)calloc(GATHERING_MAX_READ_LEN, sizeof(char));
-    numInBuffer = 0;
-    for (numRead=0; numRead<currentSamples;) {
-        /* Read the next buffer */
-        /* Try to read all the remaining points */
-        status = -1;
-        numInBuffer = currentSamples - numRead;
-        while (status && (numInBuffer > 0)) {
-            status = GatheringDataMultipleLinesGet(pVar->pollSocket, numRead, numInBuffer, buffer);
-            if (pVar->debugLevel > 0) {
-                printMessage("readGathering: GatheringDataMultipleLinesGet, status=%d, numInBuffer=%d\n", status, numInBuffer);
+    status = ftpRetrieveFile(ftpSocket, GATHERING_FILE);
+    if (status != 0) {
+        printMessage("Error calling ftpRetrieveFile, status=%d\n", status);
+        return;
+    }
+    status = ftpDisconnect(ftpSocket);
+    if (status != 0) {
+        printMessage("Error calling ftpDisconnect, status=%d\n", status);
+        return;
+    }
+
+    gatheringFile = fopen(GATHERING_FILE, "r");
+    
+    /* Read 1st 2 lines which only contain the axis names */
+    for (i=0; i<2; i++) {
+        fgets (buffer, MAX_GATHERING_STRING, gatheringFile);
+    }
+    /* The next line is the motor positions at the start of the trajectory element
+     * where pulses began to be output.  
+     * We used to skip this line because this pulse just
+     * started the MCS counting, there are no data yet. 
+     * But that required the XPS to output more than the requested number of 
+     * output pulses, which is undesireable.  The SIS3801 can be configured to
+     * start counting before receiving the first input pulse, which should
+     * now be done. */
+    /* fgets (buffer, MAX_GATHERING_STRING, gatheringFile); */
+    
+    for (i=0; i<pVar->npulses; i++) {
+    	ok = 1;
+        for (j=0; j<pVar->numAxes; j++) {
+            /* Note the trailing white space in this format is required to make
+             * fscanf read the newline */
+            nitems = fscanf(gatheringFile, "%lf %lf ", 
+                            &setpointPosition, &actualPosition);
+            if (nitems != NUM_GATHERING_ITEMS) {
+                printf("Invalid position for M%d in Gathering line %d, falling back on slow method\n",j+1,i+1);            
+	        	/* We got bad data, so skip this line and get it from memory on the XPS */
+	        	c = 'a';
+	        	while (c!='\n') {
+	        		c = fgetc (gatheringFile);
+	        	}
+                ok = 0;
+                break;
             }
-            if (status) numInBuffer /= 2;
-        }
-        if (numInBuffer == 0) {
-            printMessage("Error reading gathering data, numInBuffer = 0\n");
-            goto done;
-        }
-        bptr = buffer;
-        for (i=0; i<numInBuffer; i++) {
-            /* Find the next \n and replace with null */
-            tptr = strstr(bptr, "\n");
-            if (tptr) *tptr = 0;
-            for (j=0; j<pVar->numAxes; j++) {
-                nitems = sscanf(bptr, "%lf;%lf%n", 
-                                &setpointPosition, &actualPosition, &numChars);
-                bptr += numChars+1;
-                if (nitems != NUM_GATHERING_ITEMS) {
-                    printMessage("Error reading Gathering.dat file, nitems=%d, should be %d\n",
-                           nitems, NUM_GATHERING_ITEMS);
-                    goto done;
-                }
-                pVar->motorError[j][numRead] = actualPosition - setpointPosition;
-                /* Convert from XPS units to EPICS motor user units */
-                if (pVar->epicsMotorDir[j] == 0) dir=1; else dir=-1;
-                pVar->motorReadbacks[j][numRead] = actualPosition * dir + pVar->epicsMotorOff[j];
+            if (abs(actualPosition - setpointPosition)>0.01) {
+            	printf("Possible bad value, M%d=%f in Gathering line %d, falling back on slow method\n",j+1,actualPosition,i+1);
+            	if (j+1<pVar->numAxes) {
+		        	c = 'a';
+		        	while (c!='\n') {
+		        		c = fgetc (gatheringFile);
+		        	}
+				}
+            	ok = 0;
+            	break;
             }
-            numRead++;
-            pVar->nactual = numRead;
-            bptr = tptr + 1;
+            pVar->motorError[j][i] = actualPosition - setpointPosition;
+            /* Convert from XPS units to EPICS motor user units */
+            if (pVar->epicsMotorDir[j] == 0) dir=1; else dir=-1;
+            pVar->motorReadbacks[j][i] = actualPosition * dir + pVar->epicsMotorOff[j];
+        }
+        if (ok==0) {
+			GatheringDataGet(pVar->pollSocket, i+1, buffer);
+			printf("New buffer: %s\n",buffer);
+			bptr = strtok(buffer,";");
+		    for (j=0; j<pVar->numAxes; j++) {
+		        success = sscanf(bptr, "%lf", &setpointPosition);
+		        if (success != 1) {
+		            printf("Invalid position for M%d in Gathering line %d\n",j+1,i+1);
+		            goto done;
+		        }
+		        bptr = strtok(NULL,";");
+		        success = sscanf(bptr, "%lf", &actualPosition);
+		        if (success != 1) {
+		            printf("Invalid position for M%d in Gathering line %d\n",j+1,i+1);
+		            goto done;
+		        }
+		        bptr = strtok(NULL,";");            
+		        pVar->motorError[j][i] = actualPosition - setpointPosition;
+		        /* Convert from XPS units to EPICS motor user units */
+		        if (pVar->epicsMotorDir[j] == 0) dir=1; else dir=-1;
+		        pVar->motorReadbacks[j][i] = actualPosition * dir + pVar->epicsMotorOff[j];
+		    }
+		    ok = 1;
         }
     }
     
     done:
-    free(buffer);
-    if (pVar->debugLevel > 0) {
-        printMessage("XPS_trajectoryScan: readGathering:"
-               " exit\n");
-    }
+    fclose (gatheringFile);
+    pVar->nactual = i; 
 
     return;
 }

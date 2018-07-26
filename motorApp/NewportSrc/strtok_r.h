@@ -1,9 +1,7 @@
-/* strtok_r prototype */
-#ifdef __cplusplus
+#ifndef	STRTOKR_H
+#define	STRTOKR_H
 extern "C"
 {
-#endif
-char* strtok_r(char *, const char *, char **);
-#ifdef __cplusplus
+char* __cdecl strtok_r(char *s, const char *delim, char **lasts);
 }
-#endif
+#endif	/* STRTOKR_H */

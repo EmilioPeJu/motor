@@ -4,10 +4,10 @@ FILENAME..	devSoft.h
 USAGE... 	This file contains information that is common to
 		all Soft channel device support modules.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 10365 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2010-03-25 12:12:41 -0500 (Thu, 25 Mar 2010) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/SoftMotorSrc/devSoft.h $
 */
 
 /*

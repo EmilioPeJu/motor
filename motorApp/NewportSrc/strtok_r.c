@@ -1,5 +1,4 @@
 
-#include "strtok_r.h"
 #include <stdlib.h> 
 
 char* strtok_r(char *s, const char *delim, char **lasts)

@@ -1,0 +1,13 @@
+Motor Screen Documentation
+==========================
+
+motor-embed-small.edl
+---------------------
+
+Macros: 
+$(motor) = PV pointing to motor
+$(EMOTOR) = so $(motor)$(EMOTOR).SEVR gives the alarm status of the motor
+
+Db:
+$(motor).DESC much contain the description of the motor, ie the box label
+All other fields as in the motor record

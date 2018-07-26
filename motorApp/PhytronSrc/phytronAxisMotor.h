@@ -5,10 +5,10 @@ USAGE...    Motor record  support for Phytron Axis controller.
 Tom Slejko & Bor Marolt
 Cosylab d.d. 2014
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 18549 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2015-01-07 08:56:44 -0600 (Wed, 07 Jan 2015) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/PhytronSrc/phytronAxisMotor.h $
 */
 
 #include "asynMotorController.h"

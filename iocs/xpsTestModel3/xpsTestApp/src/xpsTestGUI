@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#EDIT THIS SECTION
+
+export MOTOR=/dls_sw/prod/R3.14.11/support/motor/6-5-2dls4
+export EPICS_CA_SERVER_PORT=5064
+export EPICS_CA_REPEATER_PORT=5065
+motorPV1=mp49t:xps:motor1
+motorPV2=mp49t:xps:motor2
+
+#DO NOT EDIT THIS SECTION
+
+export EDMDATAFILES=${EDMDATAFILES}:${MOTOR}/data/
+export PATH=${PATH}:EDMDATAFILES
+edm -x -m "motor=${motorPV1}" -port ${EPICS_CA_SERVER_PORT} ${MOTOR}/data/motor.edl &
+edm -x -m "motor=${motorPV2}" -port ${EPICS_CA_SERVER_PORT} ${MOTOR}/data/motor.edl &
+
+

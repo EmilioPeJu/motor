@@ -2,10 +2,10 @@
 FILENAME... drvESP300.cc
 USAGE...    Motor record driver level support for Newport ESP300/100.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 17447 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2014-05-23 10:33:19 -0500 (Fri, 23 May 2014) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/NewportSrc/drvESP300.cc $
 */
 
 /*

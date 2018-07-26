@@ -3,10 +3,10 @@ FILENAME... drvMDrive.cc
 USAGE...    Motor record driver level support for Intelligent Motion
             Systems, Inc. MDrive series; M17, M23, M34.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 16385 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2013-04-24 11:01:47 -0500 (Wed, 24 Apr 2013) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/ImsSrc/drvMDrive.cc $
 */
 
 /*

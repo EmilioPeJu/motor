@@ -1,0 +1,109 @@
+##########################################
+# six circle specific template to help with 
+# diffractometer control. 
+# This only works with the axes
+# configured as a MultipleAxis group.
+#
+##########################################
+
+record(dfanout, "$(device):STOPALL") {
+  field(DESC, "Stop all axes")
+  field(VAL, "1")
+  field(OUTA, "$(m1).STOP")
+  field(OUTB, "$(m2).STOP")
+#  field(OUTC, "$(m3).STOP")
+#  field(OUTD, "$(m4).STOP")
+#  field(OUTE, "$(m5).STOP")
+#  field(OUTF, "$(m6).STOP")
+}
+
+
+record(seq, "$(device):HOMEALL") {
+  field(DESC, "Home everything")
+  field(LNK1, "$(device):STOREALLLIMITS.PROC")
+  field(DLY2, "1.0")
+  field(LNK2, "$(device):HOMEALLMOTORS.PROC")
+  field(DLY4, "1.0")
+  field(LNK3, "$(device):RESETALLHOMESTATES.PROC")
+  field(DLY4, "1.0")
+  field(LNK4, "$(device):RESETALLLIMITS.PROC")
+  field(DLY5, "2.0")
+  field(LNK5, "$(device):DUMMY.PROC")
+}
+
+record(bo, "$(device):DUMMY") {
+  field(DTYP, "Soft Channel")
+}
+
+record(fanout, "$(device):STOREALLLIMITS") {
+  field(DESC, "Store all limits")
+  field(LNK1, "$(m1):STOREANDWIDENLIM.PROC")
+  field(LNK2, "$(m2):STOREANDWIDENLIM.PROC")
+#  field(LNK3, "$(m3):STOREANDWIDENLIM.PROC")
+#  field(LNK4, "$(m4):STOREANDWIDENLIM.PROC")
+#  field(LNK5, "$(m5):STOREANDWIDENLIM.PROC")
+#  field(LNK6, "$(m6):STOREANDWIDENLIM.PROC")
+}
+
+record(dfanout, "$(device):RESETALLHOMESTATES") {
+  field(DESC, "Reset home states")
+  field(VAL, "0")
+  field(OUTA, "$(m1):MOVE_HOME")
+  field(OUTB, "$(m2):MOVE_HOME")
+#  field(LNK3, "$(m3):MOVETOHOME_RESET.PROC")
+#  field(LNK4, "$(m4):MOVETOHOME_RESET.PROC")
+#  field(LNK5, "$(m5):MOVETOHOME_RESET.PROC")
+#  field(LNK6, "$(m6):MOVETOHOME_RESET.PROC")
+  field(FLNK, "$(device):PROCRESETALLHOMESTATES")
+}
+
+record(fanout, "$(device):PROCRESETALLHOMESTATES") {
+  field(DESC, "Process home states")
+  field(LNK1, "$(m1):MOVE_HOME.PROC")
+  field(LNK2, "$(m2):MOVE_HOME.PROC")
+#  field(LNK3, "$(m3):STOREANDWIDENLIM.PROC")
+#  field(LNK4, "$(m4):STOREANDWIDENLIM.PROC")
+#  field(LNK5, "$(m5):STOREANDWIDENLIM.PROC")
+#  field(LNK6, "$(m6):STOREANDWIDENLIM.PROC")
+}
+
+record(fanout, "$(device):RESETALLLIMITS") {
+  field(DESC, "Reset soft limits")
+  field(LNK1, "$(m1):RESTORELIM.PROC")
+  field(LNK2, "$(m2):RESTORELIM.PROC")
+#  field(LNK3, "$(m3):RESTORELIM.PROC")
+#  field(LNK4, "$(m4):RESTORELIM.PROC")
+#  field(LNK5, "$(m5):RESTORELIM.PROC")
+#  field(LNK6, "$(m6):RESTORELIM.PROC")
+}
+
+
+
+record(dfanout, "$(device):HOMEALLMOTORS") {
+  field(DESC, "Home all motors")
+  field(VAL, "1")
+  field(OUTA, "$(m1).HOMF")
+  field(FLNK, "$(m1)")
+}
+
+
+record(dfanout, "$(device):ENABLEALL") {
+  field(DESC, "Enable all axes")
+  field(VAL, "1")
+  field(OUTA, "$(m1).CNEN")
+}
+
+
+record(dfanout, "$(device):DISABLEALL") {
+  field(DESC, "Disable all axes")
+  field(VAL, "0")
+  field(OUTA, "$(m1).CNEN")
+}
+
+
+
+
+
+
+
+

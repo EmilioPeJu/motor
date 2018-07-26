@@ -2,10 +2,10 @@
 FILENAME... drvEnsembleAsyn.cc
 USAGE...    Motor record asyn driver level support for Aerotech Ensemble.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 18150 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2014-11-24 11:47:32 -0600 (Mon, 24 Nov 2014) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/AerotechSrc/drvEnsembleAsyn.cc $
 */
 
 /*

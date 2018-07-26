@@ -1,0 +1,63 @@
+##########################################
+# Template to save, widen and restore soft limits
+# from a motor record. This is useful for
+# homing where the home flag is beyond the 
+# soft limits.  
+#
+# The store of limits is disabled if we have already 
+# done it once, to prevent the wide limits overwriting 
+# the stored set in the event of multiple processes of
+# STOREANDWIDENLIM.
+#
+# Macros:
+# motor - the motor record PV
+# widelim - the amount to widen by.
+#
+##########################################
+
+record(calc, "$(motor):STORELIM") {
+  field(DESC, "Store limits")
+  field(INPA, "$(motor).DHLM")
+  field(INPB, "$(motor).DLLM")
+  field(SCAN, "Passive")
+  field(SDIS, "$(motor):STOREANDWIDEN_DONE")
+}
+
+record(seq, "$(motor):WIDENLIM") {
+  field(DESC, "Widen limits")
+  field(DOL1, "-$(widelim)")
+  field(LNK1, "$(motor).DLLM")
+  field(DOL2, "$(widelim)")
+  field(LNK2, "$(motor).DHLM")
+}
+
+record(fanout, "$(motor):STOREANDWIDENLIM") {
+  field(DESC, "Store and widen limits")
+  field(LNK1, "$(motor):STORELIM.PROC")
+  field(LNK2, "$(motor):WIDENLIM.PROC")
+  field(LNK3, "$(motor):STOREANDWIDEN_DONE.PROC")
+}
+
+record(seq, "$(motor):RESTORELIM") {
+  field(DESC, "Restore limits")
+  field(DOL1, "$(motor):STORELIM.A")
+  field(LNK1, "$(motor).DHLM")
+  field(DOL2, "$(motor):STORELIM.B")
+  field(LNK2, "$(motor).DLLM")
+  field(FLNK, "$(motor):STOREANDWIDEN_RESET")
+}
+
+
+record(calc, "$(motor):STOREANDWIDEN_DONE") {
+  field(DESC, "Record a store")
+  field(A, "0")
+  field(CALC, "A+1")
+  field(SCAN, "Passive")
+}
+
+record(dfanout, "$(motor):STOREANDWIDEN_RESET") {
+  field(DESC, "Reset the store state")
+  field(VAL, "0")
+  field(OUTA, "$(motor):STOREANDWIDEN_DONE.VAL NPP")
+  field(SCAN, "Passive")
+}

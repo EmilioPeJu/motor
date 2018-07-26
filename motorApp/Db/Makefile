@@ -16,7 +16,10 @@ include $(TOP)/configure/CONFIG
 # Create and install (or just install)
 # databases, templates, substitutions like this
 DB += motor.db
+DB += motor.template
 DB += basic_motor.db
+DB += basic_motor.template
+DB += basic_asyn_motor.template
 DB += basic_asyn_motor.db
 DB += IMS_extra.db
 DB += XPSAuxAi.db
@@ -37,12 +40,22 @@ DB += ACRAuxBo.template
 DB += ACRAuxBoRBV.template
 DB += TransPos.db
 DB += motorUtil.db
+DB += motorUtil.template
 DB += asyn_motor.db
 DB += profileMoveController.template
 DB += profileMoveAxis.template
 DB += profileMoveControllerXPS.template
 DB += profileMoveAxisXPS.template
-DB += PI_Support.db PI_SupportCtrl.db
+DB += softMotorForPiezo.template
+DB += trajectoryScan.db
+DB += scaledMotorPositions.template
+DB += limitsMonitor.template
+DB += motorReadback.template
+DB += motorTranslate.template
+DB += moveToHomeUtil.template
+DB += saveRestoreLimits.template
+DB += PI_Support.db
+DB += PI_SupportCtrl.db
 DB += Phytron_motor.db Phytron_I1AM01.db Phytron_MCM01.db
 
 #----------------------------------------------------

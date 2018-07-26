@@ -2,10 +2,10 @@
 FILENAME...     drvMAXv.cc
 USAGE...        Motor record driver level support for OMS model MAXv.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 17754 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2014-08-19 09:18:35 -0500 (Tue, 19 Aug 2014) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/OmsSrc/drvMAXv.cc $
 */
 
 /*

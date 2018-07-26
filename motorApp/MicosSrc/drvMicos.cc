@@ -318,7 +318,7 @@ static RTN_STATUS send_mess(int card, const char *com, char *name)
     if (size == 0) return(OK);
     cntrl = (struct MicosController *) motor_state[card]->DevicePrivate;
 
-    Debug(2, "send_mess: sending message to card %d, message=%s\n", card, com);
+    Debug(2, "send_mess: sending message to card %d, message=%s\n", card, buff);
     cntrl = (struct MicosController *) motor_state[card]->DevicePrivate;
     pasynOctetSyncIO->write(cntrl->pasynUser, com, size, COMM_TIMEOUT, &nwrite);
 

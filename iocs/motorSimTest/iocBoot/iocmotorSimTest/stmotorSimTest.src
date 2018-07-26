@@ -1,0 +1,70 @@
+#!$(INSTALL)/bin/$(ARCH)/motorSimTest
+
+## You may have to change motorSimTest to something else
+## everywhere it appears in this file
+
+cd "$(INSTALL)"
+
+## Register all support components
+dbLoadDatabase("dbd/motorSimTest.dbd")
+motorSimTest_registerRecordDeviceDriver(pdbbase)
+
+## Load record instances
+#dbLoadRecords("db/<filename>.db","<List of macros, e.g. user=xxx>")
+dbLoadRecords("db/motorSimTest.db")
+
+## Set this to see messages from mySub
+#mySubDebug 1
+
+# Create simulated motors: ( start card , start axis , low limit, high limit, home posn, # cards, # axes to setup)
+motorSimCreate( 0, 0, -150000000, 150000000, 0, 1, 32 )
+# Setup the Asyn layer (portname, low-level driver drvet name, card, number of axes on card)
+drvAsynMotorConfigure("PMAC1", "motorSim", 0, 32)
+
+#asynSetTraceIOMask("PMAC1",0,3)
+#asynSetTraceMask("PMAC1",0,3)
+
+
+
+####################################################################
+### Initialise save restore #########################################
+
+directoryWait("/tmp", 10)
+
+save_restoreSet_Debug(0)
+
+### status-PV prefix, so save_restore can find its status PV's.
+save_restoreSet_status_prefix("motorSimTestLocal:SR")
+
+### ok to restore a save set that had missing values (no CA connection to PV)?
+### ok to save a file if some CA connections are bad?
+save_restoreSet_IncompleteSetsOk(1)
+
+### In the restore operation, a copy of the save file will be written.  The
+### file name can look like "auto_settings.sav.bu", and be overwritten every
+### reboot, or it can look like "auto_settings.sav_020306-083522" (this is what
+### is meant by a dated backup file) and every reboot will write a new copy.
+save_restoreSet_DatedBackupFiles(1)
+
+### specify where save files should go
+set_savefile_path("/tmp/")
+
+set_requestfile_path("$(INSTALL)/data")
+
+### restore positions before record init, settings before and after
+set_pass0_restoreFile("motorSimTestLocal.sav")
+
+### Number of sequenced backup files (e.g., 'auto_settings.sav0') to write
+save_restoreSet_NumSeqFiles(3)
+
+### Time interval between sequenced backups
+save_restoreSet_SeqPeriodInSeconds(600)
+
+###########################################################
+
+
+iocInit()
+
+
+# save positions every 5 seconds
+create_monitor_set("motorSimTestLocal.req",5)

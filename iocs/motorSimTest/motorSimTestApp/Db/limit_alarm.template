@@ -1,0 +1,32 @@
+#######################################################
+#
+# Matthew Pearson Jan 2013
+#
+# Template to hold a set of software limits
+# for a PV. If the PV goes outside of the range
+# it sets an alarm.
+#
+# This can be used on motor record RBV fiedls to
+# detect drifts.
+#
+# Macros:
+#  p - the base part of the PV name
+#  name - the name of the PV to monitor
+#  alh - set to 'None' if you don't want e-mail alarms
+#
+######################################################
+
+#% $(alh=alh) $SEVRCOMMAND UP_ANY /dls_sw/tools/bin/dls-alh-handler.py $(P):ALARM
+record(ai, "$(P):ALARM") {
+  field(DESC, "Check for range")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(name) CP")
+  field(HIHI, "10.0")
+  field(LOLO, "-10.0")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(HYST, "0.01")
+  field(PREC, "4")
+}
+
+

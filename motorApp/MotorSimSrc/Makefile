@@ -34,7 +34,6 @@ DBD += motorSim.dbd
 
 # motorSim.dbd will be made up from these files:
 motorSim_DBD += base.dbd
-motorSim_DBD += asyn.dbd
 motorSim_DBD += motorSupport.dbd
 motorSim_DBD += motorSimSupport.dbd
 
@@ -54,7 +53,7 @@ motorSim_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #===========================
 
-# SCRIPTS += motorSimTest.boot
+SCRIPTS += motorSimTest.boot
 DB += motorSimTest.db
 
 include $(TOP)/configure/RULES

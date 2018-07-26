@@ -2,10 +2,10 @@
 FILENAME...	drvOms58.cc
 USAGE...	Motor record driver level support for OMS model VME58.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 14914 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2012-07-26 14:04:55 -0500 (Thu, 26 Jul 2012) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/OmsSrc/drvOms58.cc $
 */
 
 /*
@@ -717,6 +717,10 @@ static RTN_STATUS send_mess(int card, char const *com, char *name)
         pmotor->outBuffer[putIndex++] = *p;
         if (putIndex >= BUFFER_SIZE)
             putIndex = 0;
+        /*** SJS Addition 24/05/04 to fix MVME5500 processor timing problem ***/        epicsThreadSleep(0);
+        /*** SJS Addition 19/04/05 - double delay to fix timing for Micromech ***/
+        epicsThreadSleep(0);
+        /*** End of SJS Addition ***/
     }
 
     Debug(4, "send_mess: sent card %d message:", card);

@@ -1,0 +1,124 @@
+#!$(INSTALL)/bin/$(ARCH)/xpsTest
+
+## You may have to change xpsTest to something else
+## everywhere it appears in this file
+
+$(VXWORKS_ONLY)tyBackspaceSet(127)
+$(VXWORKS_ONLY)putenv("EPICS_CA_MAX_ARRAY_BYTES=10000000")
+
+cd "$(INSTALL)"
+
+# Load binaries on architectures that need to do so.
+# VXWORKS_ONLY, LINUX_ONLY and RTEMS_ONLY are macros that resolve
+# to a comment symbol on architectures that are not the current
+# build architecture, so they can be used liberally to do architecture
+# specific things. Alternatively, you can include an architecture
+# specific file.
+$(VXWORKS_ONLY)ld < bin/$(ARCH)/xpsTest.munch
+
+## Register all support components
+dbLoadDatabase("dbd/xpsTest.dbd")
+xpsTest_registerRecordDeviceDriver(pdbbase)
+
+## Load record instances
+dbLoadRecords("db/xpsTest.db")
+
+#General purpose Asyn Record.
+#dbLoadRecords("db/asynRecord.db","P=mp49:xpsTest:,R=ASYN,PORT="",ADDR="",OMAX=0,IMAX=200")
+
+
+epicsEnvSet("STREAM_PROTOCOL_PATH", "$(XPSUTIL)/data/")
+
+
+####################################################################
+### Initialise save restore #########################################
+
+save_restoreSet_Debug(0)
+
+### status-PV prefix, so save_restore can find its status PV's.
+save_restoreSet_status_prefix("xpsTest:SR")
+
+### ok to restore a save set that had missing values (no CA connection to PV)?
+### ok to save a file if some CA connections are bad?
+save_restoreSet_IncompleteSetsOk(1)
+
+### In the restore operation, a copy of the save file will be written.  The
+### file name can look like "auto_settings.sav.bu", and be overwritten every
+### reboot, or it can look like "auto_settings.sav_020306-083522" (this is what
+### is meant by a dated backup file) and every reboot will write a new copy.
+save_restoreSet_DatedBackupFiles(1)
+
+### specify where save files should go
+set_savefile_path("$(INSTALL)/autosave/")
+
+set_requestfile_path("$(INSTALL)/data")
+
+### restore positions before record init, settings before and after
+set_pass0_restoreFile("xpsTest.sav")
+###set_pass1_restoreFile("xpsTest.sav")
+
+### Number of sequenced backup files (e.g., 'auto_settings.sav0') to write
+save_restoreSet_NumSeqFiles(3)
+
+### Time interval between sequenced backups
+save_restoreSet_SeqPeriodInSeconds(600)
+
+###########################################################
+
+
+#Set up the XPS controllers
+
+#XPSSetup(number of controllers)
+XPSSetup(1)
+
+#XPSConfig(card,IP,PORT,number of axes,active poll period (ms), idle poll period (ms))
+XPSConfig(0, "172.23.243.157", 5001, 2, 50, 500)
+
+#Configure ASYN motor controller.
+#(asyn port, driver name, controller index, max number of axes).
+drvAsynMotorConfigure("XPS1", "motorXPS", 0, 2)
+
+#XPSConfigAxis(card, axis, group.positioner, number of steps per user unit)
+#XPSConfigAxis(0,0,"S1.Pos", 1000)
+#XPSConfigAxis(0,1,"S2.Pos", 1000)
+XPSConfigAxis(0,0,"M.P1", 1000)
+XPSConfigAxis(0,1,"M.P2", 1000)
+
+#Enable move to home position driver function (card, positioner name, max distance to move by)
+#XPSEnableMoveToHome(0, "S1.Pos", 100)
+#XPSEnableMoveToHome(0, "S2.Pos", 100)
+#XPSEnableMoveToHome(0, "M.P1", 100)
+#XPSEnableMoveToHome(0, "M.P2", 100)
+
+#Disable set position for all XPS controllers (1=enable, 0=disable)
+XPSEnableSetPosition(0)
+
+# Add an ASYN port to communicate directly with the controller.
+drvAsynIPPortConfigure("XPS1IP", "172.23.243.157:5001", 0, 0, 0)
+#drvAsynIPPortConfigure("XPS1IP2", "172.23.243.157:5001", 0, 0, 0)
+
+#drvAsynIPPortConfigure("XPSPC1", "172.23.243.157:5001", 0, 0, 0)
+#drvAsynIPPortConfigure("XPSPC2", "172.23.243.157:5001", 0, 0, 0)
+
+XPSEnableSetPosition(1)
+
+# Set debugging flags if desired
+#asynSetTraceIOMask("XPS1",2,255)
+#asynSetTraceMask("XPS1",2,255)
+#asynSetTraceIOMask("XPS1",0,3)
+#asynSetTraceMask("XPS1",0,3)
+
+
+# Set debugging flags if desired
+#asynSetTraceIOMask("XPS1IP",0,15)
+#asynSetTraceMask("XPS1IP",0,15)
+
+
+
+iocInit()
+
+## Start any sequence programs
+#seq sncExample,"user=xxx"
+
+# save positions every 5 seconds
+create_monitor_set("xpsTest.req",5)

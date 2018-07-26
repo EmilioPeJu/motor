@@ -1,0 +1,9 @@
+record( motor, "$(device)-$(s):mot" )
+{
+   field(DTYP,"PMAC")
+   field(PREC,"$(PREC)")
+   field(VELO,"$(VELO)")
+   field(ACCL,"$(ACCL)")
+   field(VMAX,"$(VMAX)")
+   field(OUT,"#C$(c) S$(s) @")
+}

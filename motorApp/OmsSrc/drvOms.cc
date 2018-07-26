@@ -2,10 +2,10 @@
 FILENAME...     drvOms.cc
 USAGE...        Driver level support for OMS models VME8, VME44, VS4 and VX2.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 17104 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2013-11-15 13:44:42 -0600 (Fri, 15 Nov 2013) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/OmsSrc/drvOms.cc $
 */
 
 /*

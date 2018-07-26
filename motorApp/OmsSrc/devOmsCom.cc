@@ -2,10 +2,10 @@
 FILENAME...     devOmsCom.cc
 USAGE...        Data and functions common to all OMS device level support.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 17420 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2014-05-09 16:51:25 -0500 (Fri, 09 May 2014) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/OmsSrc/devOmsCom.cc $
 */
 
 /*

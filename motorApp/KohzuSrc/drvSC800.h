@@ -2,10 +2,10 @@
 FILENAME...	drvSC800.h
 USAGE...    This file contains Kohzu SC800 motorRecord driver information.
 
-Version:	    $Revision$
-Modified By:	$Author$
-Last Modified:	$Date$
-HeadURL:        $URL$
+Version:	    $Revision: 9857 $
+Modified By:	$Author: sluiter $
+Last Modified:	$Date: 2009-12-09 10:21:24 -0600 (Wed, 09 Dec 2009) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/KohzuSrc/drvSC800.h $
 */
 
 /*
@@ -61,7 +61,9 @@ enum SC_model
 {
     SC800,
     SC400,
-    SC200
+    SC200,
+    SC410,
+    SC210
 };
 
 /* Motion Master specific data is stored in this structure. */

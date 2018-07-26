@@ -9,33 +9,31 @@
 #
 # Add your declarations here
 
-SUPPORT=
--include $(TOP)/../configure/SUPPORT.$(EPICS_HOST_ARCH)
+#!GATEWAY=
+SUPPORT=/dls_sw/prod/R3.14.12.3/support
+#AJFWORK=/home/ajf67/work/R3.14.12.3/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-# Recommended ASYN release: R4-23
-ASYN=$(SUPPORT)/asyn/R4-23
+ASYN=$(SUPPORT)/asyn/4-21
+BUSY=$(SUPPORT)/busy/1-4dls1
+#ASYN=$(AJFWORK)/asyn
+#BUSY=$(AJFWORK)/busy
 
-# Need the sequencer and the bust record for the MM4005 and XPS trajectory scanning
-# Recommended SNCSEQ release: R2.1.16
-SNCSEQ=$(SUPPORT)/seq/seq-2-1-16
-# Recommended BUSY release: R1-6
-BUSY=$(SUPPORT)/busy/R1-6
+# Need the sequencer and busy for the MM4005 and XPS trajectory scanning
+SNCSEQ=$(SUPPORT)/seq/2-1-15dls2
+#SNCSEQ=$(AJFWORK)/seq
 
-# Recommended EPICS release: R3.14.12.4
-EPICS_BASE=
--include $(TOP)/../configure/EPICS_BASE.$(EPICS_HOST_ARCH)
+# Recommended EPICS release: R3.14.12.3
+EPICS_BASE=/dls_sw/epics/R3.14.12.3/base
+
+# The following must be defined if the "WithMPF" example in motorExApp is to
+# be built.
+# Recommended IPAC release: R2-9
+#!IPAC=$(SUPPORT)/ipacR2-9
 
 # The following must be defined for the MXmotor device driver.
 #!MX=$(SUPPORT)/mx/mx
-
-# The following support modules are required for the Hytec driver and for the examples in
-# <motor>/motorExApp.  To build examples, the top Makefile,
-# <motor>/Makefile must also be edited.
-
-# Recommended IPAC release: R2-12
-IPAC=$(SUPPORT)/ipac/R2-12
 
 # The following is only needed for the motor examples in iocBoot.
 #!MOTOR=$(TOP)

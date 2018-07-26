@@ -2,10 +2,10 @@
 FILENAME...	AerotechRegister.cc
 USAGE...	Register Aerotech motor device driver shell commands.
 
-Version:        $Revision$
-Modified By:    $Author$
-Last Modified:  $Date$
-HeadURL:        $URL$
+Version:        $Revision: 17434 $
+Modified By:    $Author: sluiter $
+Last Modified:  $Date: 2014-05-21 11:43:51 -0500 (Wed, 21 May 2014) $
+HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/AerotechSrc/AerotechRegister.cc $
 */
 
 /*****************************************************************
