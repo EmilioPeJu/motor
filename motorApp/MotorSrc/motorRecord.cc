@@ -186,7 +186,9 @@ USAGE...        Motor Record Support.
  * .74 09-28-16 rls - Reverted .71 FLNK change. Except for the condition that DMOV == FALSE, FLNK
  *                    processing was standard. If processing is needed on a DMOV false to true
  *                    transition, a new motor record field should be added.
- * .75 05-18-17 rls - Stop motor if URIP is Yes and RDBL read returns an error.
+ * .75 05-18-17 rls - Stop motor if URIP is Yes and RDBL read returns an error. 
+ * .76 04-04-18 rls - If URIP is Yes and RDBL is inaccessible (e.g., CA server is down), do not start
+ *                    a new target position move (sans Home search or Jog).
  */
 
 #define VERSION 6.10
@@ -468,7 +470,7 @@ static void callbackFunc(struct callback *pcb)
     {
         pmr->mip &= ~MIP_DELAY_REQ;     /* Turn off REQ. */
         pmr->mip |= MIP_DELAY_ACK;      /* Turn on ACK. */
-#if LT_EPICSBASE(3,14,10)
+#if LT_EPICSBASE(3,14,10,0)
 	scanOnce(pmr);
 #else
 	scanOnce((struct dbCommon *) pmr);
@@ -1167,7 +1169,7 @@ Exit:
     Update record timestamp, call recGblGetTimeStamp().
     Process alarms, call alarm_sub().
     Monitor changes to record fields, call monitor().
-
+ 
     IF Done Moving field (DMOV) is TRUE
         Process the forward-scan-link record, call recGblFwdLink().
     ENDIF
@@ -1628,6 +1630,8 @@ LOGIC:
 
             IF this is not a retry.
                 Reset retry counter and mark RCNT for dbposting.
+            ELSE
+                Process retry based on retry mode (RMOD).
             ENDIF
             
             IF (relative move indicator is OFF, AND, sign of absolute move
@@ -1639,16 +1643,23 @@ LOGIC:
                 Set preferred direction indicator OFF.
             ENDIF
             
-            IF the dial DIFF is within the retry deadband.
-                IF MIP state is DONE.
-                    Update last target positions.
-                    Terminate move. Set DMOV TRUE.
-                ENDIF               
-                NORMAL RETURN.
+            Process soft-travel limit.
+
+            IF URIP is set to Yes
+                Test and set indicator on RDBL access in case it is a CA link that is down.
+            ENDIF
+            IF soft-travel limit error, OR, RDBL CA server disconnect error.
+                Restore previous target positions.
+                IF MIP indicates this is a retry.
+                    Set MIP to Done.
+                ENDIF
+                IF MIP indicates Done Moving and DMOV is False
+                    Set DMOV true.
+                ENDIF
             ENDIF
             ....
             ....
-            IF motion in progress indicator is false.
+            IF motion in progress indicator (MIP) is Done or Retry.
                 Set MIP MOVE indicator ON and mark for posting.
                 IF DMOV is TRUE.
                     Set DMOV to FALSE and mark for posting.
@@ -1793,9 +1804,13 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             /* Cancel any operations. */
             if (pmr->mip & MIP_HOME)
                 clear_buttons(pmr);
-            
-            pmr->mip = MIP_STOP;
-            MARK(M_MIP);
+
+            if (!(pmr->mip & MIP_DELAY_REQ)) {
+               /* When we wait for DLY, keep it. */
+               /* Otherwise the record may lock up */
+                pmr->mip = MIP_STOP;
+                MARK(M_MIP);
+            }
             INIT_MSG();
             WRITE_MSG(STOP_AXIS, NULL);
             SEND_MSG();
@@ -2160,7 +2175,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
             double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
             long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
-            long rpos, npos;
+            long rpos, npos, rtnstat;
             msta_field msta;
             msta.All = pmr->msta;
 
@@ -2279,9 +2294,23 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
                 }
             }
 
+            if (pmr->urip == motorUEIP_Yes)
+            {
+                double test_drbv;
+                rtnstat = dbGetLink(&(pmr->rdbl), DBR_DOUBLE, &test_drbv, 0, 0 );
+                if (RTN_SUCCESS(rtnstat))
+                    rtnstat = TRUE;
+                else
+                    rtnstat = FALSE;
+            }
+            else
+                rtnstat = TRUE;
+
             if (pmr->lvio != old_lvio)
                 MARK(M_LVIO);
-            if (pmr->lvio)
+
+            /* Test for travel limit violation, OR, URIP is True, but CA server is disconnected.*/
+            if (pmr->lvio || rtnstat == FALSE)
             {
                 pmr->val = pmr->lval;
                 MARK(M_VAL);

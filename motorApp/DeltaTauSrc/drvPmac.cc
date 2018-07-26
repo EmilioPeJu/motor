@@ -48,10 +48,12 @@ USAGE...	Driver level support for Delta Tau PMAC model.
 #include	<vxLib.h>
 #include	<sysLib.h>
 #include	<string.h>
+#include 	<stdlib.h>
 #include	<rebootLib.h>
 #include	<logLib.h>
 #include	<drvSup.h>
 #include	<epicsVersion.h>
+#include	<errlog.h>
 #include	<devLib.h>
 #include	<dbAccess.h>
 #include	<epicsThread.h>
@@ -585,7 +587,7 @@ static int motorIsrEnable(int card)
     
     status = pdevLibVirtualOS->pDevConnectInterruptVME(
 	PmacInterruptVector + card,
-#if LT_EPICSBASE(3,14,8)
+#if LT_EPICSBASE(3,14,8,0)
         (void (*)()) motorIsr,
 #else
         (void (*)(void *)) motorIsr,
