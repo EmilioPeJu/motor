@@ -2,10 +2,6 @@
 FILENAME...     motorRecord.cc
 USAGE...        Motor Record Support.
 
-Version:        $Revision: 17843 $
-Modified By:    $Author: sluiter $
-Last Modified:  $Date: 2014-09-11 10:37:22 -0500 (Thu, 11 Sep 2014) $
-HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/MotorSrc/motorRecord.cc $
 */
 
 /*
@@ -183,9 +179,17 @@ HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-
  *                  - Fix for LOAD_POS not posting RVAL.
  *                  - Reversed order of issuing SET_VEL_BASE and SET_VELOCITY commands. Fixes MAXv
  *                    command errors.
- */                                                          
+ * .71 02-25-15 rls - Fix for excessive motor record forward link processing.
+ * .72 03-13-15 rls - Changed RDBL to set RRBV rather than DRBV.
+ * .73 02-15-16 rls - JOGF/R soft limit error check was using the wrong coordinate sytem limits.
+ *                    Changed error checks from dial to user limits.
+ * .74 09-28-16 rls - Reverted .71 FLNK change. Except for the condition that DMOV == FALSE, FLNK
+ *                    processing was standard. If processing is needed on a DMOV false to true
+ *                    transition, a new motor record field should be added.
+ * .75 05-18-17 rls - Stop motor if URIP is Yes and RDBL read returns an error.
+ */
 
-#define VERSION 6.9
+#define VERSION 6.10
 
 #include    <stdlib.h>
 #include    <string.h>
@@ -704,8 +708,7 @@ LOGIC:
         ...
     ELSE IF done stopping after jog, OR, done with move.
         IF |backlash distance| > |motor resolution|.
-            IF Retry enabled, AND, [(encoder present, AND, use encoder true),
-                    OR, use readback link true]
+            IF Retry enabled, AND, [use encoder true, OR, use readback link true]
                 Set relative positioning indicator true.
             ELSE
                 Set relative positioning indicator false.
@@ -721,8 +724,7 @@ LOGIC:
         ...
     ELSE IF done with 1st phase take out backlash after jog.
         Calculate backlash velocity, base velocity, backlash accel. and backlash position.
-        IF Retry enabled, AND, [(encoder present, AND, use encoder true),
-                OR, use readback link true]
+        IF Retry enabled, AND, [use encoder true, OR, use readback link true]
             Set relative positioning indicator true.
         ELSE
             Set relative positioning indicator false.
@@ -785,7 +787,7 @@ static long postProcess(motorRecord * pmr)
             double vbase = pmr->vbas / fabs(pmr->mres);
             double hpos = 0;
             double hvel =  pmr->hvel / fabs(pmr->mres);
-            double acc = (hvel - vbase) / pmr->accl;
+            double acc = (hvel - vbase) > 0 ? ((hvel - vbase)/ pmr->accl): (hvel / pmr->accl);
 
             motor_cmnd command;
 
@@ -845,7 +847,7 @@ static long postProcess(motorRecord * pmr)
 
             /* Use if encoder or ReadbackLink is in use. */
             msta.All = pmr->msta;
-            bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && ((msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip));
+            bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
             double relpos = pmr->diff / pmr->mres;
             double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
 
@@ -857,7 +859,7 @@ static long postProcess(motorRecord * pmr)
 
             if (pmr->mip & MIP_JOG_STOP)
             {
-                double acc = (vel - vbase) / pmr->accl;
+                double acc = (vel - vbase) > 0 ? ((vel - vbase)/ pmr->accl) : (vel / pmr->accl);
 
                 if (vel <= vbase)
                     vel = vbase + 1;
@@ -874,7 +876,7 @@ static long postProcess(motorRecord * pmr)
             else
             {
                 double bvel = pmr->bvel / fabs(pmr->mres);
-                double bacc = (bvel - vbase) / pmr->bacc;
+                double bacc = (bvel - vbase) > 0 ? ((bvel - vbase)/ pmr->bacc) : (bvel / pmr->bacc);
 
                 if (bvel <= vbase)
                     bvel = vbase + 1;
@@ -910,12 +912,12 @@ static long postProcess(motorRecord * pmr)
         /* First part of jog done. Do backlash correction. */
         double bvel = pmr->bvel / fabs(pmr->mres);
         double vbase = pmr->vbas / fabs(pmr->mres);
-        double bacc = (bvel - vbase) / pmr->bacc;
+        double bacc = (bvel - vbase) > 0 ? ((bvel - vbase)/ pmr->bacc) : (bvel / pmr->bacc);
         double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
 
         /* Use if encoder or ReadbackLink is in use. */
         msta.All = pmr->msta;
-        bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && ((msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip));
+        bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
         double relpos = pmr->diff / pmr->mres;
         double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
 
@@ -1118,8 +1120,9 @@ LOGIC:
                     Call postProcess().
                 ENDIF
             ENDIF
-            IF the Done Moving field (DMOV) is TRUE.
-                Initialize delay ticks.
+            IF a limit switch is activated, OR, a load-position command is in progress (MIP = MIP_LOAD_P)
+                Set MIP to DONE and MARK it.
+            ELSE IF Done Moving (DMOV) is TRUE
                 IF process delay acknowledged is true, OR, ticks <= 0.
                     Clear process delay request and ack. indicators in MIP field.
                     Mark MIP as changed.
@@ -1164,7 +1167,8 @@ Exit:
     Update record timestamp, call recGblGetTimeStamp().
     Process alarms, call alarm_sub().
     Monitor changes to record fields, call monitor().
-    IF Done Moving field (DMOV) is TRUE.
+
+    IF Done Moving field (DMOV) is TRUE
         Process the forward-scan-link record, call recGblFwdLink().
     ENDIF
     Set Processing Active indicator field (PACT) false.
@@ -1303,8 +1307,12 @@ static long process(dbCommon *arg)
                     status = postProcess(pmr);
             }
 
-            /* Are we "close enough" to desired position? */
-            if (pmr->dmov == TRUE && !(pmr->rhls || pmr->rlls))
+            if ((pmr->rhls || pmr->rlls) || (pmr->mip == MIP_LOAD_P)) /* Should we test for a retry? */
+            {
+                pmr->mip = MIP_DONE;
+                MARK(M_MIP);
+            }
+            else if (pmr->dmov == TRUE)
             {
                 mmap_bits.All = pmr->mmap; /* Initialize for MARKED. */
 
@@ -1362,8 +1370,8 @@ enter_do_work:
     else
     {
         if (pmr->mip & MIP_JOG)
-            pmr->lvio = (pmr->jogf && (pmr->drbv > pmr->dhlm - pmr->jvel)) ||
-                        (pmr->jogr && (pmr->drbv < pmr->dllm + pmr->jvel));
+            pmr->lvio = (pmr->jogf && (pmr->rbv > pmr->hlm - pmr->jvel)) ||
+                        (pmr->jogr && (pmr->rbv < pmr->llm + pmr->jvel));
         else if (pmr->mip & MIP_HOME)
             pmr->lvio = false;  /* Disable soft-limit error check during home search. */
     }
@@ -1371,7 +1379,7 @@ enter_do_work:
     if (pmr->lvio != old_lvio)
     {
         MARK(M_LVIO);
-        if (pmr->lvio && !pmr->set)
+        if (pmr->lvio && (!pmr->set && !pmr->igset))
         {
             pmr->stop = 1;
             MARK(M_STOP);
@@ -1402,9 +1410,9 @@ process_exit:
     alarm_sub(pmr);                     /* If we've violated alarm limits, yell. */
     monitor(pmr);               /* If values have changed, broadcast them. */
 
-    if (pmr->dmov)
-        recGblFwdLink(pmr);     /* Process the forward-scan-link record. */
-    
+    if (pmr->dmov != 0)
+        recGblFwdLink(pmr);                 /* Process the forward-scan-link record. */
+
     pmr->pact = 0;
     Debug(4, "process:---------------------- end; motor \"%s\"\n", pmr->name);
     return (status);
@@ -1590,8 +1598,7 @@ LOGIC:
         ELSE
             Calculate....
             
-            IF Retry enabled, AND, [(encoder present, AND, use encoder true),
-                    OR, use readback link true]
+            IF Retry enabled, AND, Retry mode is Not "In-Position", AND, [use encoder true, OR, use readback link true]
                 Set relative positioning indicator true.
             ELSE
                 Set relative positioning indicator false.
@@ -1862,7 +1869,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             WRITE_MSG(SET_ENC_RATIO, ep_mp);
             SEND_MSG();
         }
-        if (pmr->set)
+        if (pmr->set && !pmr->igset)
         {
             pmr->pp = TRUE;
             INIT_MSG();
@@ -1929,7 +1936,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 
                 vbase = pmr->vbas / fabs(pmr->mres);
                 hvel  = pmr->hvel / fabs(pmr->mres);
-                acc   = (hvel - vbase) / pmr->accl;
+                acc   = (hvel - vbase) > 0 ? ((hvel - vbase) / pmr->accl) : (hvel / pmr->accl);
                 hpos = 0;
 
                 INIT_MSG();
@@ -1968,8 +1975,8 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             /* check for limit violation */
             if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
                 ;
-            else if ((pmr->jogf && (pmr->dval > pmr->dhlm - pmr->jvel)) ||
-                     (pmr->jogr && (pmr->dval < pmr->dllm + pmr->jvel)))
+            else if ((pmr->jogf && (pmr->val > pmr->hlm - pmr->jvel)) ||
+                     (pmr->jogr && (pmr->val < pmr->llm + pmr->jvel)))
             {
                 pmr->lvio = 1;
                 MARK(M_LVIO);
@@ -2076,7 +2083,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
     if (pmr->val != pmr->lval)
     {
         MARK(M_VAL);
-        if (set && !pmr->foff)
+        if ((set && !pmr->igset) && !pmr->foff)
         {
             /*
              * Act directly on .val. and return. User wants to redefine .val
@@ -2126,7 +2133,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
 
         pmr->rdif = NINT(pmr->diff / pmr->mres);
         MARK(M_RDIF);
-        if (set)
+        if (set && !pmr->igset)
         {
             if ((pmr->mip & MIP_LOAD_P) == 0) /* Test for LOAD_POS completion. */
                 load_pos(pmr);
@@ -2141,13 +2148,13 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             double newpos = pmr->dval / pmr->mres;      /* where to go     */
             double vbase = pmr->vbas / fabs(pmr->mres); /* base speed      */
             double vel = pmr->velo / fabs(pmr->mres);   /* normal speed    */
-            double acc = (vel - vbase) / pmr->accl;     /* normal accel.   */
+            double acc = (vel - vbase) > 0 ? ((vel - vbase) / pmr->accl) : (vel / pmr->accl);     /* normal accel.   */
             /*
              * 'bpos' is one backlash distance away from 'newpos'.
              */
             double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
             double bvel = pmr->bvel / fabs(pmr->mres);  /* backlash speed  */
-            double bacc = (bvel - vbase) / pmr->bacc;   /* backlash accel. */
+            double bacc = (bvel - vbase) > 0 ? ((bvel - vbase) / pmr->bacc) : (bvel / pmr->bacc);   /* backlash accel. */
             bool use_rel, preferred_dir, too_small;
             double relpos = pmr->diff / pmr->mres;
             double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
@@ -2158,7 +2165,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             msta.All = pmr->msta;
 
             /*** Use if encoder or ReadbackLink is in use. ***/
-            if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && ((msta.Bits.EA_PRESENT && pmr->ueip) || pmr->urip))
+            if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip))
                 use_rel = true;
             else
                 use_rel = false;
@@ -2824,9 +2831,31 @@ velcheckB:
 
         /* new ueip flag */
     case motorRecordUEIP:
-        MARK(M_UEIP);
-        /* Ideally, we should be recalculating speeds, but at the moment */
-        /* we don't know whether hardware even has an encoder. */
+        if (pmr->ueip == motorUEIP_Yes)
+        {
+            if (msta.Bits.EA_PRESENT)
+            {
+                if (pmr->urip == motorUEIP_Yes)
+                {
+                    pmr->urip = motorUEIP_No;   /* Set URIP = No, if UEIP = Yes. */
+                    db_post_events(pmr, &pmr->urip, DBE_VAL_LOG);
+                }
+            }
+            else
+            {
+                pmr->ueip = motorUEIP_No;       /* Override UEIP = Yes if EA_PRESENT is false. */
+                MARK(M_UEIP);
+            }
+        }
+        break;
+
+        /* new urip flag */
+    case motorRecordURIP:
+        if ((pmr->urip == motorUEIP_Yes) && (pmr->ueip == motorUEIP_Yes))
+        {
+            pmr->ueip = motorUEIP_No;           /* Set UEIP = No, if URIP = Yes. */
+            MARK(M_UEIP);
+        }
         break;
 
         /* Set to SET mode  */
@@ -3514,8 +3543,7 @@ static void monitor(motorRecord * pmr)
 /******************************************************************************
         process_motor_info()
 *******************************************************************************/
-static void
- process_motor_info(motorRecord * pmr, bool initcall)
+static void process_motor_info(motorRecord * pmr, bool initcall)
 {
     double old_drbv = pmr->drbv;
     double old_rbv = pmr->rbv;
@@ -3533,17 +3561,39 @@ static void
 
     /* Calculate raw and dial readback values. */
     msta.All = pmr->msta;
-    if (msta.Bits.EA_PRESENT && pmr->ueip)
+    if (pmr->ueip == motorUEIP_Yes)
     {
         /* An encoder is present and the user wants us to use it. */
         pmr->rrbv = pmr->rep;
         pmr->drbv = pmr->rrbv * pmr->eres;
     }
-    else
+    else if (pmr->urip == motorUEIP_Yes && initcall == false)
+    {
+        double rdblvalue;
+        long rtnstat;
+
+        rtnstat = dbGetLink(&(pmr->rdbl), DBR_DOUBLE, &rdblvalue, 0, 0 );
+        if (!RTN_SUCCESS(rtnstat))
+        {
+            Debug(3, "process_motor_info: error reading RDBL link.\n");
+            if (pmr->mip != MIP_DONE)
+            {
+                /* Error reading RDBL - stop move. */
+                clear_buttons(pmr);
+                pmr->stop = 1;
+                MARK(M_STOP);
+            }
+        }
+        else
+        {
+            pmr->rrbv = NINT((rdblvalue * pmr->rres) / pmr->mres);
+            pmr->drbv = pmr->rrbv * pmr->mres;
+        }
+    }
+    else /* UEIP = URIP = No */
     {
         pmr->rrbv = pmr->rmp;
-        if (pmr->urip == motorUEIP_No || initcall == true)
-            pmr->drbv = pmr->rrbv * pmr->mres;
+        pmr->drbv = pmr->rrbv * pmr->mres;
     }
 
     if (pmr->rrbv != old_rrbv)
@@ -3595,7 +3645,7 @@ static void
         MARK(M_MOVN);
     
     /* Get state of motor's or encoder's home switch. */
-    if (msta.Bits.EA_PRESENT && pmr->ueip)
+    if (pmr->ueip)
         pmr->athm = (msta.Bits.EA_HOME) ? 1 : 0;
     else
         pmr->athm = (msta.Bits.RA_HOME) ? 1 : 0;
@@ -3603,32 +3653,6 @@ static void
     if (pmr->athm != old_athm)
         MARK(M_ATHM);
 
-
-    /*
-     * If we've got an external readback device, get Dial readback from it, and
-     * propagate to User readback. We do this after motor and encoder readbacks
-     * have been read and propagated to .rbv in case .rdbl is a link involving
-     * that field.
-     */
-    if (pmr->urip && initcall == false)
-    {
-        long rtnstat;
-
-        old_drbv = pmr->drbv;
-        rtnstat = dbGetLink(&(pmr->rdbl), DBR_DOUBLE, &(pmr->drbv), 0, 0 );
-        if (!RTN_SUCCESS(rtnstat))
-            pmr->drbv = old_drbv;
-        else
-        {
-            pmr->drbv *= pmr->rres;
-            pmr->rbv = pmr->drbv * dir + pmr->off;
-            if (pmr->drbv != old_drbv)
-            {
-                MARK(M_DRBV);
-                MARK(M_RBV);
-            }
-        }
-    }
     pmr->diff = pmr->dval - pmr->drbv;
     MARK(M_DIFF);
     pmr->rdif = NINT(pmr->diff / pmr->mres);
@@ -4029,22 +4053,39 @@ static void syncTargetPosition(motorRecord *pmr)
 {
     int dir = (pmr->dir == motorDIR_Pos) ? 1 : -1;
     msta_field msta;
+    double rdblvalue;
+    long rtnstat;
 
     msta.All = pmr->msta;
 
-    if (msta.Bits.EA_PRESENT && pmr->ueip)
+    if (pmr->ueip)
     {
         /* An encoder is present and the user wants us to use it. */
         pmr->rrbv = pmr->rep;
         pmr->drbv = pmr->rrbv * pmr->eres;
+    }
+    else if (pmr->urip)
+    {
+        /* user wants us to use the readback link */
+        rtnstat = dbGetLink(&(pmr->rdbl), DBR_DOUBLE, &rdblvalue, 0, 0 );
+        if (!RTN_SUCCESS(rtnstat))
+            printf("%s: syncTargetPosition: error reading RDBL link.\n", pmr->name);
+        else
+        {
+            pmr->rrbv = NINT((rdblvalue * pmr->rres) / pmr->mres);
+            pmr->drbv = pmr->rrbv * pmr->mres;
+        }
     }
     else
     {
         pmr->rrbv = pmr->rmp;
         pmr->drbv = pmr->rrbv * pmr->mres;
     }
+    MARK(M_RRBV);
+    MARK(M_DRBV);
     pmr->rbv = pmr->drbv * dir + pmr->off;
-    
+    MARK(M_RBV);
+
     pmr->val  = pmr->lval = pmr->rbv ;
     MARK(M_VAL);
     pmr->dval = pmr->ldvl = pmr->drbv;

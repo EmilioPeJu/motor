@@ -2,10 +2,6 @@
 FILENAME...     drvXPSasyn.c
 USAGE...        Newport XPS EPICS asyn motor device driver
 
-Version:        $Revision: 15944 $
-Modified By:    $Author: rivers $
-Last Modified:  $Date: 2013-02-18 14:50:16 -0600 (Mon, 18 Feb 2013) $
-HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/NewportSrc/drvXPSAsyn.c $
 */
 
 /*

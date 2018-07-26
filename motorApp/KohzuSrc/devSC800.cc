@@ -2,10 +2,6 @@
 FILENAME...     devSC800.cc
 USAGE...        Motor record device level support for Kohzu SC800 motor controller.
 
-Version:        $Revision: 9857 $
-Modified By:    $Author: sluiter $
-Last Modified:  $Date: 2009-12-09 10:21:24 -0600 (Wed, 09 Dec 2009) $
-HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-9/motorApp/KohzuSrc/devSC800.cc $
 
 */
 
@@ -42,6 +38,8 @@ HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-
 
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
+#include <errlog.h>
 #include "motorRecord.h"
 #include "motor.h"
 #include "motordevCom.h"
