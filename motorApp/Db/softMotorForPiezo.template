@@ -23,6 +23,10 @@
 #% gdatag,motor,rw,$(gda_name=),RECORD,Motor
 # % gui, $(name=), edm, motor.edl, motor=$(P)$(Q)
 # % gui, $(name=), edmembed, motor-embed-small.edl, motor=$(P)$(Q),filename=motor.edl,box-label=$(DESC)
+# This associates a BOY screen with the template
+# % gui, $(name=), boydetail, motorApp_opi/motor_detail.opi, P=$(P),M=$(Q),DESC=$(DESC), name=$(name=)
+# % gui, $(name=), boyembed, motorApp_opi/motor_embed_box.opi, P=$(P),M=$(Q),DESC=$(DESC), name=$(name=)
+# % gui, $(name=), boyembed, motorApp_opi/motor_embed.opi, P=$(P),M=$(Q),DESC=$(DESC), name=$(name=)
 
 record(motor, "$(P)$(Q)") {
   field(DTYP, "Soft Channel")

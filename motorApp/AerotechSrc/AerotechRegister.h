@@ -46,4 +46,5 @@ HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-
 #include "drvEnsembleAsyn.h"
 #include "drvSoloist.h"
 #include "drvA3200Asyn.h"
+#include "A3200ExtraParams.h"
 

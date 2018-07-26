@@ -30,6 +30,7 @@
 #% macro, UEIP   , Use Encoder If Present
 #% macro, URIP   , Use RDBL If Present
 #% macro, RDBL   , Readback Location, set URIP = 1 if you specify this
+#% macro, RLNK   , Readback output link
 #% macro, RTRY   , Max retry count
 #% macro, DLY    , Readback settle time (s)
 #% macro, OFF    , User Offset (EGU)
@@ -67,9 +68,9 @@
 # % gui, $(name=), edmembed, motor-embed-small.edl, motor=$(P)$(M),filename=motor.edl,box-label=$(DESC)
 
 # This associates a BOY screen with the template
-# % gui, $(name=), boydetail, motorApp_opi/motor_detail.opi, P=$(P),M=$(M),DESC=$(DESC), name=$(name)
-# % gui, $(name=), boyembed, motorApp_opi/motor_embed_box.opi, P=$(P),M=$(M),DESC=$(DESC), name=$(name)
-# % gui, $(name=), boyembed, motorApp_opi/motor_embed.opi, P=$(P),M=$(M),DESC=$(DESC), name=$(name)
+# % gui, $(name=), boydetail, motorApp_opi/motor_detail.opi, P=$(P),M=$(M),DESC=$(DESC), name=$(name=)
+# % gui, $(name=), boyembed, motorApp_opi/motor_embed_box.opi, P=$(P),M=$(M),DESC=$(DESC), name=$(name=)
+# % gui, $(name=), boyembed, motorApp_opi/motor_embed.opi, P=$(P),M=$(M),DESC=$(DESC), name=$(name=)
 # FIXME: this should be in pmacUtil or tpmac
 # % gui, $(name=), boyembed, motorApp_opi/motor_homed_embed.opi, P=$(P),M=$(M)
 
@@ -80,6 +81,7 @@
 # These define what PVs a motor detail screen should contain
 # % gui, $(name=), statusbits, Status,  <pv>.MSTA, Direction Positive, Done, High Limit, Home Limit, Unused, Closed Loop, Following Error, At Home, Encoder Present, Problem, Moving, Gain Support, Comms Error, Low Limit, Homed
 # % gui, $(name=), statusbits, ELoss,  <pv>:ELOSS, Encoder Loss, Amplifier Loss, Sys Fail
+# % gui, $(name=), command, ELoss Clear,  <pv>:ELOSSRC.A
 # % gui, $(name=), statusbits, Limit Violation,  <pv>.LVIO, Lim
 # % gui, $(name=), statusbits, At High Limit,  <pv>.HLS, High
 # % gui, $(name=), statusbits, At Low Limit,  <pv>.LLS, Low
@@ -130,6 +132,14 @@
 # % gui, $(name=), demand, PREC,   <pv>.PREC
 # % gui, $(name=), demand, EGU,   <pv>.EGU
 
+# % gui, $(name=), demand, Output Specification,   <pv>.OUT
+# % gui, $(name=), readback, Readback Location,   <pv>.RDBL
+# % gui, $(name=), readback, Desired Output Loc,   <pv>.DOL
+# % gui, $(name=), readback, Output Mode Select,   <pv>.OMSL
+# % gui, $(name=), readback, Readback Out Link,   <pv>.RLNK
+# % gui, $(name=), demand, DMOV Input Link,   <pv>.DINP
+# % gui, $(name=), demand, RMP Input Link,   <pv>.RINP
+# % gui, $(name=), demand, Stop Out Link,   <pv>.STOO
 
 
 record(motor,"$(P)$(M)")
@@ -172,6 +182,7 @@ record(motor,"$(P)$(M)")
 	field(ADEL, "$(ADEL=0)")
 	field(NTM, "$(NTM=1)")
 	field(SDIS, "$(P)$(M):SDIS.VAL")	
+	field(RLNK, "$(RLNK=)")
 }
 
 # record that holds the ADDR
@@ -187,7 +198,7 @@ record(stringout, "$(P)$(M):PORT") {
 }
 
 # record that holds the SCALE
-record(stringout, "$(P)$(M):SCALE") {
+record(ao, "$(P)$(M):SCALE") {
     field(PINI, "YES")
     field(VAL, "$(SCALE=1)")
 }

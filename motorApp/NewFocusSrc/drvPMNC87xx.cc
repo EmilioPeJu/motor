@@ -66,6 +66,8 @@ Last Modified:	2005/03/30 19:10:48
 #include <string.h>
 #include <epicsThread.h>
 #include <drvSup.h>
+#include <stdlib.h>
+#include <errlog.h>
 #include "NewFocusRegister.h"
 #include "drvPMNCCom.h"
 #include "asynOctetSyncIO.h"
@@ -439,12 +441,9 @@ STATIC int set_status(int card, int signal)
 	if (mstat.Bits_8751.powerOn && auxstat.Bits_8751.servoOn)
 	  {
 	    /* Limit Switch Status */
-        if (!(mstat.Bits_8751.forLimit)&&(mstat.Bits_8751.revLimit))
-        {
-	      status.Bits.RA_PLUS_LS = ((mstat.Bits_8751.forLimit) ? 1: 0);
-	      status.Bits.RA_MINUS_LS = ((mstat.Bits_8751.revLimit) ? 1: 0);
-          status.Bits.RA_HOME = ((mstat.Bits_8751.homing) ? 1: 0);
-        }
+	    status.Bits.RA_PLUS_LS = ((mstat.Bits_8751.forLimit) ? 1: 0);
+	    status.Bits.RA_MINUS_LS = ((mstat.Bits_8751.revLimit) ? 1: 0);
+            status.Bits.RA_HOME = ((mstat.Bits_8751.homing) ? 1: 0);
 	  }
 
 	/* encoder status - NOT AVAILABLE  */
@@ -494,8 +493,8 @@ STATIC int set_status(int card, int signal)
 
     /* Determine if move done because of limit switches */   
     if ((plusdir && status.Bits.RA_PLUS_LS) || (!plusdir && status.Bits.RA_MINUS_LS))
-      ls_active = true;  
-      
+      ls_active = true;
+
     status.Bits.RA_PROBLEM = 0;
 
     /* Parse motor velocity? */
