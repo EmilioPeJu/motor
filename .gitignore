@@ -8,3 +8,5 @@ lib
 .svn*
 iocs/*IOC*
 .idea
+*.pyc
+include/

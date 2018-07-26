@@ -10,22 +10,18 @@
 # Add your declarations here
 
 #!GATEWAY=
-SUPPORT=/dls_sw/prod/R3.14.12.3/support
-#AJFWORK=/home/ajf67/work/R3.14.12.3/support
+SUPPORT=/dls_sw/prod/R3.14.12.7/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-ASYN=$(SUPPORT)/asyn/4-31
-BUSY=$(SUPPORT)/busy/1-6-1dls1
-#ASYN=$(AJFWORK)/asyn
-#BUSY=$(AJFWORK)/busy
+ASYN=$(SUPPORT)/asyn/4-33
+BUSY=$(SUPPORT)/busy/1-7
 
 # Need the sequencer and busy for the MM4005 and XPS trajectory scanning
-SNCSEQ=$(SUPPORT)/seq/2-2-4
-#SNCSEQ=$(AJFWORK)/seq
+SNCSEQ=$(SUPPORT)/seq/2-2-5
 
-# Recommended EPICS release: R3.14.12.3
-EPICS_BASE=/dls_sw/epics/R3.14.12.3/base
+ # Recommended EPICS release: R3.14.12.7
+EPICS_BASE=/dls_sw/epics/R3.14.12.7/base
 
 # The following must be defined if the "WithMPF" example in motorExApp is to
 # be built.
