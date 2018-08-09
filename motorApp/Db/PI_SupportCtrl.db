@@ -1,3 +1,7 @@
+
+#% macro, P      , Device Prefix
+#% macro, PORT   , Asyn Port
+
 record(ai, "$(P)LAST_ERR")
 {
 	field(DTYP, "asynInt32")

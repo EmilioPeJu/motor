@@ -1,3 +1,10 @@
+
+#% macro, P      , Device Prefix
+#% macro, R      , Device Suffix
+#% macro, PORT   , Asyn Port
+#% macro, ADDR   , Asyn Address
+#% macro, TIMEOUT, Timeout
+
 record(ai, "$(P)$(R)POSITION")
 {
 	field(PINI, "1")

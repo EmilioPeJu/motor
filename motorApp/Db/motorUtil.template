@@ -2,6 +2,7 @@
 #! DBDSTART
 #! DBDEND
 
+#% macro, P      , Device Prefix
 
 # Setting VAL to "stop", stops ALL motorRecord's in this IOC.
 # $(P)allstop.VAL is monitored by motorUtil.
