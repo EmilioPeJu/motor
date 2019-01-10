@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 442
-y 133
+x 1222
+y 147
 w 551
 h 595
 font "arial-medium-r-16.0"
@@ -43,7 +43,7 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 0
 y 0
 w 550
@@ -64,11 +64,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 65
 w 219
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -84,11 +84,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 380
 y 67
 w 163
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -104,11 +104,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 95
 w 230
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -124,17 +124,17 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 247
 w 157
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
 useDisplayBg
 value {
-  ".RDIF - DVAL-DRBV"
+  ".RDIF - RVAL-RRBV"
 }
 autoSize
 endObjectProperties
@@ -144,11 +144,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 120
 w 178
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -164,11 +164,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 145
 w 194
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -184,11 +184,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 179
 w 215
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -204,17 +204,17 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 217
 w 155
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
 useDisplayBg
 value {
-  ".DIFF - RVAL-DRBV"
+  ".DIFF - DVAL-DRBV"
 }
 autoSize
 endObjectProperties
@@ -224,11 +224,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 277
 w 102
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -244,11 +244,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 307
 w 208
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -264,11 +264,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 366
 w 199
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -284,11 +284,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 337
 w 226
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -304,11 +304,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 395
 w 134
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -342,11 +342,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 420
 w 156
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -362,11 +362,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 475
 w 164
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -382,11 +382,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 10
 y 447
 w 204
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -556,11 +556,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 240
 y 367
 w 68
-h 19
+h 18
 font "arial-bold-r-16.0"
 fgColor index 18
 bgColor index 0
@@ -579,11 +579,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 240
 y 367
-w 68
-h 19
+w 67
+h 18
 font "arial-bold-r-16.0"
 fgColor index 18
 bgColor index 0
@@ -698,11 +698,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 95
 w 133
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -718,11 +718,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 135
 w 75
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -738,11 +738,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 155
 w 86
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -758,11 +758,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 195
 w 98
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -778,11 +778,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 235
 w 66
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -798,11 +798,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 255
 w 129
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -818,11 +818,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 275
 w 64
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -838,11 +838,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 115
 w 41
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -858,11 +858,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 295
 w 55
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -878,11 +878,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 315
 w 99
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -954,11 +954,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 335
 w 103
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -974,11 +974,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 355
 w 71
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -994,11 +994,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 216
 w 117
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1014,11 +1014,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 376
 w 56
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1034,11 +1034,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 405
 y 175
 w 59
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1054,11 +1054,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 12
 y 507
 w 211
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1074,11 +1074,11 @@ object activeXTextClass
 beginObjectProperties
 major 4
 minor 1
-release 0
+release 1
 x 12
 y 536
 w 154
-h 17
+h 18
 font "arial-medium-r-16.0"
 fgColor index 14
 bgColor index 0
@@ -1131,7 +1131,7 @@ endObjectProperties
 object activeMessageButtonClass
 beginObjectProperties
 major 4
-minor 0
+minor 1
 release 0
 x 239
 y 559
