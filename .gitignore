@@ -10,4 +10,5 @@ iocs/*IOC*
 .idea
 *.pyc
 include/
+iocs/sim-example
 

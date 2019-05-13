@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<motor.MotorSim AXES="8" name="SimController1"/>
+	<motor.MotorSim AXES="8" name="SimController2"/>
+	<motor.basic_asyn_motor ADDR="1" DESC="a motor" DHLM="1000" DLLM="-1000" EGU="mm" M=":M1" MRES=".01" P="SIM1" PORT="SimController1" PREC="3" TWV="1" VELO="1" name="Motor1"/>
+	<motor.basic_asyn_motor ADDR="2" DESC="a motor" DHLM="1000" DLLM="-1000" EGU="mm" M=":M2" MRES=".01" P="SIM1" PORT="SimController1" PREC="3" TWV="1" VELO="1" name="Motor2"/>
+	<motor.basic_asyn_motor ADDR="3" DESC="a motor" DHLM="1000" DLLM="-1000" EGU="mm" M=":M3" MRES=".01" P="SIM1" PORT="SimController1" PREC="3" TWV="1" VELO="1" name="Motor3"/>
+	<motor.basic_asyn_motor ADDR="4" DESC="a motor" DHLM="1000" DLLM="-1000" EGU="mm" M=":M4" MRES=".01" P="SIM1" PORT="SimController1" PREC="3" TWV="1" VELO="1" name="Motor4"/>
+	<motor.basic_asyn_motor ADDR="1" DESC="a motor" DHLM="1000" DLLM="-1000" EGU="mm" M=":M1" MRES=".01" P="SIM2" PORT="SimController2" PREC="3" TWV="1" VELO="1" name="Motor2-1"/>
+	<motor.basic_asyn_motor ADDR="2" DESC="a motor" DHLM="1000" DLLM="-1000" EGU="mm" M=":M2" MRES=".01" P="SIM2" PORT="SimController2" PREC="3" TWV="1" VELO="1" name="Motor2-2"/>
+</components>
