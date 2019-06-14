@@ -60,6 +60,7 @@ HeadURL:        $URL: https://subversion.xray.aps.anl.gov/synApps/motor/tags/R6-
 #include        <callback.h>
 #include        <epicsThread.h>
 #include        <epicsExport.h>
+#include        <stdarg.h>
 
 #include        "motor.h"
 

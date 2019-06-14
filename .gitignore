@@ -12,3 +12,12 @@ iocs/*IOC*
 include/
 iocs/sim-example
 
+lib/
+templates/
+cdCommands
+envPaths
+dllPath.bat
+auto_settings.sav*
+auto_positions.sav*
+.ccfxprepdir/
+*.local

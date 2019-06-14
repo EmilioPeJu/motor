@@ -188,8 +188,9 @@ USAGE...        Motor Record Support.
  *                    transition, a new motor record field should be added.
  * .75 05-18-17 rls - Stop motor if URIP is Yes and RDBL read returns an error. 
  * .76 04-04-18 rls - If URIP is Yes and RDBL is inaccessible (e.g., CA server is down), do not start
- *                    a new target position move (sans Home search or Jog).
- */
+ *                    a new target position move (sans Home search or Jog). 
+ * .78 08-21-18 kmp - Reverted .69 stop on RA_PROBLEM true.
+ */                                                          
 
 #define VERSION 6.10
 
@@ -197,15 +198,9 @@ USAGE...        Motor Record Support.
 #include    <string.h>
 #include    <stdarg.h>
 #include    <alarm.h>
-#include    <dbDefs.h>
-#include    <callback.h>
-#include    <dbAccess.h>
-#include    <dbScan.h>
-#include    <recGbl.h>
-#include    <recSup.h>
-#include    <dbEvent.h>
-#include    <devSup.h>
 #include    <math.h>
+
+#include    "motor_epics_inc.h"
 
 #define GEN_SIZE_OFFSET
 #include    "motorRecord.h"
@@ -248,38 +243,39 @@ static void syncTargetPosition(motorRecord *);
 
 /*** Record Support Entry Table (RSET) functions. ***/
 
-static long init_record(dbCommon *, int);
-static long process(dbCommon *);
+extern "C" {
+static long init_record(struct dbCommon*, int);
+static long process(struct dbCommon*);
 static long special(DBADDR *, int);
-static long get_units(const DBADDR *, char *);
-static long get_precision(const DBADDR *, long *);
-static long get_graphic_double(const DBADDR *, struct dbr_grDouble *);
-static long get_control_double(const DBADDR *, struct dbr_ctrlDouble *);
-static long get_alarm_double(const DBADDR  *, struct dbr_alDouble *);
-
+static long get_units(DBADDR *, char *);
+static long get_precision(const struct dbAddr *, long *);
+static long get_graphic_double(DBADDR *, struct dbr_grDouble *);
+static long get_control_double(DBADDR *, struct dbr_ctrlDouble *);
+static long get_alarm_double(DBADDR  *, struct dbr_alDouble *);
 
 rset motorRSET =
 {
     RSETNUMBER,
     NULL,
     NULL,
-    (RECSUPFUN) init_record,
-    (RECSUPFUN) process,
-    (RECSUPFUN) special,
+    RECSUPFUN_CAST init_record,
+    RECSUPFUN_CAST process,
+    RECSUPFUN_CAST special,
     NULL,
     NULL,
     NULL,
     NULL,
-    (RECSUPFUN) get_units,
-    (RECSUPFUN) get_precision,
+    RECSUPFUN_CAST get_units,
+    RECSUPFUN_CAST get_precision,
     NULL,
     NULL,
     NULL,
-    (RECSUPFUN) get_graphic_double,
-    (RECSUPFUN) get_control_double,
-    (RECSUPFUN) get_alarm_double
+    RECSUPFUN_CAST get_graphic_double,
+    RECSUPFUN_CAST get_control_double,
+    RECSUPFUN_CAST get_alarm_double
 };
-extern "C" {epicsExportAddress(rset, motorRSET);}
+epicsExportAddress(rset, motorRSET);
+}
 
 
 /*******************************************************************************
@@ -517,7 +513,8 @@ LOGIC:
     Initialize Limit violation field false.
     IF (Software Travel limits are NOT disabled), AND,
             (Dial readback violates dial high limit), OR,
-            (Dial readback violates dial low limit)
+            (Dial readback violates dial low limit), OR,
+            (Dial low limit is greater than dial high limit)
         Set Limit violation field true.
     ENDIF
     ...
@@ -666,7 +663,8 @@ static long init_record(dbCommon* arg, int pass)
 
     if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
         ;
-    else if ((pmr->drbv > pmr->dhlm + pmr->mres) || (pmr->drbv < pmr->dllm - pmr->mres))
+    else if ((pmr->drbv > pmr->dhlm + pmr->mres) || (pmr->drbv < pmr->dllm - pmr->mres) ||
+             (pmr->dllm > pmr->dhlm))
     {
         pmr->lvio = 1;
         MARK(M_LVIO);
@@ -971,7 +969,12 @@ that it will happen when we return.
 ******************************************************************************/
 static void maybeRetry(motorRecord * pmr)
 {
-    if ((fabs(pmr->diff) >= pmr->rdbd) && !pmr->hls && !pmr->lls)
+    bool user_cdir;
+
+    /* Commanded direction in user coordinates. */
+    user_cdir = ((pmr->dir == motorDIR_Pos) == (pmr->mres >= 0)) ? pmr->cdir : !pmr->cdir;
+
+    if ((fabs(pmr->diff) >= pmr->rdbd) && !(pmr->hls && user_cdir) && !(pmr->lls && !user_cdir))
     {
         /* No, we're not close enough.  Try again. */
         Debug(1, "maybeRetry: not close enough; diff = %f\n", pmr->diff);
@@ -1144,7 +1147,7 @@ LOGIC:
         Clear Limit violation field.
     ELSE
         IF Jog indicator is true in MIP field.
-            Update Limit violation (LVIO) based on Jog direction (JOGF/JOGR) and velocity (JVEL).
+            Update Limit violation (LVIO) based on Jog direction (JOGF/JOGR) and velocity (JVEL) or DLLM > HLLM
         ELSE IF Homing indicator is true in MIP field.
             Set Limit violation (LVIO) FALSE.
         ENDIF
@@ -1275,12 +1278,22 @@ static long process(dbCommon *arg)
             /* Assume we're done moving until we find out otherwise. */
             if (pmr->dmov == FALSE)
             {
+                Debug(3, "%s:%d motor has stopped pp=%d mip=0x%0x\n",
+                      __FILE__, __LINE__, pmr->pp, pmr->mip);
                 pmr->dmov = TRUE;
                 MARK(M_DMOV);
+                if (pmr->mip == MIP_JOGF || pmr->mip == MIP_JOGR)
+                {
+                    /* Motor stopped while jogging and we didn't stop it */
+                    pmr->mip = MIP_DONE;
+                    MARK(M_MIP);
+                    clear_buttons(pmr);
+                    pmr->pp = TRUE;
+                }
             }
 
             /* Do another update after LS error. */
-            if (pmr->mip != MIP_DONE && (pmr->rhls || pmr->rlls))
+            if (pmr->mip != MIP_DONE && ((pmr->rhls && pmr->cdir) || (pmr->rlls && !pmr->cdir)))
             {
                 /* Restore DMOV to false and UNMARK it so it is not posted. */
                 pmr->dmov = FALSE;
@@ -1309,7 +1322,8 @@ static long process(dbCommon *arg)
                     status = postProcess(pmr);
             }
 
-            if ((pmr->rhls || pmr->rlls) || (pmr->mip == MIP_LOAD_P)) /* Should we test for a retry? */
+            /* Should we test for a retry? Consider limit only if in direction of move.*/
+            if (((pmr->rhls && pmr->cdir) || (pmr->rlls && !pmr->cdir)) || (pmr->mip == MIP_LOAD_P))
             {
                 pmr->mip = MIP_DONE;
                 MARK(M_MIP);
@@ -1373,7 +1387,8 @@ enter_do_work:
     {
         if (pmr->mip & MIP_JOG)
             pmr->lvio = (pmr->jogf && (pmr->rbv > pmr->hlm - pmr->jvel)) ||
-                        (pmr->jogr && (pmr->rbv < pmr->llm + pmr->jvel));
+                        (pmr->jogr && (pmr->rbv < pmr->llm + pmr->jvel)) ||
+                        (pmr->dllm > pmr->dhlm);
         else if (pmr->mip & MIP_HOME)
             pmr->lvio = false;  /* Disable soft-limit error check during home search. */
     }
@@ -1644,7 +1659,7 @@ LOGIC:
             ENDIF
             
             Process soft-travel limit.
-
+ 
             IF URIP is set to Yes
                 Test and set indicator on RDBL access in case it is a CA link that is down.
             ENDIF
@@ -1808,7 +1823,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             if (!(pmr->mip & MIP_DELAY_REQ)) {
                /* When we wait for DLY, keep it. */
                /* Otherwise the record may lock up */
-                pmr->mip = MIP_STOP;
+                pmr->mip = MIP_STOP;     
                 MARK(M_MIP);
             }
             INIT_MSG();
@@ -1866,8 +1881,8 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             /* Calculate encoder ratio. */
             for (m = 10000000; (m > 1) &&
                  (fabs(m / pmr->eres) > 1.e6 || fabs(m / pmr->mres) > 1.e6); m /= 10);
-            ep_mp[0] = fabs(m / pmr->eres);
-            ep_mp[1] = fabs(m / pmr->mres);
+            ep_mp[0] = m / pmr->eres;
+            ep_mp[1] = m / pmr->mres;
         }
         else
         {
@@ -1991,10 +2006,22 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
                 ;
             else if ((pmr->jogf && (pmr->val > pmr->hlm - pmr->jvel)) ||
-                     (pmr->jogr && (pmr->val < pmr->llm + pmr->jvel)))
+                     (pmr->jogr && (pmr->val < pmr->llm + pmr->jvel)) ||
+                     (pmr->dllm > pmr->dhlm))
             {
                 pmr->lvio = 1;
                 MARK(M_LVIO);
+                /* Prevent record from locking up in mip=JOG_REQ */
+                if (pmr->jogf)
+                {
+                    pmr->jogf = 0;
+                    MARK_AUX(M_JOGF);
+                }
+                if (pmr->jogr)
+                {
+                    pmr->jogr = 0;
+                    MARK_AUX(M_JOGR);
+                }
                 return(OK);
             }
             pmr->mip = pmr->jogf ? MIP_JOGF : MIP_JOGR;
@@ -2207,6 +2234,18 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             {
                 if (abs(npos - rpos) < 1)
                     too_small = true;
+                if (!too_small)
+                {
+                    double spdb = pmr->spdb;
+                    if (spdb > 0) {
+                        /* Don't move if new setpoint is within SPDB of DRBV */
+                        double drbv = pmr->drbv;
+                        double dval = pmr->dval;
+                        if (((dval - spdb) < drbv) && ((dval + spdb) > drbv)) {
+                            too_small = true;
+                        }
+                    }
+                }
             }
             else if (abs(npos - rpos) < rdbdpos)
                 too_small = true;
@@ -2279,6 +2318,9 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             /* Check for soft-travel limit violation */
             if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
                 pmr->lvio = false;
+            /* At least one limit is violated when DLLM > DHLM */
+            else if (pmr->dllm > pmr->dhlm)
+                pmr->lvio = true;
             /* LVIO = TRUE, AND, Move request towards valid travel limit range. */
             else if (((pmr->dval > pmr->dhlm) && (pmr->dval < pmr->ldvl)) ||
                      ((pmr->dval < pmr->dllm) && (pmr->dval > pmr->ldvl)))
@@ -2876,7 +2918,7 @@ velcheckB:
                 MARK(M_UEIP);
             }
         }
-        break;
+        break; 
 
         /* new urip flag */
     case motorRecordURIP:
@@ -2885,7 +2927,7 @@ velcheckB:
             pmr->ueip = motorUEIP_No;           /* Set UEIP = No, if URIP = Yes. */
             MARK(M_UEIP);
         }
-        break;
+        break; 
 
         /* Set to SET mode  */
     case motorRecordSSET:
@@ -3081,7 +3123,7 @@ velcheckA:
 /******************************************************************************
         get_units()
 *******************************************************************************/
-static long get_units(const DBADDR *paddr, char *units)
+static long get_units(DBADDR *paddr, char *units)
 {
     motorRecord *pmr = (motorRecord *) paddr->precord;
     int siz = dbr_units_size - 1;       /* "dbr_units_size" from dbAccess.h */
@@ -3138,7 +3180,7 @@ static long get_units(const DBADDR *paddr, char *units)
 /******************************************************************************
         get_graphic_double()
 *******************************************************************************/
-static long get_graphic_double(const DBADDR *paddr, struct dbr_grDouble * pgd)
+static long get_graphic_double(DBADDR *paddr, struct dbr_grDouble * pgd)
 {
     motorRecord *pmr = (motorRecord *) paddr->precord;
     int fieldIndex = dbGetFieldIndex(paddr);
@@ -3189,7 +3231,7 @@ static long get_graphic_double(const DBADDR *paddr, struct dbr_grDouble * pgd)
         get_control_double()
 *******************************************************************************/
 static long
- get_control_double(const DBADDR *paddr, struct dbr_ctrlDouble * pcd)
+ get_control_double(DBADDR *paddr, struct dbr_ctrlDouble * pcd)
 {
     motorRecord *pmr = (motorRecord *) paddr->precord;
     int fieldIndex = dbGetFieldIndex(paddr);
@@ -3269,7 +3311,7 @@ static long get_precision(const DBADDR *paddr, long *precision)
 /******************************************************************************
         get_alarm_double()
 *******************************************************************************/
-static long get_alarm_double(const DBADDR  *paddr, struct dbr_alDouble * pad)
+static long get_alarm_double(DBADDR  *paddr, struct dbr_alDouble * pad)
 {
     motorRecord *pmr = (motorRecord *) paddr->precord;
     int fieldIndex = dbGetFieldIndex(paddr);
@@ -3302,7 +3344,8 @@ static void alarm_sub(motorRecord * pmr)
         status = recGblSetSevr((dbCommon *) pmr, UDF_ALARM, INVALID_ALARM);
         return;
     }
-    /* limit-switch and soft-limit violations */
+    /* Limit-switch and soft-limit violations. Consider limit switches also if not in
+     * direction of move (limit hit by externally triggered move)*/
     if (pmr->hlsv && (pmr->hls || (pmr->dval > pmr->dhlm)))
     {
         status = recGblSetSevr((dbCommon *) pmr, HIGH_ALARM, pmr->hlsv);
@@ -3640,11 +3683,12 @@ static void process_motor_info(motorRecord * pmr, bool initcall)
     if (pmr->tdir != old_tdir)
         MARK(M_TDIR);
 
-    /* Get states of high, low limit switches. */
-    pmr->rhls = (msta.Bits.RA_PLUS_LS)  &&  pmr->cdir;
-    pmr->rlls = (msta.Bits.RA_MINUS_LS) && !pmr->cdir;
+    /* Get states of high, low limit switches. State is independent of direction. */
+    pmr->rhls = (msta.Bits.RA_PLUS_LS);
+    pmr->rlls = (msta.Bits.RA_MINUS_LS);
 
-    ls_active = (pmr->rhls || pmr->rlls) ? true : false;
+    /* Treat limit switch active only when it is pressed and in direction of movement. */
+    ls_active = ((pmr->rhls && pmr->cdir) || (pmr->rlls && !pmr->cdir)) ? true : false;
     
     pmr->hls = ((pmr->dir == motorDIR_Pos) == (pmr->mres >= 0)) ? pmr->rhls : pmr->rlls;
     pmr->lls = ((pmr->dir == motorDIR_Pos) == (pmr->mres >= 0)) ? pmr->rlls : pmr->rhls;
@@ -3660,11 +3704,6 @@ static void process_motor_info(motorRecord * pmr, bool initcall)
         if (ls_active == true || msta.Bits.RA_PROBLEM)
         {
             clear_buttons(pmr);
-            if (msta.Bits.RA_PROBLEM)
-            {
-                pmr->stop = 1;
-                MARK(M_STOP);
-            }
         }
     }
     else

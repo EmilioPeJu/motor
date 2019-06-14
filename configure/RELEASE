@@ -34,3 +34,8 @@ EPICS_BASE=/dls_sw/epics/R3.14.12.7/base
 # The following is only needed for the motor examples in iocBoot.
 #!MOTOR=$(TOP)
 
+# These lines allow developers to override these RELEASE settings
+# without having to modify this file directly.
+-include $(TOP)/../RELEASE.local
+-include $(TOP)/../RELEASE.$(EPICS_HOST_ARCH).local
+-include $(TOP)/configure/RELEASE.local

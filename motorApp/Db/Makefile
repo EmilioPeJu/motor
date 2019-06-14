@@ -15,51 +15,11 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------------------
 # Create and install (or just install)
 # databases, templates, substitutions like this
-DB += motor.db
-DB += motor.template
-DB += basic_motor.db
-DB += basic_motor.template
-DB += basic_asyn_motor.template
-DB += basic_asyn_motor.db
-DB += IMS_extra.db
-DB += XPSAuxAi.db
-DB += XPSAuxAo.db
-DB += XPSAuxBi.db
-DB += XPSAuxBo.db
-DB += XPSAuxLi.db
-DB += XPSAuxLo.db
-DB += XPS_extra.db
-DB += XPSPositionCompare.db
-DB += XPSTclScript.template
-DB += HXP_extra.db
-DB += HXP_coords.db
-DB += ACRAux.template
-DB += ACRAuxRead.template
-DB += ACRAuxLi.template
-DB += ACRAuxBi.template
-DB += ACRAuxBo.template
-DB += ACRAuxBoRBV.template
-DB += TransPos.db
-DB += motorUtil.db
-DB += motorUtil.template
-DB += asyn_motor.db
-DB += profileMoveController.template
-DB += profileMoveAxis.template
-DB += profileMoveControllerXPS.template
-DB += profileMoveAxisXPS.template
-DB += softMotorForPiezo.template
-DB += trajectoryScan.db
-DB += scaledMotorPositions.template
-DB += limitsMonitor.template
-DB += motorReadback.template
-DB += motorTranslate.template
-DB += moveToHomeUtil.template
-DB += saveRestoreLimits.template
-DB += PI_Support.db
-DB += PI_SupportCtrl.db
-DB += Phytron_motor.db Phytron_I1AM01.db Phytron_MCM01.db
-DB += A3200_axis_extra.db
-DB += asyn_auto_power.db
+DB += $(patsubst ../%, %, $(wildcard ../*.template))
+DB += $(patsubst ../%, %, $(wildcard ../*.db))
+DB += $(patsubst ../%, %, $(wildcard ../*.vdb))
+
+REQ += $(patsubst ../%, %, $(wildcard ../*.req))
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB
@@ -68,3 +28,8 @@ DB += asyn_auto_power.db
 include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD RULES AFTER THIS LINE
+
+ifeq ($(BASE_3_14),YES)
+# Only needed for 3.14 build rules:
+vpath %.req $(USR_VPATH) $(GENERIC_SRC_DIRS)
+endif
