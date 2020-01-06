@@ -17,9 +17,6 @@ SUPPORT=/dls_sw/prod/R3.14.12.7/support
 ASYN=$(SUPPORT)/asyn/4-36
 BUSY=$(SUPPORT)/busy/1-7-2dls1
 
-# Need the sequencer and busy for the MM4005 and XPS trajectory scanning
-SNCSEQ=$(SUPPORT)/seq/2-2-5
-
  # Recommended EPICS release: R3.14.12.7
 EPICS_BASE=/dls_sw/epics/R3.14.12.7/base
 
