@@ -2,7 +2,6 @@ from common import MotorLib, MotorRecord, basic_asyn_motor
 from iocbuilder import AutoSubstitution, Device, ModuleBase
 from iocbuilder.arginfo import *
 from iocbuilder.modules.asyn import AsynPort, Asyn
-from iocbuilder.modules.seq import Seq
 
 __all__ = ['MotorSim']
 
