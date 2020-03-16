@@ -14,8 +14,8 @@ SUPPORT=/dls_sw/prod/R3.14.12.7/support
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
-ASYN=$(SUPPORT)/asyn/4-37
-BUSY=$(SUPPORT)/busy/1-7-2dls2
+ASYN=$(SUPPORT)/asyn/4-39
+BUSY=$(SUPPORT)/busy/1-7-2dls3
 
  # Recommended EPICS release: R3.14.12.7
 EPICS_BASE=/dls_sw/epics/R3.14.12.7/base
